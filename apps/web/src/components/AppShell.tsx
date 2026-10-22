@@ -18,6 +18,7 @@ import {
   FolderPlus,
   Bot,
   Sparkles,
+  Key,
 } from 'lucide-react';
 import { useRole } from './RoleContext';
 import { useToast } from './Toast';
@@ -174,7 +175,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {/* User Card in Sidebar Footer */}
         <div className="p-3 border-t border-neutral-200 bg-white flex items-center justify-between">
           <button
-            onClick={openAuthModal}
+            onClick={() => openAuthModal('signin')}
             className="flex items-center space-x-2.5 text-left flex-1 min-w-0 group hover:opacity-90 transition"
           >
             <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-mono font-bold text-xs shrink-0 shadow-xs border border-purple-500/30">
@@ -191,11 +192,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </button>
 
           <button
-            onClick={openAuthModal}
-            title="Switch Persona / Inspect JWT"
+            onClick={() => openAuthModal('signin')}
+            title="Account & JWT Session"
             className="p-1.5 rounded-lg text-neutral-400 hover:text-purple-600 hover:bg-purple-50 transition"
           >
-            <UserCheck className="w-4 h-4" />
+            <Key className="w-4 h-4" />
           </button>
         </div>
       </aside>

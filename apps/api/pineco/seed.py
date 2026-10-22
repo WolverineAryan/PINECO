@@ -15,8 +15,10 @@ from pineco.models import (
     Finding,
     ReviewDecision,
     AuditEvent,
+    User,
     get_utc_now,
 )
+from pineco.auth import hash_password, DEMO_USERS
 from pineco.engine.deterministic import run_deterministic_rules
 
 
@@ -55,6 +57,22 @@ def seed_database(db: Session) -> None:
         created_by=settings.DEFAULT_USER_ADMIN,
     )
     db.add(demo_product)
+
+    # 0.1 Seed Default Users for Real JWT Auth
+    for user_key, u_data in DEMO_USERS.items():
+        existing = db.query(User).filter(User.email == u_data["email"]).first()
+        if not existing:
+            default_user = User(
+                id=u_data["id"],
+                workspace_id=workspace_id,
+                email=u_data["email"],
+                password_hash=hash_password("pineco2026!"),
+                name=u_data["name"],
+                role=u_data["role"],
+                title=u_data.get("title", "Governance Specialist"),
+                department=u_data.get("department", "Enterprise"),
+            )
+            db.add(default_user)
     db.commit()
 
     # 1. Seed Brand Rules

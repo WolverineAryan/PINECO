@@ -148,11 +148,11 @@ export default function LandingPage() {
             <ArrowRight className="w-4 h-4 text-purple-400 group-hover:translate-x-1 transition-transform" />
           </Link>
           <button
-            onClick={openAuthModal}
+            onClick={() => openAuthModal('signup')}
             className="w-full sm:w-auto flex items-center justify-center space-x-2 glass-pill hover:bg-purple-50 hover:border-purple-300 text-black font-bold text-sm px-7 py-3.5 rounded-xl transition shadow-xs"
           >
-            <UserCheck className="w-4 h-4 text-purple-600" />
-            <span>Persona Access (JWT)</span>
+            <Lock className="w-4 h-4 text-purple-600" />
+            <span>Create Account (JWT)</span>
           </button>
         </div>
 
@@ -1087,10 +1087,10 @@ export default function LandingPage() {
               Open Command Center &rarr;
             </Link>
             <button
-              onClick={openAuthModal}
+              onClick={() => openAuthModal('signin')}
               className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-semibold text-xs px-6 py-3.5 rounded-xl transition border border-white/20"
             >
-              Switch Persona (JWT)
+              Sign In (JWT)
             </button>
           </div>
         </div>

@@ -61,11 +61,11 @@ export default function LandingPage() {
             <ArrowRight className="w-4 h-4 text-emerald-400" />
           </Link>
           <button
-            onClick={openAuthModal}
+            onClick={() => openAuthModal('signin')}
             className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-900 font-semibold text-xs px-5 py-3 rounded-xl shadow-sm transition"
           >
             <UserCheck className="w-4 h-4 text-slate-500" />
-            <span>Sign In / Demo Personas</span>
+            <span>Sign In / Register (JWT)</span>
           </button>
         </div>
 

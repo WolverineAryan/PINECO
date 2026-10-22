@@ -47,6 +47,7 @@ interface RoleContextType {
   role: UserRole;
   setRole: (role: UserRole) => void;
   currentUser: UserProfile;
+  isAuthenticated: boolean;
   workspaceId: string;
   setWorkspaceId: (id: string) => void;
   products: Product[];
@@ -56,12 +57,23 @@ interface RoleContextType {
   isDemoMode: boolean;
   setDemoMode: (val: boolean) => void;
   token: string | null;
+  login: (email: string, password?: string) => Promise<void>;
+  register: (data: {
+    name: string;
+    email: string;
+    password: string;
+    role?: UserRole;
+    title?: string;
+    department?: string;
+  }) => Promise<void>;
   loginWithRole: (role: UserRole) => Promise<void>;
   loginWithCredentials: (email: string, password?: string) => Promise<void>;
   logout: () => void;
-  openAuthModal: () => void;
+  openAuthModal: (mode?: any) => void;
   closeAuthModal: () => void;
   isAuthModalOpen: boolean;
+  authModalMode: 'signin' | 'signup';
+  setAuthModalMode: (mode: 'signin' | 'signup') => void;
 }
 
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
@@ -74,14 +86,15 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
   const [isDemoMode, setDemoMode] = useState(true);
   const [token, setToken] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signin');
 
   const reloadProducts = async () => {
     try {
       const list = await api.getProducts(workspaceId);
       setProducts(list);
       if (list.length > 0) {
-        // preserve current selection or default to first
         setActiveProduct((prev) => {
           if (prev && list.some((p) => p.id === prev.id)) {
             return list.find((p) => p.id === prev.id) || list[0];
@@ -111,15 +124,59 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
         setToken(savedToken);
         setCurrentUser(parsed);
         setRoleState(parsed.role);
+        setIsAuthenticated(true);
+
+        // Verify token with backend /me in background
+        api
+          .getCurrentUser()
+          .then((verifiedProfile) => {
+            setCurrentUser(verifiedProfile);
+            setRoleState(verifiedProfile.role);
+            localStorage.setItem('pineco_jwt_user', JSON.stringify(verifiedProfile));
+          })
+          .catch(() => {
+            // Token expired or invalid
+            localStorage.removeItem('pineco_jwt_token');
+            localStorage.removeItem('pineco_jwt_user');
+            setToken(null);
+            setIsAuthenticated(false);
+          });
         return;
       } catch {
         // ignore JSON parse error
       }
     }
 
-    // Default: login automatically as demo reviewer
-    loginWithRole('reviewer').catch(() => {});
+    // Default: initialize with demo reviewer credentials
+    loginWithCredentials('reviewer@pineco.internal', 'pineco2026!').catch(() => {});
   }, []);
+
+  const login = async (email: string, password?: string) => {
+    const res = await api.login({ email, password });
+    localStorage.setItem('pineco_jwt_token', res.access_token);
+    localStorage.setItem('pineco_jwt_user', JSON.stringify(res.user));
+    setToken(res.access_token);
+    setCurrentUser(res.user);
+    setRoleState(res.user.role);
+    setIsAuthenticated(true);
+  };
+
+  const register = async (data: {
+    name: string;
+    email: string;
+    password: string;
+    role?: UserRole;
+    title?: string;
+    department?: string;
+  }) => {
+    const res = await api.register(data);
+    localStorage.setItem('pineco_jwt_token', res.access_token);
+    localStorage.setItem('pineco_jwt_user', JSON.stringify(res.user));
+    setToken(res.access_token);
+    setCurrentUser(res.user);
+    setRoleState(res.user.role);
+    setIsAuthenticated(true);
+  };
 
   const loginWithRole = async (targetRole: UserRole) => {
     try {
@@ -129,8 +186,8 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       setToken(res.access_token);
       setCurrentUser(res.user);
       setRoleState(res.user.role);
+      setIsAuthenticated(true);
     } catch {
-      // Fallback to local profile if API offline
       const fallback = DEFAULT_PROFILES[targetRole] || DEFAULT_PROFILES['reviewer'];
       setCurrentUser(fallback);
       setRoleState(fallback.role);
@@ -138,18 +195,14 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
   };
 
   const loginWithCredentials = async (email: string, password?: string) => {
-    const res = await api.login({ email, password });
-    localStorage.setItem('pineco_jwt_token', res.access_token);
-    localStorage.setItem('pineco_jwt_user', JSON.stringify(res.user));
-    setToken(res.access_token);
-    setCurrentUser(res.user);
-    setRoleState(res.user.role);
+    await login(email, password);
   };
 
   const logout = () => {
     localStorage.removeItem('pineco_jwt_token');
     localStorage.removeItem('pineco_jwt_user');
     setToken(null);
+    setIsAuthenticated(false);
     const fallback = DEFAULT_PROFILES['creator'];
     setCurrentUser(fallback);
     setRoleState(fallback.role);
@@ -159,12 +212,18 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     loginWithRole(newRole);
   };
 
+  const openAuthModal = (mode?: any) => {
+    setAuthModalMode(mode === 'signup' ? 'signup' : 'signin');
+    setIsAuthModalOpen(true);
+  };
+
   return (
     <RoleContext.Provider
       value={{
         role,
         setRole,
         currentUser,
+        isAuthenticated,
         workspaceId,
         setWorkspaceId,
         products,
@@ -174,12 +233,16 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
         isDemoMode,
         setDemoMode,
         token,
+        login,
+        register,
         loginWithRole,
         loginWithCredentials,
         logout,
-        openAuthModal: () => setIsAuthModalOpen(true),
+        openAuthModal,
         closeAuthModal: () => setIsAuthModalOpen(false),
         isAuthModalOpen,
+        authModalMode,
+        setAuthModalMode,
       }}
     >
       {children}

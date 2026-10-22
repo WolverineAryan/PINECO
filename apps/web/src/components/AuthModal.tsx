@@ -1,79 +1,128 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Key, ShieldCheck, UserCheck, ArrowRight, Check, Sparkles } from 'lucide-react';
+import {
+  X,
+  Key,
+  ShieldCheck,
+  User,
+  Mail,
+  Lock,
+  ArrowRight,
+  Check,
+  AlertCircle,
+  LogOut,
+  Sparkles,
+} from 'lucide-react';
 import { useRole } from './RoleContext';
 import { useToast } from './Toast';
 import { UserRole } from '@/lib/types';
 
 export function AuthModal() {
-  const { isAuthModalOpen, closeAuthModal, loginWithRole, loginWithCredentials, currentUser, token } = useRole();
+  const {
+    isAuthModalOpen,
+    closeAuthModal,
+    login,
+    register,
+    logout,
+    currentUser,
+    token,
+    isAuthenticated,
+    authModalMode,
+    setAuthModalMode,
+  } = useRole();
   const { success, error: toastError } = useToast();
 
+  const [tab, setTab] = useState<'signin' | 'signup'>(authModalMode || 'signin');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [selectedRole, setSelectedRole] = useState<UserRole>('reviewer');
+  const [department, setDepartment] = useState('Global Brand Office');
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copiedToken, setCopiedToken] = useState(false);
+
+  // Sync tab with context if opened in specific mode
+  React.useEffect(() => {
+    if (authModalMode) {
+      setTab(authModalMode);
+    }
+    setErrorMessage(null);
+  }, [authModalMode, isAuthModalOpen]);
 
   if (!isAuthModalOpen) return null;
 
-  const demoAccounts: { role: UserRole; name: string; title: string; email: string; avatar: string }[] = [
-    {
-      role: 'creator',
-      name: 'Sarah Chen',
-      title: 'Content Marketing Specialist',
-      email: 'creator@pineco.internal',
-      avatar: 'SC',
-    },
-    {
-      role: 'reviewer',
-      name: 'Elena Rostova',
-      title: 'Compliance & Legal Reviewer',
-      email: 'reviewer@pineco.internal',
-      avatar: 'ER',
-    },
-    {
-      role: 'brand_manager',
-      name: 'Marcus Vance',
-      title: 'Head of Brand Governance',
-      email: 'manager@pineco.internal',
-      avatar: 'MV',
-    },
-    {
-      role: 'admin',
-      name: 'Alex Thorne',
-      title: 'Enterprise Administrator',
-      email: 'admin@pineco.internal',
-      avatar: 'AT',
-    },
-  ];
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(null);
+    if (!email.trim()) {
+      setErrorMessage('Please enter your email address.');
+      return;
+    }
+    if (!password) {
+      setErrorMessage('Please enter your password.');
+      return;
+    }
 
-  const handleRoleSelect = async (r: UserRole) => {
     try {
       setLoading(true);
-      await loginWithRole(r);
-      success('Signed In Successfully', `Switched active JWT session to ${r.replace('_', ' ')}.`);
+      await login(email.trim(), password);
+      success('Authentication Successful', `Signed in as ${email.trim()}. Cryptographic JWT issued.`);
       closeAuthModal();
+      setEmail('');
+      setPassword('');
     } catch (err: any) {
-      toastError('Login Failed', err.message);
+      const msg = err.message || 'Authentication failed. Please verify your email and password.';
+      setErrorMessage(msg);
+      toastError('Sign In Failed', msg);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleManualLogin = async (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
+    setErrorMessage(null);
+    if (!name.trim()) {
+      setErrorMessage('Please enter your full name.');
+      return;
+    }
+    if (!email.trim() || !email.includes('@')) {
+      setErrorMessage('Please enter a valid work email address.');
+      return;
+    }
+    if (!password || password.length < 6) {
+      setErrorMessage('Password must be at least 6 characters.');
+      return;
+    }
+
     try {
       setLoading(true);
-      await loginWithCredentials(email.trim(), password);
-      success('Authenticated via JWT', `Signed in as ${email}.`);
+      await register({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+        role: selectedRole,
+        department: department.trim() || 'Global Brand Office',
+      });
+      success('Account Registered', `Welcome ${name.trim()}! Signed in with cryptographically verified JWT.`);
       closeAuthModal();
+      setName('');
+      setEmail('');
+      setPassword('');
     } catch (err: any) {
-      toastError('Authentication Failed', err.message);
+      const msg = err.message || 'Registration failed. An account with this email may already exist.';
+      setErrorMessage(msg);
+      toastError('Registration Failed', msg);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLogoutClick = () => {
+    logout();
+    success('Signed Out', 'Your active JWT session has been cleared.');
   };
 
   const copyToken = () => {
@@ -85,130 +134,263 @@ export function AuthModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-neutral-200 animate-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between pb-4 border-b border-neutral-200">
-          <div className="flex items-center space-x-2.5">
-            <img
-              src="/logo-mark.jpg"
-              alt="Pineco"
-              className="w-8 h-8 rounded-lg object-contain border border-neutral-200 shadow-xs"
-            />
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+      <div className="bg-white rounded-2xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-neutral-200 animate-in zoom-in-95 duration-200 relative">
+        {/* Modal Header */}
+        <div className="flex items-center justify-between pb-4 border-b border-neutral-100">
+          <div className="flex items-center space-x-3">
+            <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center p-1.5 shadow-sm">
+              <img
+                src="/logo-mark.jpg"
+                alt="Pineco"
+                className="w-full h-full object-contain rounded-md"
+              />
+            </div>
             <div>
-              <h2 className="text-base font-bold text-black">Enterprise Authentication</h2>
-              <p className="text-[11px] text-neutral-500">Cryptographic JWT bearer session & RBAC</p>
+              <h2 className="text-sm font-bold text-black tracking-tight">Enterprise Authentication</h2>
+              <p className="text-[11px] text-neutral-500 font-medium">Cryptographic JWT bearer session (HS256)</p>
             </div>
           </div>
           <button
             onClick={closeAuthModal}
-            className="text-neutral-400 hover:text-black p-1 rounded-lg transition"
+            className="text-neutral-400 hover:text-black p-1.5 rounded-lg hover:bg-neutral-100 transition"
+            aria-label="Close modal"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* 1-Click Demo Accounts Selector */}
-        <div className="my-5 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-700 uppercase tracking-wider font-mono">
-              1-Click Enterprise Personas:
-            </span>
-            <span className="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full font-medium">
-              Instant JWT Issuance
-            </span>
+        {/* Currently Logged In Banner if Authenticated */}
+        {isAuthenticated && token && (
+          <div className="mt-4 p-3 bg-neutral-50 rounded-xl border border-neutral-200 flex items-center justify-between">
+            <div className="flex items-center space-x-2.5 min-w-0">
+              <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center text-xs font-bold font-mono shrink-0">
+                {currentUser.avatar || 'PI'}
+              </div>
+              <div className="min-w-0">
+                <span className="text-xs font-semibold text-black block truncate">{currentUser.name}</span>
+                <span className="text-[10px] text-neutral-500 block truncate">{currentUser.email}</span>
+              </div>
+            </div>
+            <button
+              onClick={handleLogoutClick}
+              className="px-2.5 py-1 text-[11px] font-medium text-rose-600 hover:text-white hover:bg-rose-600 rounded-lg border border-rose-200 hover:border-rose-600 transition flex items-center space-x-1 shrink-0"
+            >
+              <LogOut className="w-3 h-3" />
+              <span>Sign Out</span>
+            </button>
           </div>
+        )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-            {demoAccounts.map((acc) => {
-              const isSelected = currentUser.email === acc.email;
-              return (
-                <button
-                  key={acc.email}
-                  type="button"
-                  onClick={() => handleRoleSelect(acc.role)}
-                  disabled={loading}
-                  className={`text-left p-3 rounded-xl border transition-all text-xs flex items-center space-x-3 group ${
-                    isSelected
-                      ? 'bg-slate-950 text-white border-slate-950 shadow-md'
-                      : 'bg-slate-50/70 hover:bg-slate-100/80 border-slate-200/80 text-slate-800'
-                  }`}
-                >
-                  <div
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center font-mono font-bold text-xs shrink-0 ${
-                      isSelected ? 'bg-slate-800 text-emerald-400' : 'bg-slate-200 text-slate-700'
-                    }`}
-                  >
-                    {acc.avatar}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="font-semibold block truncate">{acc.name}</span>
-                    <span className={`text-[10px] block truncate ${isSelected ? 'text-slate-300' : 'text-slate-400'}`}>
-                      {acc.title}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="relative my-4">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-200" />
-          </div>
-          <div className="relative flex justify-center text-[10px] uppercase font-mono">
-            <span className="bg-white px-2 text-slate-400">or sign in with credentials</span>
-          </div>
-        </div>
-
-        {/* Email / Password Form */}
-        <form onSubmit={handleManualLogin} className="space-y-3 text-xs">
-          <div>
-            <label className="block text-[11px] font-medium text-slate-600 mb-1">Work Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. reviewer@pineco.internal"
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-slate-900"
-            />
-          </div>
-          <div>
-            <label className="block text-[11px] font-medium text-slate-600 mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="•••••••••••• (any demo password)"
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-slate-900"
-            />
-          </div>
-
+        {/* Tab Toggle: Sign In vs Create Account */}
+        <div className="flex p-1 bg-neutral-100 rounded-xl mt-4 mb-4">
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-slate-950 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl shadow-sm transition text-xs flex items-center justify-center space-x-1.5"
+            type="button"
+            onClick={() => {
+              setTab('signin');
+              setErrorMessage(null);
+            }}
+            className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition ${
+              tab === 'signin'
+                ? 'bg-white text-black shadow-xs'
+                : 'text-neutral-500 hover:text-black'
+            }`}
           >
-            <span>Authenticate & Generate JWT</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            Sign In
           </button>
-        </form>
+          <button
+            type="button"
+            onClick={() => {
+              setTab('signup');
+              setErrorMessage(null);
+            }}
+            className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition ${
+              tab === 'signup'
+                ? 'bg-white text-black shadow-xs'
+                : 'text-neutral-500 hover:text-black'
+            }`}
+          >
+            Create Account
+          </button>
+        </div>
 
-        {/* Active JWT Debug Excerpt for Judges */}
-        {token && (
-          <div className="mt-4 pt-4 border-t border-slate-100 text-[11px] font-mono text-slate-500">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] font-bold text-slate-700 uppercase font-sans">Active JWT Signature:</span>
-              <button
-                onClick={copyToken}
-                className="text-slate-600 hover:text-slate-900 flex items-center space-x-1"
+        {/* Error Alert */}
+        {errorMessage && (
+          <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-start space-x-2.5 text-xs text-rose-800 animate-in fade-in">
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+            <span className="leading-relaxed">{errorMessage}</span>
+          </div>
+        )}
+
+        {/* Sign In Form */}
+        {tab === 'signin' ? (
+          <form onSubmit={handleSignIn} className="space-y-3.5">
+            <div>
+              <label className="block text-[11px] font-semibold text-neutral-700 uppercase tracking-wider mb-1">
+                Work Email Address
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-neutral-400 absolute left-3 top-2.5" />
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@company.com"
+                  className="w-full pl-9 pr-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:bg-white transition"
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-[11px] font-semibold text-neutral-700 uppercase tracking-wider">
+                  Password
+                </label>
+              </div>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-neutral-400 absolute left-3 top-2.5" />
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••••••"
+                  className="w-full pl-9 pr-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:bg-white transition"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold py-2.5 rounded-xl shadow-xs transition text-xs flex items-center justify-center space-x-2 mt-2 disabled:opacity-50"
+            >
+              {loading ? (
+                <span className="animate-pulse">Authenticating...</span>
+              ) : (
+                <>
+                  <span>Sign In with JWT</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </>
+              )}
+            </button>
+          </form>
+        ) : (
+          /* Create Account (Sign Up) Form */
+          <form onSubmit={handleSignUp} className="space-y-3">
+            <div>
+              <label className="block text-[11px] font-semibold text-neutral-700 uppercase tracking-wider mb-1">
+                Full Name
+              </label>
+              <div className="relative">
+                <User className="w-4 h-4 text-neutral-400 absolute left-3 top-2.5" />
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Thor Aryan"
+                  className="w-full pl-9 pr-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:bg-white transition"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-semibold text-neutral-700 uppercase tracking-wider mb-1">
+                Work Email Address
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-neutral-400 absolute left-3 top-2.5" />
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="36thoraryan@gmail.com"
+                  className="w-full pl-9 pr-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:bg-white transition"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-semibold text-neutral-700 uppercase tracking-wider mb-1">
+                Password <span className="font-normal text-neutral-400 text-[10px]">(min 6 chars)</span>
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-neutral-400 absolute left-3 top-2.5" />
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••••••"
+                  className="w-full pl-9 pr-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:bg-white transition"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-semibold text-neutral-700 uppercase tracking-wider mb-1">
+                Governance Role
+              </label>
+              <select
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value as UserRole)}
+                className="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-black focus:outline-none focus:ring-2 focus:ring-primary-600 focus:bg-white transition"
               >
-                {copiedToken ? <Check className="w-3 h-3 text-emerald-600" /> : <Key className="w-3 h-3" />}
-                <span>{copiedToken ? 'Copied' : 'Copy JWT'}</span>
+                <option value="reviewer">Compliance & Legal Reviewer</option>
+                <option value="brand_manager">Head of Brand Governance</option>
+                <option value="creator">Content Marketing Specialist</option>
+                <option value="admin">Enterprise Platform Administrator</option>
+              </select>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white font-semibold py-2.5 rounded-xl shadow-xs transition text-xs flex items-center justify-center space-x-2 mt-2 disabled:opacity-50"
+            >
+              {loading ? (
+                <span className="animate-pulse">Creating Account...</span>
+              ) : (
+                <>
+                  <span>Create Account & Issue JWT</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </>
+              )}
+            </button>
+          </form>
+        )}
+
+        {/* Cryptographic JWT Inspector Footer */}
+        {token && (
+          <div className="mt-4 pt-3.5 border-t border-neutral-100">
+            <div className="flex items-center justify-between text-[11px]">
+              <div className="flex items-center space-x-1.5 text-neutral-600">
+                <ShieldCheck className="w-3.5 h-3.5 text-primary-600" />
+                <span className="font-semibold text-black">Active JWT Bearer Session</span>
+              </div>
+              <button
+                type="button"
+                onClick={copyToken}
+                className="text-neutral-500 hover:text-black flex items-center space-x-1 font-mono text-[10px] bg-neutral-50 px-2 py-0.5 rounded border border-neutral-200 hover:bg-neutral-100 transition"
+              >
+                {copiedToken ? (
+                  <>
+                    <Check className="w-3 h-3 text-emerald-600" />
+                    <span className="text-emerald-600 font-semibold">Copied</span>
+                  </>
+                ) : (
+                  <>
+                    <Key className="w-3 h-3 text-neutral-400" />
+                    <span>Copy Token</span>
+                  </>
+                )}
               </button>
             </div>
-            <p className="bg-slate-50 p-2 rounded border border-slate-200/80 truncate text-[10px] text-slate-600">
+            <p className="font-mono text-[9px] text-neutral-400 truncate mt-1 bg-neutral-50 p-1.5 rounded border border-neutral-100">
               {token}
             </p>
           </div>

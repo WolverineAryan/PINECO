@@ -195,3 +195,19 @@ class AuditEvent(Base):
     __table_args__ = (
         Index("idx_audit_workspace_created", "workspace_id", "created_at"),
     )
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(String(64), primary_key=True, default=generate_uuid)
+    workspace_id = Column(String(64), nullable=False, default="ws-demo-enterprise-001", index=True)
+    email = Column(String(255), unique=True, nullable=False, index=True)
+    password_hash = Column(String(255), nullable=False)
+    name = Column(String(255), nullable=False)
+    role = Column(String(64), nullable=False, default="reviewer")  # creator, reviewer, brand_manager, admin
+    title = Column(String(255), nullable=True, default="Brand Specialist")
+    department = Column(String(255), nullable=True, default="Governance & Review")
+    created_at = Column(DateTime(timezone=True), default=get_utc_now, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=get_utc_now, onupdate=get_utc_now, nullable=False)
+
