@@ -81,7 +81,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Desktop Persistent Left Sidebar */}
       <aside className="hidden lg:flex w-64 bg-white border-r border-neutral-200 flex-col shrink-0 min-h-screen fixed inset-y-0 left-0 z-30 shadow-[1px_0_4px_rgba(0,0,0,0.02)]">
         {/* Brand Header with New Logos */}
-        <div className="p-4 border-b border-neutral-200 flex items-center justify-between bg-white">
+        <div className="p-4 border-b border-neutral-200 flex items-center bg-white">
           <Link href="/dashboard" className="flex items-center group">
             <img
               src="/logo-navbar.png"
@@ -89,9 +89,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               className="h-7 w-auto object-contain"
             />
           </Link>
-          <span className="text-[10px] font-mono bg-neutral-100 border border-neutral-300 text-black px-2 py-0.5 rounded font-bold">
-            OS
-          </span>
         </div>
 
         {/* Product Folder Selection Card */}
