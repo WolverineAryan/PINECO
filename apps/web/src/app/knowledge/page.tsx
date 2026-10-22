@@ -11,15 +11,18 @@ import {
   ToggleLeft,
   ToggleRight,
   ExternalLink,
-  RefreshCw,
   Search,
+  X,
+  HelpCircle,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { BrandRule, ApprovedFact } from '@/lib/types';
 import { useRole } from '@/components/RoleContext';
+import { useToast } from '@/components/Toast';
 
 export default function KnowledgePage() {
-  const { workspaceId, currentUser, role } = useRole();
+  const { workspaceId, currentUser } = useRole();
+  const { success, error: toastError } = useToast();
   const [activeTab, setActiveTab] = useState<'rules' | 'facts'>('rules');
 
   const [rules, setRules] = useState<BrandRule[]>([]);
@@ -47,11 +50,9 @@ export default function KnowledgePage() {
   const [factSourceUrl, setFactSourceUrl] = useState('');
   const [factOwner, setFactOwner] = useState('Product Marketing');
 
-  const canManage = role === 'brand_manager' || role === 'admin';
-
-  const loadData = async () => {
+  const loadData = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const [r, f] = await Promise.all([
         api.getRules(workspaceId),
         api.getFacts(workspaceId),
@@ -59,9 +60,9 @@ export default function KnowledgePage() {
       setRules(r);
       setFacts(f);
     } catch (err: any) {
-      alert(`Error loading brand knowledge: ${err.message}`);
+      toastError('Load Error', err.message);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -77,8 +78,12 @@ export default function KnowledgePage() {
         currentUser.id
       );
       setRules((prev) => prev.map((r) => (r.id === rule.id ? updated : r)));
+      success(
+        updated.enabled ? 'Rule Enabled' : 'Rule Disabled',
+        `Policy '${rule.name}' is now ${updated.enabled ? 'active' : 'inactive'}.`
+      );
     } catch (err: any) {
-      alert(`Error updating rule: ${err.message}`);
+      toastError('Update Failed', err.message);
     }
   };
 
@@ -105,8 +110,9 @@ export default function KnowledgePage() {
       setRulePattern('');
       setRuleReplacement('');
       setRuleDescription('');
+      success('Brand Rule Created', `'${created.name}' is now enforced.`);
     } catch (err: any) {
-      alert(`Error creating rule: ${err.message}`);
+      toastError('Rule Creation Failed', err.message);
     }
   };
 
@@ -131,8 +137,9 @@ export default function KnowledgePage() {
       setFactSourceTitle('');
       setFactSourceRef('');
       setFactSourceUrl('');
+      success('Approved Fact Saved', `'${created.source_title}' added to authoritative ground truth.`);
     } catch (err: any) {
-      alert(`Error adding fact: ${err.message}`);
+      toastError('Fact Creation Failed', err.message);
     }
   };
 
@@ -150,31 +157,40 @@ export default function KnowledgePage() {
       f.owner.toLowerCase().includes(search.toLowerCase())
   );
 
+  if (loading) {
+    return (
+      <div className="space-y-6 animate-in fade-in duration-300">
+        <div className="h-14 rounded-xl bg-white border border-slate-200/80 skeleton-shimmer" />
+        <div className="h-96 rounded-2xl bg-white border border-slate-200/80 skeleton-shimmer" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Brand Knowledge Base</h1>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Brand Knowledge Base</h1>
           <p className="text-xs text-slate-500 mt-1">
-            Deterministic brand policies, prohibited terminology, disclaimers, and authoritative corporate facts.
+            Authoritative deterministic policies, prohibited terms, disclaimers, and verified corporate facts.
           </p>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2.5">
           {activeTab === 'rules' ? (
             <button
               onClick={() => setShowRuleModal(true)}
-              className="flex items-center space-x-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-sm transition"
+              className="flex items-center space-x-1.5 bg-slate-950 hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm transition"
             >
-              <Plus className="w-4 h-4" />
-              <span>Create Brand Rule</span>
+              <Plus className="w-3.5 h-3.5 text-emerald-400" />
+              <span>New Brand Rule</span>
             </button>
           ) : (
             <button
               onClick={() => setShowFactModal(true)}
-              className="flex items-center space-x-1.5 bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-sm transition"
+              className="flex items-center space-x-1.5 bg-slate-950 hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm transition"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-3.5 h-3.5 text-teal-400" />
               <span>Add Approved Fact</span>
             </button>
           )}
@@ -182,28 +198,28 @@ export default function KnowledgePage() {
       </div>
 
       {/* Tabs & Search */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-b border-slate-200 pb-3">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setActiveTab('rules')}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-tight transition flex items-center space-x-2 ${
               activeTab === 'rules'
-                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                : 'text-slate-600 hover:bg-slate-100'
+                ? 'bg-slate-950 text-white shadow-sm'
+                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
-            <Shield className="w-4 h-4" />
+            <Shield className="w-3.5 h-3.5" />
             <span>Brand Rules ({rules.length})</span>
           </button>
           <button
             onClick={() => setActiveTab('facts')}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center space-x-2 ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-tight transition flex items-center space-x-2 ${
               activeTab === 'facts'
-                ? 'bg-teal-50 text-teal-800 border border-teal-200'
-                : 'text-slate-600 hover:bg-slate-100'
+                ? 'bg-slate-950 text-white shadow-sm'
+                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
-            <FileText className="w-4 h-4" />
+            <FileText className="w-3.5 h-3.5" />
             <span>Approved Facts ({facts.length})</span>
           </button>
         </div>
@@ -215,22 +231,22 @@ export default function KnowledgePage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={`Filter ${activeTab}...`}
-            className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-900"
           />
         </div>
       </div>
 
       {/* Rules Table */}
       {activeTab === 'rules' && (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
-                  <th className="py-3 px-6">Rule Name & Details</th>
+                <tr className="bg-slate-50/60 text-slate-400 font-semibold border-b border-slate-100 uppercase tracking-wider text-[10px] font-mono">
+                  <th className="py-3 px-6">Rule Name & Guideline</th>
                   <th className="py-3 px-6">Category</th>
-                  <th className="py-3 px-6">Pattern / Match</th>
-                  <th className="py-3 px-6">Preferred Replacement</th>
+                  <th className="py-3 px-6">Pattern</th>
+                  <th className="py-3 px-6">Replacement</th>
                   <th className="py-3 px-6">Severity</th>
                   <th className="py-3 px-6 text-center">Status</th>
                 </tr>
@@ -238,29 +254,29 @@ export default function KnowledgePage() {
               <tbody className="divide-y divide-slate-100 text-slate-700">
                 {filteredRules.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="py-8 text-center text-slate-400">
-                      No brand rules found.
+                    <td colSpan={6} className="py-12 text-center text-slate-400">
+                      No brand rules found matching your filter.
                     </td>
                   </tr>
                 ) : (
                   filteredRules.map((rule) => (
-                    <tr key={rule.id} className="hover:bg-slate-50 transition">
-                      <td className="py-3 px-6 max-w-xs">
+                    <tr key={rule.id} className="hover:bg-slate-50/80 transition duration-150">
+                      <td className="py-3.5 px-6 max-w-xs">
                         <span className="font-semibold text-slate-900 block">{rule.name}</span>
-                        <span className="text-[11px] text-slate-500 block truncate">{rule.description}</span>
+                        <span className="text-[11px] text-slate-400 block truncate">{rule.description}</span>
                       </td>
-                      <td className="py-3 px-6">
+                      <td className="py-3.5 px-6">
                         <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded uppercase font-mono text-[10px] font-bold">
                           {rule.category}
                         </span>
                       </td>
-                      <td className="py-3 px-6 font-mono text-[11px] text-rose-700 bg-rose-50/50 rounded px-2 py-1 max-w-[150px] truncate">
+                      <td className="py-3.5 px-6 font-mono text-[11px] text-rose-700 bg-rose-50/40 rounded px-2 py-1 max-w-[150px] truncate">
                         {rule.pattern || '—'}
                       </td>
-                      <td className="py-3 px-6 font-mono text-[11px] text-emerald-700 bg-emerald-50/50 rounded px-2 py-1 max-w-[150px] truncate">
+                      <td className="py-3.5 px-6 font-mono text-[11px] text-emerald-700 bg-emerald-50/40 rounded px-2 py-1 max-w-[150px] truncate">
                         {rule.preferred_replacement || '—'}
                       </td>
-                      <td className="py-3 px-6">
+                      <td className="py-3.5 px-6">
                         <span
                           className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                             rule.severity === 'high'
@@ -273,16 +289,16 @@ export default function KnowledgePage() {
                           {rule.severity}
                         </span>
                       </td>
-                      <td className="py-3 px-6 text-center">
+                      <td className="py-3.5 px-6 text-center">
                         <button
                           onClick={() => handleToggleRule(rule)}
-                          className="text-slate-600 hover:text-slate-900 focus:outline-none"
-                          title="Toggle rule enabled/disabled"
+                          className="focus:outline-none transition-transform active:scale-95"
+                          title="Toggle policy enabled/disabled"
                         >
                           {rule.enabled ? (
                             <ToggleRight className="w-6 h-6 text-emerald-600 inline" />
                           ) : (
-                            <ToggleLeft className="w-6 h-6 text-slate-400 inline" />
+                            <ToggleLeft className="w-6 h-6 text-slate-300 inline" />
                           )}
                         </button>
                       </td>
@@ -297,11 +313,11 @@ export default function KnowledgePage() {
 
       {/* Facts Table */}
       {activeTab === 'facts' && (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                <tr className="bg-slate-50/60 text-slate-400 font-semibold border-b border-slate-100 uppercase tracking-wider text-[10px] font-mono">
                   <th className="py-3 px-6">Approved Statement</th>
                   <th className="py-3 px-6">Source Reference</th>
                   <th className="py-3 px-6">Owner</th>
@@ -312,13 +328,13 @@ export default function KnowledgePage() {
               <tbody className="divide-y divide-slate-100 text-slate-700">
                 {filteredFacts.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="py-8 text-center text-slate-400">
-                      No approved facts found.
+                    <td colSpan={5} className="py-12 text-center text-slate-400">
+                      No approved facts found matching your filter.
                     </td>
                   </tr>
                 ) : (
                   filteredFacts.map((fact) => (
-                    <tr key={fact.id} className="hover:bg-slate-50 transition">
+                    <tr key={fact.id} className="hover:bg-slate-50/80 transition duration-150">
                       <td className="py-3.5 px-6 font-medium text-slate-900 max-w-md">
                         {fact.statement}
                         {fact.source_url && (
@@ -326,7 +342,7 @@ export default function KnowledgePage() {
                             href={fact.source_url}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex items-center space-x-1 text-emerald-600 ml-2 hover:underline"
+                            className="inline-flex items-center space-x-1 text-slate-400 hover:text-slate-800 ml-2"
                           >
                             <ExternalLink className="w-3 h-3" />
                           </a>
@@ -336,16 +352,16 @@ export default function KnowledgePage() {
                         <span className="font-semibold text-slate-800 block">{fact.source_title}</span>
                         <span className="font-mono text-[11px] text-slate-400">Ref: {fact.source_reference}</span>
                       </td>
-                      <td className="py-3.5 px-6 text-slate-600">{fact.owner}</td>
-                      <td className="py-3.5 px-6 text-slate-500 text-[11px]">
+                      <td className="py-3.5 px-6 text-slate-600 font-medium">{fact.owner}</td>
+                      <td className="py-3.5 px-6 text-slate-400 text-[11px] font-mono">
                         {fact.valid_until ? `Until ${new Date(fact.valid_until).toLocaleDateString()}` : 'Perpetual'}
                       </td>
                       <td className="py-3.5 px-6">
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase inline-flex items-center space-x-1 ${
+                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase inline-flex items-center space-x-1 ${
                             fact.approval_status === 'approved'
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : 'bg-rose-100 text-rose-800'
+                              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                              : 'bg-rose-50 text-rose-800 border border-rose-200'
                           }`}
                         >
                           <CheckCircle2 className="w-3 h-3 text-emerald-600" />
@@ -363,10 +379,15 @@ export default function KnowledgePage() {
 
       {/* Modal: Create Brand Rule */}
       {showRuleModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-200 animate-in fade-in zoom-in-95">
-            <h2 className="text-lg font-bold text-slate-900 mb-1">Create Brand Policy Rule</h2>
-            <p className="text-xs text-slate-500 mb-4">
+        <div className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-base font-bold text-slate-900">Create Brand Policy Rule</h2>
+              <button onClick={() => setShowRuleModal(false)} className="text-slate-400 hover:text-slate-600 p-1 rounded">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-xs text-slate-400 mb-5">
               Deterministic rules are evaluated instantly across all submitted copy.
             </p>
 
@@ -379,7 +400,7 @@ export default function KnowledgePage() {
                   value={ruleName}
                   onChange={(e) => setRuleName(e.target.value)}
                   placeholder="e.g. Prohibited Absolute Claim: 'guaranteed'"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-900"
                 />
               </div>
 
@@ -389,7 +410,7 @@ export default function KnowledgePage() {
                   <select
                     value={ruleCategory}
                     onChange={(e) => setRuleCategory(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-900"
                   >
                     <option value="terminology">Terminology</option>
                     <option value="disclaimer">Disclaimer</option>
@@ -402,7 +423,7 @@ export default function KnowledgePage() {
                   <select
                     value={ruleSeverity}
                     onChange={(e) => setRuleSeverity(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-900"
                   >
                     <option value="high">High (Blocks approval)</option>
                     <option value="medium">Medium (Warning)</option>
@@ -419,7 +440,7 @@ export default function KnowledgePage() {
                     value={rulePattern}
                     onChange={(e) => setRulePattern(e.target.value)}
                     placeholder="e.g. guaranteed"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-900"
                   />
                 </div>
                 <div>
@@ -429,7 +450,7 @@ export default function KnowledgePage() {
                     value={ruleReplacement}
                     onChange={(e) => setRuleReplacement(e.target.value)}
                     placeholder="e.g. proven"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-900"
                   />
                 </div>
               </div>
@@ -442,7 +463,7 @@ export default function KnowledgePage() {
                   value={ruleDescription}
                   onChange={(e) => setRuleDescription(e.target.value)}
                   placeholder="Explain why this rule exists and how creators should adhere..."
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-900"
                 />
               </div>
 
@@ -456,7 +477,7 @@ export default function KnowledgePage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium shadow-sm"
+                  className="px-4 py-2 bg-slate-950 hover:bg-slate-800 text-white rounded-lg font-medium shadow-sm transition"
                 >
                   Save Brand Rule
                 </button>
@@ -468,10 +489,15 @@ export default function KnowledgePage() {
 
       {/* Modal: Add Approved Fact */}
       {showFactModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-200 animate-in fade-in zoom-in-95">
-            <h2 className="text-lg font-bold text-slate-900 mb-1">Add Approved Fact</h2>
-            <p className="text-xs text-slate-500 mb-4">
+        <div className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-base font-bold text-slate-900">Add Approved Fact</h2>
+              <button onClick={() => setShowFactModal(false)} className="text-slate-400 hover:text-slate-600 p-1 rounded">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-xs text-slate-400 mb-5">
               Verified corporate facts serve as authoritative ground truth for claim verification.
             </p>
 
@@ -484,7 +510,7 @@ export default function KnowledgePage() {
                   value={factStatement}
                   onChange={(e) => setFactStatement(e.target.value)}
                   placeholder="e.g. Pineco delivers 68% faster compliance turnarounds across marketing teams."
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-1 focus:ring-teal-500"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-900"
                 />
               </div>
 
@@ -497,7 +523,7 @@ export default function KnowledgePage() {
                     value={factSourceTitle}
                     onChange={(e) => setFactSourceTitle(e.target.value)}
                     placeholder="e.g. Benchmark Study 2026"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-1 focus:ring-teal-500"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-900"
                   />
                 </div>
                 <div>
@@ -508,7 +534,7 @@ export default function KnowledgePage() {
                     value={factSourceRef}
                     onChange={(e) => setFactSourceRef(e.target.value)}
                     placeholder="e.g. REP-2026-68"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-1 focus:ring-teal-500"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-900"
                   />
                 </div>
               </div>
@@ -522,7 +548,7 @@ export default function KnowledgePage() {
                     value={factOwner}
                     onChange={(e) => setFactOwner(e.target.value)}
                     placeholder="e.g. Product Marketing"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-1 focus:ring-teal-500"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-900"
                   />
                 </div>
                 <div>
@@ -532,7 +558,7 @@ export default function KnowledgePage() {
                     value={factSourceUrl}
                     onChange={(e) => setFactSourceUrl(e.target.value)}
                     placeholder="https://..."
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-1 focus:ring-teal-500"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-900"
                   />
                 </div>
               </div>
@@ -547,7 +573,7 @@ export default function KnowledgePage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium shadow-sm"
+                  className="px-4 py-2 bg-slate-950 hover:bg-slate-800 text-white rounded-lg font-medium shadow-sm transition"
                 >
                   Save Approved Fact
                 </button>

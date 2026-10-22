@@ -11,30 +11,31 @@ import {
   Clock,
   ArrowLeft,
   RefreshCw,
-  GitCommit,
-  ExternalLink,
-  MessageSquare,
-  AlertCircle,
   Copy,
   Check,
   History,
   Send,
   Sparkles,
+  Info,
+  X,
+  UserCheck,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { SubmissionDetail, Finding, Review, ContentVersion, AuditEvent } from '@/lib/types';
 import { useRole } from '@/components/RoleContext';
+import { useToast } from '@/components/Toast';
 
 export default function SubmissionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const submissionId = resolvedParams.id;
-  const { currentUser, role } = useRole();
+  const { currentUser } = useRole();
+  const { success, error: toastError, info } = useToast();
 
   const [submission, setSubmission] = useState<SubmissionDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'findings' | 'editor' | 'history' | 'audit'>('findings');
+  const [activeTab, setActiveTab] = useState<'findings' | 'editor' | 'history'>('findings');
 
   // Filter state
   const [severityFilter, setSeverityFilter] = useState<string>('all');
@@ -44,9 +45,8 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
   // Revision Editor State
   const [revisionContent, setRevisionContent] = useState('');
   const [submittingRevision, setSubmittingRevision] = useState(false);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  // Reviewer Decision Modal / Form
+  // Reviewer Decision Modal
   const [showDecisionModal, setShowDecisionModal] = useState(false);
   const [decisionType, setDecisionType] = useState<'approved' | 'changes_requested' | 'overridden'>('approved');
   const [decisionRationale, setDecisionRationale] = useState('');
@@ -60,9 +60,9 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
   // Re-run review state
   const [rerunning, setRerunning] = useState(false);
 
-  const loadSubmission = async () => {
+  const loadSubmission = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       setError(null);
       const data = await api.getSubmissionDetail(submissionId);
       setSubmission(data);
@@ -72,7 +72,7 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
     } catch (err: any) {
       setError(err.message || 'Failed to load submission details');
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -85,9 +85,10 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
     try {
       setRerunning(true);
       await api.triggerReview(submission.id, submission.current_version_id, currentUser.id);
-      await loadSubmission();
+      success('Review Re-executed', 'Findings updated across all active policies.');
+      await loadSubmission(true);
     } catch (err: any) {
-      alert(`Error running review: ${err.message}`);
+      toastError('Review Failed', err.message);
     } finally {
       setRerunning(false);
     }
@@ -103,11 +104,12 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
       const newVer = await api.createRevision(submission.id, revisionContent.trim(), currentUser.id);
       // 2. Trigger review on new version
       await api.triggerReview(submission.id, newVer.id, currentUser.id);
+      success('Revision Committed', `Version ${newVer.version_number} created and evaluated.`);
       // 3. Reload
-      await loadSubmission();
+      await loadSubmission(true);
       setActiveTab('findings');
     } catch (err: any) {
-      alert(`Error submitting revision: ${err.message}`);
+      toastError('Revision Failed', err.message);
     } finally {
       setSubmittingRevision(false);
     }
@@ -118,7 +120,7 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
     if (!submission?.latest_review) return;
 
     if ((decisionType === 'overridden' || decisionType === 'changes_requested') && !decisionRationale.trim()) {
-      alert('A rationale is mandatory when overriding or requesting changes.');
+      alert('A non-empty rationale is mandatory when overriding or requesting changes.');
       return;
     }
 
@@ -134,9 +136,10 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
       );
       setShowDecisionModal(false);
       setDecisionRationale('');
-      await loadSubmission();
+      success('Decision Recorded', `Submission status updated to ${decisionType}.`);
+      await loadSubmission(true);
     } catch (err: any) {
-      alert(`Error recording decision: ${err.message}`);
+      toastError('Decision Failed', err.message);
     } finally {
       setDecisionSubmitting(false);
     }
@@ -154,9 +157,10 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
       await api.overrideFinding(overrideFindingId, overrideRationale.trim(), currentUser.id);
       setOverrideFindingId(null);
       setOverrideRationale('');
-      await loadSubmission();
+      success('Finding Overridden', 'Override justification permanently logged to audit trail.');
+      await loadSubmission(true);
     } catch (err: any) {
-      alert(`Error overriding finding: ${err.message}`);
+      toastError('Override Failed', err.message);
     } finally {
       setOverrideSubmitting(false);
     }
@@ -164,27 +168,40 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
 
   const applySuggestedCorrection = (suggested: string) => {
     setRevisionContent((prev) => `${prev}\n\n[Correction Note]: ${suggested}`);
+    info('Applied to Revision', 'Correction copied into the revision editor.');
     setActiveTab('editor');
   };
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-slate-500">
-        <RefreshCw className="w-8 h-8 animate-spin text-emerald-600 mb-4" />
-        <p className="text-sm">Loading submission governance records...</p>
+      <div className="space-y-6 animate-in fade-in duration-300">
+        <div className="flex justify-between items-center">
+          <div className="w-24 h-4 bg-slate-200/80 rounded skeleton-shimmer" />
+          <div className="flex space-x-2">
+            <div className="w-24 h-8 bg-slate-200/80 rounded-lg skeleton-shimmer" />
+            <div className="w-32 h-8 bg-slate-200/80 rounded-lg skeleton-shimmer" />
+          </div>
+        </div>
+        <div className="h-32 bg-white rounded-2xl border border-slate-200/80 skeleton-shimmer" />
+        <div className="h-10 bg-slate-100 rounded-xl skeleton-shimmer" />
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-36 bg-white rounded-2xl border border-slate-200/80 skeleton-shimmer" />
+          ))}
+        </div>
       </div>
     );
   }
 
   if (error || !submission) {
     return (
-      <div className="bg-rose-50 border border-rose-200 rounded-xl p-6 text-rose-800 my-8">
-        <div className="flex items-center space-x-3 mb-2">
-          <AlertCircle className="w-6 h-6 text-rose-600" />
-          <h2 className="text-lg font-semibold">Submission Not Found</h2>
+      <div className="bg-rose-50/60 border border-rose-200/80 rounded-2xl p-6 text-rose-900 my-8 shadow-sm">
+        <div className="flex items-center space-x-2.5 mb-2">
+          <AlertTriangle className="w-5 h-5 text-rose-600" />
+          <h2 className="text-sm font-semibold">Submission Not Found</h2>
         </div>
-        <p className="text-sm mb-4">{error || 'Could not locate submission record.'}</p>
-        <Link href="/" className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium px-4 py-2 rounded-lg">
+        <p className="text-xs text-rose-700 font-mono mb-4">{error || 'Could not locate record.'}</p>
+        <Link href="/" className="bg-rose-950 hover:bg-rose-900 text-white text-xs font-semibold px-4 py-2 rounded-xl transition">
           Return to Dashboard
         </Link>
       </div>
@@ -204,117 +221,117 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
 
   return (
     <div className="space-y-6">
-      {/* Breadcrumb & Navigation */}
+      {/* Top Nav & Action Header */}
       <div className="flex items-center justify-between">
-        <Link href="/" className="inline-flex items-center space-x-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800">
+        <Link href="/" className="inline-flex items-center space-x-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition">
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to Dashboard</span>
+          <span>Dashboard</span>
         </Link>
         <div className="flex items-center space-x-2">
           <button
             onClick={handleRerunReview}
             disabled={rerunning}
-            className="flex items-center space-x-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium px-3 py-1.5 rounded-lg transition"
+            className="flex items-center space-x-1.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-medium px-3 py-1.5 rounded-lg shadow-sm transition disabled:opacity-50"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${rerunning ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 text-slate-400 ${rerunning ? 'animate-spin' : ''}`} />
             <span>Rerun Review</span>
           </button>
           <button
             onClick={() => setShowDecisionModal(true)}
-            className="flex items-center space-x-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3.5 py-1.5 rounded-lg shadow-sm transition"
+            className="flex items-center space-x-1.5 bg-slate-950 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg shadow-sm transition"
           >
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Record Review Decision</span>
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Record Decision</span>
           </button>
         </div>
       </div>
 
-      {/* Submission Header Card */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+      {/* Submission Info Card */}
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="space-y-1.5">
-            <div className="flex items-center space-x-2.5">
-              <span className="bg-slate-100 text-slate-700 font-mono text-[11px] px-2 py-0.5 rounded font-semibold">
-                {submission.channel.toUpperCase()}
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <span className="bg-slate-100 text-slate-700 font-mono text-[10px] uppercase px-2 py-0.5 rounded font-bold">
+                {submission.channel}
               </span>
-              <span className="bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono text-[11px] px-2 py-0.5 rounded font-semibold">
+              <span className="bg-slate-100 text-slate-800 font-mono text-[10px] px-2 py-0.5 rounded font-bold">
                 Version {currentVersion?.version_number || 1}
               </span>
               {submission.status === 'approved' ? (
-                <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[11px] font-semibold inline-flex items-center space-x-1">
+                <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 px-2.5 py-0.5 rounded-full text-[11px] font-semibold inline-flex items-center space-x-1">
                   <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                   <span>Approved for Publication</span>
                 </span>
               ) : submission.status === 'changes_requested' ? (
-                <span className="bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded text-[11px] font-semibold inline-flex items-center space-x-1">
+                <span className="bg-rose-50 text-rose-700 border border-rose-200/80 px-2.5 py-0.5 rounded-full text-[11px] font-semibold inline-flex items-center space-x-1">
                   <AlertTriangle className="w-3 h-3 text-rose-600" />
                   <span>Changes Requested</span>
                 </span>
               ) : (
-                <span className="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-[11px] font-semibold inline-flex items-center space-x-1">
+                <span className="bg-amber-50 text-amber-700 border border-amber-200/80 px-2.5 py-0.5 rounded-full text-[11px] font-semibold inline-flex items-center space-x-1">
                   <Clock className="w-3 h-3 text-amber-600" />
                   <span>Under Governance Review</span>
                 </span>
               )}
             </div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">{submission.title}</h1>
-            <p className="text-xs text-slate-400 font-mono">
-              Submission ID: {submission.id} • Content Hash: {currentVersion?.content_hash.slice(0, 16)}...
+            <p className="text-[11px] text-slate-400 font-mono">
+              ID: {submission.id} • SHA-256: {currentVersion?.content_hash.slice(0, 16)}...
             </p>
           </div>
 
-          <div className="flex flex-col items-start sm:items-end text-xs text-slate-500 space-y-1">
-            <span>Author: <strong className="text-slate-800 font-mono">{submission.created_by}</strong></span>
-            <span>Created: {new Date(submission.created_at).toLocaleString()}</span>
-            <span>Versions Recorded: <strong className="text-slate-800">{submission.versions.length}</strong></span>
+          <div className="flex flex-col items-start sm:items-end text-xs text-slate-400 space-y-1 font-mono text-[11px]">
+            <span>Author: <strong className="text-slate-800">{submission.created_by}</strong></span>
+            <span>Created: {new Date(submission.created_at).toLocaleDateString()}</span>
+            <span>Recorded Versions: <strong className="text-slate-800">{submission.versions.length}</strong></span>
           </div>
         </div>
 
-        {/* AI Warning Summary Banner if present */}
+        {/* Warning Summary if degraded AI or timeout */}
         {review?.warning_summary && (
-          <div className="mt-4 bg-amber-50 border border-amber-200 text-amber-800 text-xs p-3 rounded-lg flex items-start space-x-2.5">
+          <div className="mt-4 bg-amber-50/70 border border-amber-200 text-amber-900 text-xs p-3.5 rounded-xl flex items-start space-x-2.5">
             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <div>
-              <span className="font-semibold block">Review Pipeline Operational Notice:</span>
-              <p className="mt-0.5 text-amber-700">{review.warning_summary}</p>
+              <span className="font-semibold block">Operational Notice:</span>
+              <p className="mt-0.5 text-amber-800 text-[11px] leading-relaxed">{review.warning_summary}</p>
             </div>
           </div>
         )}
       </div>
 
-      {/* Tabs Bar */}
+      {/* Tabs */}
       <div className="flex items-center space-x-2 border-b border-slate-200 pb-3 text-xs">
         <button
           onClick={() => setActiveTab('findings')}
-          className={`px-4 py-2 rounded-lg font-semibold transition flex items-center space-x-2 ${
+          className={`px-3.5 py-1.5 rounded-lg font-semibold transition flex items-center space-x-2 ${
             activeTab === 'findings'
-              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-slate-950 text-white shadow-sm'
+              : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
-          <Shield className="w-4 h-4" />
+          <Shield className="w-3.5 h-3.5" />
           <span>Findings Explorer ({findings.length})</span>
         </button>
         <button
           onClick={() => setActiveTab('editor')}
-          className={`px-4 py-2 rounded-lg font-semibold transition flex items-center space-x-2 ${
+          className={`px-3.5 py-1.5 rounded-lg font-semibold transition flex items-center space-x-2 ${
             activeTab === 'editor'
-              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-slate-950 text-white shadow-sm'
+              : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
-          <FileText className="w-4 h-4" />
-          <span>Content Copy & Revision Editor</span>
+          <FileText className="w-3.5 h-3.5" />
+          <span>Revision Editor</span>
         </button>
         <button
           onClick={() => setActiveTab('history')}
-          className={`px-4 py-2 rounded-lg font-semibold transition flex items-center space-x-2 ${
+          className={`px-3.5 py-1.5 rounded-lg font-semibold transition flex items-center space-x-2 ${
             activeTab === 'history'
-              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-slate-950 text-white shadow-sm'
+              : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
-          <History className="w-4 h-4" />
+          <History className="w-3.5 h-3.5" />
           <span>Version History ({submission.versions.length})</span>
         </button>
       </div>
@@ -323,14 +340,14 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
       {activeTab === 'findings' && (
         <div className="space-y-4">
           {/* Filters Bar */}
-          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4 text-xs">
+          <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm flex flex-wrap items-center justify-between gap-3 text-xs">
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center space-x-1.5">
                 <span className="text-slate-400 font-medium">Severity:</span>
                 <select
                   value={severityFilter}
                   onChange={(e) => setSeverityFilter(e.target.value)}
-                  className="bg-slate-50 border border-slate-200 rounded px-2 py-1 text-slate-700"
+                  className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-slate-700 font-medium"
                 >
                   <option value="all">All Severities</option>
                   <option value="high">High</option>
@@ -344,7 +361,7 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                 <select
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="bg-slate-50 border border-slate-200 rounded px-2 py-1 text-slate-700"
+                  className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-slate-700 font-medium"
                 >
                   <option value="all">All Categories</option>
                   <option value="terminology">Terminology</option>
@@ -359,7 +376,7 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                 <select
                   value={evidenceFilter}
                   onChange={(e) => setEvidenceFilter(e.target.value)}
-                  className="bg-slate-50 border border-slate-200 rounded px-2 py-1 text-slate-700"
+                  className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-slate-700 font-medium"
                 >
                   <option value="all">All Statuses</option>
                   <option value="supported">Supported</option>
@@ -370,39 +387,37 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
               </div>
             </div>
 
-            <span className="text-slate-400 font-mono">
+            <span className="text-slate-400 font-mono text-[11px]">
               Showing {filteredFindings.length} of {findings.length} findings
             </span>
           </div>
 
-          {/* Findings Cards List */}
+          {/* Findings Cards */}
           {filteredFindings.length === 0 ? (
-            <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-500">
+            <div className="bg-white rounded-2xl border border-slate-200/80 p-12 text-center text-slate-500">
               <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
-              <h3 className="text-base font-semibold text-slate-800">No matching findings</h3>
+              <h3 className="text-sm font-semibold text-slate-800">No matching findings</h3>
               <p className="text-xs text-slate-400 mt-1">
-                Content complies with all active filters or no violations were flagged.
+                Content adheres to all active governance filters or no violations were flagged.
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3.5">
               {filteredFindings.map((finding) => {
                 const isOverridden = finding.resolution_status === 'overridden';
                 return (
                   <div
                     key={finding.id}
-                    className={`bg-white rounded-xl border p-5 shadow-sm space-y-3 transition ${
+                    className={`bg-white rounded-2xl border p-5 shadow-sm space-y-3 transition duration-150 ${
                       finding.severity === 'high'
-                        ? 'border-rose-200 hover:border-rose-300'
+                        ? 'border-rose-200/80'
                         : finding.severity === 'medium'
-                        ? 'border-amber-200 hover:border-amber-300'
-                        : 'border-slate-200 hover:border-slate-300'
+                        ? 'border-amber-200/80'
+                        : 'border-slate-200/80'
                     }`}
                   >
-                    {/* Finding Header */}
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center space-x-2">
-                        {/* Severity Badge */}
                         <span
                           className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
                             finding.severity === 'high'
@@ -412,15 +427,13 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                               : 'bg-slate-100 text-slate-700'
                           }`}
                         >
-                          {finding.severity} Severity
+                          {finding.severity}
                         </span>
 
-                        {/* Category */}
                         <span className="bg-slate-100 text-slate-700 text-[10px] uppercase font-mono px-2 py-0.5 rounded font-bold">
                           {finding.category}
                         </span>
 
-                        {/* Origin */}
                         <span className="text-[10px] font-mono text-slate-400">
                           via {finding.source_origin === 'rule_engine' ? 'Deterministic Engine' : 'AI Claim Verifier'}
                         </span>
@@ -429,25 +442,25 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                       {/* Evidence Status Pill */}
                       <div className="flex items-center space-x-2">
                         {finding.evidence_status === 'supported' && (
-                          <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs px-2.5 py-0.5 rounded-full font-medium inline-flex items-center space-x-1">
+                          <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[11px] px-2.5 py-0.5 rounded-full font-medium inline-flex items-center space-x-1">
                             <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                             <span>Supported by Approved Evidence</span>
                           </span>
                         )}
                         {finding.evidence_status === 'contradicted' && (
-                          <span className="bg-rose-50 text-rose-700 border border-rose-200 text-xs px-2.5 py-0.5 rounded-full font-medium inline-flex items-center space-x-1">
+                          <span className="bg-rose-50 text-rose-700 border border-rose-200/80 text-[11px] px-2.5 py-0.5 rounded-full font-medium inline-flex items-center space-x-1">
                             <AlertTriangle className="w-3 h-3 text-rose-600" />
                             <span>Contradicts Brand Guideline / Policy</span>
                           </span>
                         )}
                         {finding.evidence_status === 'unverified' && (
-                          <span className="bg-amber-50 text-amber-700 border border-amber-200 text-xs px-2.5 py-0.5 rounded-full font-medium inline-flex items-center space-x-1">
+                          <span className="bg-amber-50 text-amber-700 border border-amber-200/80 text-[11px] px-2.5 py-0.5 rounded-full font-medium inline-flex items-center space-x-1">
                             <HelpCircle className="w-3 h-3 text-amber-600" />
-                            <span>Unverified (No Approved Source)</span>
+                            <span>Unverified (No Approved Evidence)</span>
                           </span>
                         )}
                         {finding.evidence_status === 'needs_human_review' && (
-                          <span className="bg-sky-50 text-sky-700 border border-sky-200 text-xs px-2.5 py-0.5 rounded-full font-medium inline-flex items-center space-x-1">
+                          <span className="bg-sky-50 text-sky-700 border border-sky-200/80 text-[11px] px-2.5 py-0.5 rounded-full font-medium inline-flex items-center space-x-1">
                             <Clock className="w-3 h-3 text-sky-600" />
                             <span>Needs Human Review</span>
                           </span>
@@ -455,8 +468,8 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                       </div>
                     </div>
 
-                    {/* Excerpt Box */}
-                    <div className="bg-slate-50 border border-slate-200/80 rounded-lg p-3 text-xs font-mono text-slate-800">
+                    {/* Excerpt */}
+                    <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3 text-xs font-mono text-slate-800">
                       <span className="text-[10px] text-slate-400 uppercase font-sans font-bold block mb-1">
                         Affected Excerpt:
                       </span>
@@ -468,25 +481,25 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                       <strong className="text-slate-900">Analysis:</strong> {finding.explanation}
                     </div>
 
-                    {/* Associated Rule or Fact Evidence Trace */}
+                    {/* Rule / Fact Links */}
                     {finding.rule && (
-                      <div className="bg-indigo-50/50 border border-indigo-100 rounded-lg p-2.5 text-xs flex items-start space-x-2 text-indigo-900">
-                        <Shield className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+                      <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs flex items-start space-x-2 text-slate-800">
+                        <Shield className="w-4 h-4 text-slate-600 shrink-0 mt-0.5" />
                         <div>
                           <span className="font-semibold">Brand Policy Rule: </span>
                           <span>{finding.rule.name}</span>
-                          <span className="text-slate-500 block text-[11px] mt-0.5">{finding.rule.description}</span>
+                          <span className="text-slate-400 block text-[11px] mt-0.5">{finding.rule.description}</span>
                         </div>
                       </div>
                     )}
 
                     {finding.fact && (
-                      <div className="bg-teal-50/50 border border-teal-100 rounded-lg p-2.5 text-xs flex items-start space-x-2 text-teal-900">
-                        <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
+                      <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs flex items-start space-x-2 text-slate-800">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                         <div>
-                          <span className="font-semibold">Authoritative Evidence Reference: </span>
+                          <span className="font-semibold">Authoritative Ground Truth: </span>
                           <span>{finding.fact.source_title} (Ref: {finding.fact.source_reference})</span>
-                          <p className="text-slate-600 text-[11px] mt-0.5 italic">
+                          <p className="text-slate-500 text-[11px] mt-0.5 italic">
                             &quot;{finding.fact.statement}&quot; — Owner: {finding.fact.owner}
                           </p>
                         </div>
@@ -495,41 +508,39 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
 
                     {/* Suggested Correction */}
                     {finding.suggested_correction && (
-                      <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                      <div className="bg-emerald-50/50 border border-emerald-200/80 rounded-xl p-3 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                         <div>
-                          <span className="font-semibold text-emerald-900 block">Suggested Correction:</span>
+                          <span className="font-semibold text-emerald-950 block">Suggested Correction:</span>
                           <span className="text-emerald-800">{finding.suggested_correction}</span>
                         </div>
                         <button
                           onClick={() => applySuggestedCorrection(finding.suggested_correction!)}
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-[11px] px-3 py-1 rounded transition shrink-0"
+                          className="bg-emerald-700 hover:bg-emerald-800 text-white font-medium text-[11px] px-3 py-1 rounded-lg transition shrink-0 shadow-sm"
                         >
-                          Apply to Editor &rarr;
+                          Apply to Revision &rarr;
                         </button>
                       </div>
                     )}
 
-                    {/* Overridden status or Override CTA */}
+                    {/* Override Banner or CTA */}
                     <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
                       {isOverridden ? (
-                        <div className="bg-amber-50 text-amber-800 px-3 py-1.5 rounded-lg border border-amber-200 text-[11px] flex items-center space-x-1.5">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-amber-600" />
+                        <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg text-[11px] flex items-center space-x-1.5 font-medium">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-slate-600" />
                           <span>
                             <strong>Overridden by Reviewer:</strong> {finding.resolution_rationale} ({finding.resolved_by})
                           </span>
                         </div>
                       ) : (
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => {
-                              setOverrideFindingId(finding.id);
-                              setOverrideRationale('');
-                            }}
-                            className="text-slate-500 hover:text-slate-800 font-medium underline text-[11px]"
-                          >
-                            Override Finding with Rationale...
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => {
+                            setOverrideFindingId(finding.id);
+                            setOverrideRationale('');
+                          }}
+                          className="text-slate-500 hover:text-slate-900 font-medium underline text-[11px] transition"
+                        >
+                          Override Finding with Rationale...
+                        </button>
                       )}
                     </div>
                   </div>
@@ -540,13 +551,13 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
         </div>
       )}
 
-      {/* Tab: Content & Revision Editor */}
+      {/* Tab: Revision Editor */}
       {activeTab === 'editor' && (
-        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4 text-xs">
+        <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-4 text-xs">
           <div>
             <h2 className="text-sm font-bold text-slate-900">Revise Content Copy</h2>
-            <p className="text-slate-500 text-[11px] mt-0.5">
-              Editing creates an immutable new version (v{submission.versions.length + 1}). Prior versions and findings remain preserved.
+            <p className="text-slate-400 text-[11px] mt-0.5">
+              Editing generates an immutable new Version {submission.versions.length + 1}. Earlier versions remain preserved in history.
             </p>
           </div>
 
@@ -555,7 +566,7 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
               rows={10}
               value={revisionContent}
               onChange={(e) => setRevisionContent(e.target.value)}
-              className="w-full px-3.5 py-2.5 font-mono text-xs bg-slate-50/50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 leading-relaxed"
+              className="w-full px-3.5 py-2.5 font-mono text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-slate-900 transition leading-relaxed"
             />
 
             <div className="flex items-center justify-between pt-2">
@@ -566,16 +577,16 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
               <button
                 type="submit"
                 disabled={submittingRevision}
-                className="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm transition disabled:opacity-50"
+                className="flex items-center space-x-2 bg-slate-950 hover:bg-slate-800 text-white font-semibold px-5 py-2.5 rounded-xl shadow-sm transition disabled:opacity-50"
               >
                 {submittingRevision ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>Creating Version & Running Review...</span>
+                    <RefreshCw className="w-4 h-4 animate-spin text-emerald-400" />
+                    <span>Committing Version & Rerunning Pipeline...</span>
                   </>
                 ) : (
                   <>
-                    <Send className="w-4 h-4" />
+                    <Send className="w-4 h-4 text-emerald-400" />
                     <span>Submit Revision & Rerun Review &rarr;</span>
                   </>
                 )}
@@ -587,11 +598,11 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
 
       {/* Tab: Version History */}
       {activeTab === 'history' && (
-        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4 text-xs">
+        <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-4 text-xs">
           <div>
             <h2 className="text-sm font-bold text-slate-900">Immutable Content Versions</h2>
-            <p className="text-slate-500 text-[11px] mt-0.5">
-              Every revision is strictly hashed and versioned. Approvals apply only to the exact version reviewed.
+            <p className="text-slate-400 text-[11px] mt-0.5">
+              Every revision is strictly hashed and versioned. Approvals bind only to the exact version reviewed.
             </p>
           </div>
 
@@ -602,14 +613,14 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                 <div
                   key={ver.id}
                   className={`p-4 rounded-xl border transition ${
-                    isCurrent ? 'bg-emerald-50/40 border-emerald-300' : 'bg-slate-50 border-slate-200'
+                    isCurrent ? 'bg-slate-50 border-slate-400' : 'bg-slate-50/50 border-slate-200/80'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
                       <span className="font-bold text-slate-900">Version {ver.version_number}</span>
                       {isCurrent && (
-                        <span className="bg-emerald-600 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
+                        <span className="bg-slate-900 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
                           Current Active
                         </span>
                       )}
@@ -619,13 +630,13 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                     </span>
                   </div>
 
-                  <p className="font-mono text-slate-700 bg-white p-3 rounded border border-slate-200/80 leading-relaxed whitespace-pre-wrap">
+                  <p className="font-mono text-slate-700 bg-white p-3 rounded-lg border border-slate-200/80 leading-relaxed whitespace-pre-wrap">
                     {ver.content_text}
                   </p>
 
                   <div className="mt-2 text-[10px] text-slate-400 font-mono flex items-center justify-between">
-                    <span>SHA-256 Hash: {ver.content_hash}</span>
-                    <span>Created by: {ver.created_by}</span>
+                    <span>SHA-256: {ver.content_hash}</span>
+                    <span>Author: {ver.created_by}</span>
                   </div>
                 </div>
               );
@@ -634,13 +645,18 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
         </div>
       )}
 
-      {/* Modal: Record Review Decision */}
+      {/* Modal: Record Decision */}
       {showDecisionModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 animate-in fade-in zoom-in-95 text-xs">
-            <h2 className="text-base font-bold text-slate-900 mb-1">Record Human Review Decision</h2>
-            <p className="text-slate-500 text-[11px] mb-4">
-              Decision will be permanently recorded for Version {currentVersion?.version_number} by{' '}
+        <div className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 text-xs">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-base font-bold text-slate-900">Record Review Decision</h2>
+              <button onClick={() => setShowDecisionModal(false)} className="text-slate-400 hover:text-slate-600 p-1 rounded">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-slate-400 text-[11px] mb-4">
+              Commit decision permanently for Version {currentVersion?.version_number} by{' '}
               <strong className="text-slate-800">{currentUser.name}</strong>.
             </p>
 
@@ -651,9 +667,9 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                   <button
                     type="button"
                     onClick={() => setDecisionType('approved')}
-                    className={`py-2 px-3 rounded-lg border font-medium text-center transition ${
+                    className={`py-2 px-3 rounded-xl border font-semibold text-center transition ${
                       decisionType === 'approved'
-                        ? 'bg-emerald-50 border-emerald-500 text-emerald-800'
+                        ? 'bg-slate-950 border-slate-950 text-white'
                         : 'border-slate-200 hover:bg-slate-50 text-slate-700'
                     }`}
                   >
@@ -662,9 +678,9 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                   <button
                     type="button"
                     onClick={() => setDecisionType('changes_requested')}
-                    className={`py-2 px-3 rounded-lg border font-medium text-center transition ${
+                    className={`py-2 px-3 rounded-xl border font-semibold text-center transition ${
                       decisionType === 'changes_requested'
-                        ? 'bg-rose-50 border-rose-500 text-rose-800'
+                        ? 'bg-slate-950 border-slate-950 text-white'
                         : 'border-slate-200 hover:bg-slate-50 text-slate-700'
                     }`}
                   >
@@ -673,9 +689,9 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                   <button
                     type="button"
                     onClick={() => setDecisionType('overridden')}
-                    className={`py-2 px-3 rounded-lg border font-medium text-center transition ${
+                    className={`py-2 px-3 rounded-xl border font-semibold text-center transition ${
                       decisionType === 'overridden'
-                        ? 'bg-amber-50 border-amber-500 text-amber-800'
+                        ? 'bg-slate-950 border-slate-950 text-white'
                         : 'border-slate-200 hover:bg-slate-50 text-slate-700'
                     }`}
                   >
@@ -696,10 +712,10 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                   onChange={(e) => setDecisionRationale(e.target.value)}
                   placeholder={
                     decisionType === 'approved'
-                      ? 'Optional sign-off notes...'
-                      : 'Provide explicit business justification or specific changes required...'
+                      ? 'Optional approval sign-off note...'
+                      : 'Provide explicit business rationale or required copy revisions...'
                   }
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-slate-900"
                 />
               </div>
 
@@ -714,7 +730,7 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                 <button
                   type="submit"
                   disabled={decisionSubmitting}
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium shadow-sm transition disabled:opacity-50"
+                  className="px-4 py-2 bg-slate-950 hover:bg-slate-800 text-white rounded-lg font-medium shadow-sm transition disabled:opacity-50"
                 >
                   {decisionSubmitting ? 'Recording...' : 'Commit Decision'}
                 </button>
@@ -726,11 +742,16 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
 
       {/* Modal: Finding Override */}
       {overrideFindingId && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 animate-in fade-in zoom-in-95 text-xs">
-            <h2 className="text-base font-bold text-slate-900 mb-1">Override Finding</h2>
-            <p className="text-slate-500 text-[11px] mb-4">
-              Overriding a brand finding requires an explicit business rationale recorded in the audit trail.
+        <div className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 text-xs">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-base font-bold text-slate-900">Override Finding</h2>
+              <button onClick={() => setOverrideFindingId(null)} className="text-slate-400 hover:text-slate-600 p-1 rounded">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-slate-400 text-[11px] mb-4">
+              Overriding a brand finding requires an explicit business justification permanently recorded in the audit trail.
             </p>
 
             <form onSubmit={handleOverrideFinding} className="space-y-4">
@@ -741,8 +762,8 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                   required
                   value={overrideRationale}
                   onChange={(e) => setOverrideRationale(e.target.value)}
-                  placeholder="e.g. Approved under marketing pilot program exception #881 by VP..."
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-1 focus:ring-amber-500"
+                  placeholder="e.g. Campaign exception approved by VP Marketing #881..."
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-slate-900"
                 />
               </div>
 
@@ -757,7 +778,7 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                 <button
                   type="submit"
                   disabled={overrideSubmitting}
-                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium shadow-sm transition disabled:opacity-50"
+                  className="px-4 py-2 bg-slate-950 hover:bg-slate-800 text-white rounded-lg font-medium shadow-sm transition disabled:opacity-50"
                 >
                   {overrideSubmitting ? 'Submitting...' : 'Confirm Override'}
                 </button>
