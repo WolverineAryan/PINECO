@@ -23,11 +23,25 @@ def get_utc_now() -> datetime:
     return datetime.now(timezone.utc)
 
 
+class Product(Base):
+    __tablename__ = "products"
+
+    id = Column(String(64), primary_key=True, default=generate_uuid)
+    workspace_id = Column(String(64), nullable=False, index=True)
+    name = Column(String(255), nullable=False)
+    description = Column(Text, nullable=True)
+    category = Column(String(64), nullable=False, default="Software")
+    created_by = Column(String(64), nullable=False)
+    created_at = Column(DateTime(timezone=True), default=get_utc_now, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=get_utc_now, onupdate=get_utc_now, nullable=False)
+
+
 class BrandRule(Base):
     __tablename__ = "brand_rules"
 
     id = Column(String(36), primary_key=True, default=generate_uuid)
     workspace_id = Column(String(64), nullable=False, index=True)
+    product_id = Column(String(64), nullable=True, index=True)
     name = Column(String(255), nullable=False)
     category = Column(String(64), nullable=False, index=True)  # terminology, tone, disclaimer, factual
     description = Column(Text, nullable=False)
@@ -49,6 +63,7 @@ class ApprovedFact(Base):
 
     id = Column(String(36), primary_key=True, default=generate_uuid)
     workspace_id = Column(String(64), nullable=False, index=True)
+    product_id = Column(String(64), nullable=True, index=True)
     statement = Column(Text, nullable=False)
     source_title = Column(String(255), nullable=False)
     source_reference = Column(String(255), nullable=False)
@@ -68,6 +83,7 @@ class Submission(Base):
 
     id = Column(String(36), primary_key=True, default=generate_uuid)
     workspace_id = Column(String(64), nullable=False, index=True)
+    product_id = Column(String(64), nullable=True, index=True)
     title = Column(String(255), nullable=False)
     channel = Column(String(64), nullable=False, default="all")
     created_by = Column(String(64), nullable=False)

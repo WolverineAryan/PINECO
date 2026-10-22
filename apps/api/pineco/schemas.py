@@ -29,6 +29,35 @@ class ErrorResponse(BaseModel):
 
 
 # -------------------------------------------------------------
+# Products / Projects Schemas (Folders)
+# -------------------------------------------------------------
+class ProductCreate(BaseModel):
+    name: str = Field(..., min_length=2, max_length=255)
+    description: Optional[str] = None
+    category: str = Field(default="Software", max_length=64)
+    workspace_id: Optional[str] = None
+
+
+class ProductUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    category: Optional[str] = None
+
+
+class ProductResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    workspace_id: str
+    name: str
+    description: Optional[str] = None
+    category: str
+    created_by: str
+    created_at: datetime
+    updated_at: datetime
+
+
+# -------------------------------------------------------------
 # Brand Rules Schemas
 # -------------------------------------------------------------
 class RuleCreate(BaseModel):
@@ -41,6 +70,7 @@ class RuleCreate(BaseModel):
     channel_scope: str = "all"
     enabled: bool = True
     workspace_id: Optional[str] = None
+    product_id: Optional[str] = None
 
 
 class RuleUpdate(BaseModel):
@@ -52,6 +82,7 @@ class RuleUpdate(BaseModel):
     severity: Optional[SeverityLevel] = None
     channel_scope: Optional[str] = None
     enabled: Optional[bool] = None
+    product_id: Optional[str] = None
 
 
 class RuleResponse(BaseModel):
@@ -59,6 +90,7 @@ class RuleResponse(BaseModel):
 
     id: str
     workspace_id: str
+    product_id: Optional[str] = None
     name: str
     category: str
     description: str
@@ -86,6 +118,7 @@ class FactCreate(BaseModel):
     valid_from: Optional[datetime] = None
     valid_until: Optional[datetime] = None
     workspace_id: Optional[str] = None
+    product_id: Optional[str] = None
 
 
 class FactResponse(BaseModel):
@@ -93,6 +126,7 @@ class FactResponse(BaseModel):
 
     id: str
     workspace_id: str
+    product_id: Optional[str] = None
     statement: str
     source_title: str
     source_reference: str
@@ -113,6 +147,7 @@ class SubmissionCreate(BaseModel):
     channel: str = Field(default="all", max_length=64)
     content: str = Field(..., min_length=3)
     workspace_id: Optional[str] = None
+    product_id: Optional[str] = None
 
 
 class VersionCreate(BaseModel):
@@ -136,6 +171,7 @@ class SubmissionResponse(BaseModel):
 
     id: str
     workspace_id: str
+    product_id: Optional[str] = None
     title: str
     channel: str
     created_by: str

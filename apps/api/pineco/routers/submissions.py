@@ -26,11 +26,14 @@ def hash_text(text: str) -> str:
 @router.get("", response_model=List[SubmissionResponse])
 def list_submissions(
     workspace_id: Optional[str] = Query(default=None),
+    product_id: Optional[str] = Query(default=None),
     status: Optional[str] = Query(default=None),
     db: Session = Depends(get_db),
 ):
     ws_id = workspace_id or settings.DEFAULT_WORKSPACE_ID
     query = db.query(Submission).filter(Submission.workspace_id == ws_id)
+    if product_id:
+        query = query.filter(Submission.product_id == product_id)
     if status:
         query = query.filter(Submission.status == status)
     return query.order_by(Submission.updated_at.desc()).all()
@@ -45,6 +48,7 @@ def create_submission(
     ws_id = payload.workspace_id or settings.DEFAULT_WORKSPACE_ID
     submission = Submission(
         workspace_id=ws_id,
+        product_id=payload.product_id,
         title=payload.title,
         channel=payload.channel,
         created_by=actor_id,

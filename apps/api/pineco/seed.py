@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from pineco.config import settings
 from pineco.database import SessionLocal, Base, engine
 from pineco.models import (
+    Product,
     BrandRule,
     ApprovedFact,
     Submission,
@@ -41,6 +42,19 @@ def seed_database(db: Session) -> None:
         db.query(Submission).filter(Submission.id.in_(sub_ids)).delete(synchronize_session=False)
     db.query(BrandRule).filter(BrandRule.workspace_id == workspace_id).delete()
     db.query(ApprovedFact).filter(ApprovedFact.workspace_id == workspace_id).delete()
+    db.query(Product).filter(Product.workspace_id == workspace_id).delete()
+    db.commit()
+
+    # 0. Seed Demo Product (Folder)
+    demo_product = Product(
+        id="prod-demo-enterprise",
+        workspace_id=workspace_id,
+        name="Pineco Core Cloud",
+        description="Flagship AI Brand Governance & Pre-Publication Compliance Platform",
+        category="Enterprise Cloud",
+        created_by=settings.DEFAULT_USER_ADMIN,
+    )
+    db.add(demo_product)
     db.commit()
 
     # 1. Seed Brand Rules
@@ -48,6 +62,7 @@ def seed_database(db: Session) -> None:
         BrandRule(
             id="rule-demo-001",
             workspace_id=workspace_id,
+            product_id="prod-demo-enterprise",
             name="Prohibited Absolute Claim: 'guaranteed results'",
             category="terminology",
             description="Brand policy prohibits absolute guarantees in marketing copy.",
@@ -62,6 +77,7 @@ def seed_database(db: Session) -> None:
         BrandRule(
             id="rule-demo-002",
             workspace_id=workspace_id,
+            product_id="prod-demo-enterprise",
             name="Prohibited Value Term: 'cheap'",
             category="terminology",
             description="Use value-oriented messaging rather than terms implying inferior quality.",
@@ -76,6 +92,7 @@ def seed_database(db: Session) -> None:
         BrandRule(
             id="rule-demo-003",
             workspace_id=workspace_id,
+            product_id="prod-demo-enterprise",
             name="Mandatory Performance Disclaimer",
             category="disclaimer",
             description="All promotional and financial communications must include the standard forward-looking disclaimer.",
@@ -90,6 +107,7 @@ def seed_database(db: Session) -> None:
         BrandRule(
             id="rule-demo-004",
             workspace_id=workspace_id,
+            product_id="prod-demo-enterprise",
             name="Professional Non-Aggressive Tone",
             category="tone",
             description="Maintain an authoritative, transparent tone. Avoid aggressive countdowns and unsubstantiated leaps.",
@@ -110,6 +128,7 @@ def seed_database(db: Session) -> None:
         ApprovedFact(
             id="fact-demo-001",
             workspace_id=workspace_id,
+            product_id="prod-demo-enterprise",
             statement="Pineco reduces compliance turnaround times by up to 68% across enterprise content teams.",
             source_title="Enterprise Benchmark & Value Report 2026",
             source_reference="REP-2026-68",
@@ -123,6 +142,7 @@ def seed_database(db: Session) -> None:
         ApprovedFact(
             id="fact-demo-002",
             workspace_id=workspace_id,
+            product_id="prod-demo-enterprise",
             statement="Pineco is strictly an advisory governance platform and does NOT provide automated legal or regulatory sign-off without certified human review.",
             source_title="Legal & Compliance Risk Charter v3.0",
             source_reference="LEG-POL-2026",
@@ -136,6 +156,7 @@ def seed_database(db: Session) -> None:
         ApprovedFact(
             id="fact-demo-003",
             workspace_id=workspace_id,
+            product_id="prod-demo-enterprise",
             statement="Pineco features deterministic rule evaluation, dual PostgreSQL/SQLite persistence, and server-side LLM provider adapters.",
             source_title="Pineco Technical Architecture Specification",
             source_reference="ENG-ARCH-001",
@@ -159,6 +180,7 @@ def seed_database(db: Session) -> None:
     clean_sub = Submission(
         id="sub-demo-clean",
         workspace_id=workspace_id,
+        product_id="prod-demo-enterprise",
         title="Enterprise Brand Governance Launch Press Release",
         channel="press_release",
         created_by=settings.DEFAULT_USER_CREATOR,
@@ -235,6 +257,7 @@ def seed_database(db: Session) -> None:
     viol_sub = Submission(
         id="sub-demo-violation",
         workspace_id=workspace_id,
+        product_id="prod-demo-enterprise",
         title="Q4 High-Growth Campaign Draft (Violations Sample)",
         channel="social",
         created_by=settings.DEFAULT_USER_CREATOR,

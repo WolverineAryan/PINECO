@@ -13,9 +13,11 @@ class Settings(BaseSettings):
     CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000,https://pineco.vercel.app"
 
     # Server-side AI provider configuration
-    LLM_PROVIDER: str = "openai"  # openai, gemini, anthropic, groq, mock
+    LLM_PROVIDER: str = "openai"  # grok, xai, openai, gemini, anthropic, mock
     LLM_API_KEY: str = ""
-    LLM_MODEL: str = "gpt-4o-mini"
+    GROK_API_KEY: str = ""
+    XAI_API_KEY: str = ""
+    LLM_MODEL: str = "grok-2-latest"
     LLM_BASE_URL: str = ""
 
     MAX_UPLOAD_MB: int = 10

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { UserProfile, UserRole } from '@/lib/types';
+import { UserProfile, UserRole, Product } from '@/lib/types';
 import { api } from '@/lib/api';
 
 const DEFAULT_PROFILES: Record<UserRole, UserProfile> = {
@@ -48,6 +48,13 @@ interface RoleContextType {
   setRole: (role: UserRole) => void;
   currentUser: UserProfile;
   workspaceId: string;
+  setWorkspaceId: (id: string) => void;
+  products: Product[];
+  activeProduct: Product | null;
+  setActiveProduct: (prod: Product | null) => void;
+  reloadProducts: () => Promise<void>;
+  isDemoMode: boolean;
+  setDemoMode: (val: boolean) => void;
   token: string | null;
   loginWithRole: (role: UserRole) => Promise<void>;
   loginWithCredentials: (email: string, password?: string) => Promise<void>;
@@ -62,9 +69,36 @@ const RoleContext = createContext<RoleContextType | undefined>(undefined);
 export function RoleProvider({ children }: { children: React.ReactNode }) {
   const [role, setRoleState] = useState<UserRole>('reviewer');
   const [currentUser, setCurrentUser] = useState<UserProfile>(DEFAULT_PROFILES['reviewer']);
-  const [workspaceId] = useState('ws-demo-enterprise-001');
+  const [workspaceId, setWorkspaceId] = useState('ws-demo-enterprise-001');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [activeProduct, setActiveProduct] = useState<Product | null>(null);
+  const [isDemoMode, setDemoMode] = useState(true);
   const [token, setToken] = useState<string | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const reloadProducts = async () => {
+    try {
+      const list = await api.getProducts(workspaceId);
+      setProducts(list);
+      if (list.length > 0) {
+        // preserve current selection or default to first
+        setActiveProduct((prev) => {
+          if (prev && list.some((p) => p.id === prev.id)) {
+            return list.find((p) => p.id === prev.id) || list[0];
+          }
+          return list[0];
+        });
+      } else {
+        setActiveProduct(null);
+      }
+    } catch {
+      // If offline
+    }
+  };
+
+  useEffect(() => {
+    reloadProducts();
+  }, [workspaceId]);
 
   useEffect(() => {
     // Check if token exists in localStorage
@@ -132,6 +166,13 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
         setRole,
         currentUser,
         workspaceId,
+        setWorkspaceId,
+        products,
+        activeProduct,
+        setActiveProduct,
+        reloadProducts,
+        isDemoMode,
+        setDemoMode,
         token,
         loginWithRole,
         loginWithCredentials,

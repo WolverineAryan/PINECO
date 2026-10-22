@@ -21,30 +21,41 @@ router = APIRouter(tags=["Dashboard"])
 @router.get("/dashboard/summary", response_model=DashboardSummaryResponse)
 def get_dashboard_summary(
     workspace_id: Optional[str] = Query(default=None),
+    product_id: Optional[str] = Query(default=None),
     db: Session = Depends(get_db),
 ):
     ws_id = workspace_id or settings.DEFAULT_WORKSPACE_ID
 
     # Submissions counts
-    subs = db.query(Submission).filter(Submission.workspace_id == ws_id).all()
+    subs_query = db.query(Submission).filter(Submission.workspace_id == ws_id)
+    if product_id:
+        subs_query = subs_query.filter(Submission.product_id == product_id)
+    subs = subs_query.all()
     total_subs = len(subs)
     approved_subs = sum(1 for s in subs if s.status == "approved")
     changes_requested_subs = sum(1 for s in subs if s.status == "changes_requested")
     pending_subs = sum(1 for s in subs if s.status in ("draft", "in_review"))
 
     # Rules & facts
-    total_rules = db.query(BrandRule).filter(BrandRule.workspace_id == ws_id).count()
-    total_facts = db.query(ApprovedFact).filter(ApprovedFact.workspace_id == ws_id).count()
+    rules_q = db.query(BrandRule).filter(BrandRule.workspace_id == ws_id)
+    if product_id:
+        rules_q = rules_q.filter((BrandRule.product_id == product_id) | (BrandRule.product_id.is_(None)))
+    total_rules = rules_q.count()
 
-    # Findings metrics
-    # Get all findings for reviews in this workspace
-    all_findings = (
-        db.query(Finding.severity, Finding.category)
-        .join(Submission, Submission.id == Finding.review_id, isouter=True)  # or directly count
-        .all()
-    )
-    # Direct query of findings
-    findings = db.query(Finding).all()
+    facts_q = db.query(ApprovedFact).filter(ApprovedFact.workspace_id == ws_id)
+    if product_id:
+        facts_q = facts_q.filter((ApprovedFact.product_id == product_id) | (ApprovedFact.product_id.is_(None)))
+    total_facts = facts_q.count()
+
+    # Findings metrics for these submissions
+    sub_ids = [s.id for s in subs]
+    if sub_ids:
+        from pineco.models import Review
+        review_ids = [r.id for r in db.query(Review.id).filter(Review.submission_id.in_(sub_ids)).all()]
+        findings = db.query(Finding).filter(Finding.review_id.in_(review_ids)).all() if review_ids else []
+    else:
+        findings = []
+
     total_findings = len(findings)
 
     findings_by_severity = {"low": 0, "medium": 0, "high": 0}
@@ -61,13 +72,10 @@ def get_dashboard_summary(
             findings_by_category[cat] = findings_by_category.get(cat, 0) + 1
 
     # Recent submissions
-    recent_subs = (
-        db.query(Submission)
-        .filter(Submission.workspace_id == ws_id)
-        .order_by(Submission.updated_at.desc())
-        .limit(5)
-        .all()
-    )
+    recent_subs_q = db.query(Submission).filter(Submission.workspace_id == ws_id)
+    if product_id:
+        recent_subs_q = recent_subs_q.filter(Submission.product_id == product_id)
+    recent_subs = recent_subs_q.order_by(Submission.updated_at.desc()).limit(5).all()
 
     # Recent audit events
     recent_audits = (

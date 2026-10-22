@@ -55,15 +55,21 @@ async def execute_review_pipeline(
     db.commit()
     db.refresh(review)
 
-    # Load workspace rules and candidate facts
-    rules = db.query(BrandRule).filter(
+    # Load workspace rules and candidate facts (scoped to submission's product folder if assigned)
+    rules_q = db.query(BrandRule).filter(
         BrandRule.workspace_id == submission.workspace_id,
         BrandRule.enabled == True,
-    ).all()
+    )
+    if submission.product_id:
+        rules_q = rules_q.filter((BrandRule.product_id == submission.product_id) | (BrandRule.product_id.is_(None)))
+    rules = rules_q.all()
 
-    facts = db.query(ApprovedFact).filter(
+    facts_q = db.query(ApprovedFact).filter(
         ApprovedFact.workspace_id == submission.workspace_id,
-    ).all()
+    )
+    if submission.product_id:
+        facts_q = facts_q.filter((ApprovedFact.product_id == submission.product_id) | (ApprovedFact.product_id.is_(None)))
+    facts = facts_q.all()
 
     # Step 1: Run Deterministic Engine
     deterministic_findings = run_deterministic_rules(version.content_text, rules)

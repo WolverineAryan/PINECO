@@ -21,7 +21,7 @@ import { useRole } from '@/components/RoleContext';
 import { useToast } from '@/components/Toast';
 
 export default function KnowledgePage() {
-  const { workspaceId, currentUser } = useRole();
+  const { workspaceId, currentUser, activeProduct } = useRole();
   const { success, error: toastError } = useToast();
   const [activeTab, setActiveTab] = useState<'rules' | 'facts'>('rules');
 
@@ -53,9 +53,10 @@ export default function KnowledgePage() {
   const loadData = async (silent = false) => {
     try {
       if (!silent) setLoading(true);
+      const prodId = activeProduct?.id;
       const [r, f] = await Promise.all([
-        api.getRules(workspaceId),
-        api.getFacts(workspaceId),
+        api.getRules(workspaceId, prodId),
+        api.getFacts(workspaceId, prodId),
       ]);
       setRules(r);
       setFacts(f);
@@ -68,7 +69,7 @@ export default function KnowledgePage() {
 
   useEffect(() => {
     loadData();
-  }, [workspaceId]);
+  }, [workspaceId, activeProduct?.id]);
 
   const handleToggleRule = async (rule: BrandRule) => {
     try {
@@ -101,6 +102,7 @@ export default function KnowledgePage() {
           description: ruleDescription,
           enabled: true,
           workspace_id: workspaceId,
+          product_id: activeProduct?.id || undefined,
         },
         currentUser.id
       );
@@ -128,6 +130,7 @@ export default function KnowledgePage() {
           owner: factOwner,
           approval_status: 'approved',
           workspace_id: workspaceId,
+          product_id: activeProduct?.id || undefined,
         },
         currentUser.id
       );
@@ -171,26 +174,33 @@ export default function KnowledgePage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Brand Knowledge Base</h1>
+          <div className="flex items-center space-x-2">
+            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#191919]">
+              Brand Policies & Knowledge
+            </h1>
+            <span className="text-[10px] font-mono bg-[#FFFFF0] border border-[#F6C324] text-[#191919] font-bold px-2 py-0.5 rounded-full">
+              📁 {activeProduct?.name || 'All Assets'}
+            </span>
+          </div>
           <p className="text-xs text-slate-500 mt-1">
-            Authoritative deterministic policies, prohibited terms, disclaimers, and verified corporate facts.
+            Authoritative deterministic policies, prohibited terms, disclaimers, and verified corporate facts for this product.
           </p>
         </div>
         <div className="flex items-center space-x-2.5">
           {activeTab === 'rules' ? (
             <button
               onClick={() => setShowRuleModal(true)}
-              className="flex items-center space-x-1.5 bg-slate-950 hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm transition"
+              className="flex items-center space-x-1.5 bg-[#F6C324] hover:bg-[#E5B520] text-[#191919] text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition active:scale-95"
             >
-              <Plus className="w-3.5 h-3.5 text-emerald-400" />
+              <Plus className="w-3.5 h-3.5 text-[#191919]" />
               <span>New Brand Rule</span>
             </button>
           ) : (
             <button
               onClick={() => setShowFactModal(true)}
-              className="flex items-center space-x-1.5 bg-slate-950 hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm transition"
+              className="flex items-center space-x-1.5 bg-[#F6C324] hover:bg-[#E5B520] text-[#191919] text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition active:scale-95"
             >
-              <Plus className="w-3.5 h-3.5 text-teal-400" />
+              <Plus className="w-3.5 h-3.5 text-[#191919]" />
               <span>Add Approved Fact</span>
             </button>
           )}

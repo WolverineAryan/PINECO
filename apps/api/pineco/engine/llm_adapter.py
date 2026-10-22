@@ -20,10 +20,24 @@ class LLMAdapter:
     """
 
     def __init__(self):
-        self.provider = settings.LLM_PROVIDER.lower()
-        self.api_key = settings.LLM_API_KEY
-        self.model = settings.LLM_MODEL or "gpt-4o-mini"
-        self.base_url = settings.LLM_BASE_URL
+        # Auto-detect Grok / xAI key from settings or environment
+        import os
+        grok_key = (
+            os.getenv("GROK_API_KEY")
+            or os.getenv("XAI_API_KEY")
+            or settings.GROK_API_KEY
+            or settings.XAI_API_KEY
+        )
+        if grok_key or settings.LLM_PROVIDER.lower() in ("grok", "xai"):
+            self.provider = "grok"
+            self.api_key = grok_key or settings.LLM_API_KEY
+            self.model = settings.LLM_MODEL if settings.LLM_MODEL and settings.LLM_MODEL != "gpt-4o-mini" else "grok-2-latest"
+            self.base_url = settings.LLM_BASE_URL or "https://api.x.ai/v1/chat/completions"
+        else:
+            self.provider = settings.LLM_PROVIDER.lower()
+            self.api_key = settings.LLM_API_KEY
+            self.model = settings.LLM_MODEL or "gpt-4o-mini"
+            self.base_url = settings.LLM_BASE_URL
 
     async def analyze_content(
         self,

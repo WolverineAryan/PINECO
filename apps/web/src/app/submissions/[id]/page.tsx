@@ -223,25 +223,25 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
     <div className="space-y-6">
       {/* Top Nav & Action Header */}
       <div className="flex items-center justify-between">
-        <Link href="/" className="inline-flex items-center space-x-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition">
+        <Link href="/dashboard" className="inline-flex items-center space-x-1.5 text-xs font-bold text-slate-600 hover:text-[#191919] transition">
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Dashboard</span>
+          <span>&larr; Back to Product Compliance Hub</span>
         </Link>
         <div className="flex items-center space-x-2">
           <button
             onClick={handleRerunReview}
             disabled={rerunning}
-            className="flex items-center space-x-1.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-medium px-3 py-1.5 rounded-lg shadow-sm transition disabled:opacity-50"
+            className="flex items-center space-x-1.5 bg-white hover:bg-[#FFFFF0] border border-[#E8E8DC] text-[#191919] text-xs font-semibold px-3 py-2 rounded-xl shadow-sm transition disabled:opacity-50"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-slate-400 ${rerunning ? 'animate-spin' : ''}`} />
-            <span>Rerun Review</span>
+            <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${rerunning ? 'animate-spin' : ''}`} />
+            <span>Rerun Scan</span>
           </button>
           <button
             onClick={() => setShowDecisionModal(true)}
-            className="flex items-center space-x-1.5 bg-slate-950 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg shadow-sm transition"
+            className="flex items-center space-x-1.5 bg-[#F6C324] hover:bg-[#E5B520] text-[#191919] text-xs font-bold px-4 py-2 rounded-xl shadow-sm transition active:scale-95"
           >
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Record Decision</span>
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#191919]" />
+            <span>Record Human Decision</span>
           </button>
         </div>
       </div>
@@ -300,38 +300,38 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center space-x-2 border-b border-slate-200 pb-3 text-xs">
+      <div className="flex items-center space-x-2 border-b border-[#E8E8DC] pb-3 text-xs">
         <button
           onClick={() => setActiveTab('findings')}
-          className={`px-3.5 py-1.5 rounded-lg font-semibold transition flex items-center space-x-2 ${
+          className={`px-3.5 py-1.5 rounded-xl font-bold transition flex items-center space-x-2 ${
             activeTab === 'findings'
-              ? 'bg-slate-950 text-white shadow-sm'
-              : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-[#F6C324] text-[#191919] shadow-sm'
+              : 'text-slate-600 hover:text-[#191919] hover:bg-[#FFFFF0]'
           }`}
         >
-          <Shield className="w-3.5 h-3.5" />
-          <span>Findings Explorer ({findings.length})</span>
+          <Shield className="w-3.5 h-3.5 text-[#191919]" />
+          <span>Findings & Evidence ({findings.length})</span>
         </button>
         <button
           onClick={() => setActiveTab('editor')}
-          className={`px-3.5 py-1.5 rounded-lg font-semibold transition flex items-center space-x-2 ${
+          className={`px-3.5 py-1.5 rounded-xl font-bold transition flex items-center space-x-2 ${
             activeTab === 'editor'
-              ? 'bg-slate-950 text-white shadow-sm'
-              : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-[#F6C324] text-[#191919] shadow-sm'
+              : 'text-slate-600 hover:text-[#191919] hover:bg-[#FFFFF0]'
           }`}
         >
-          <FileText className="w-3.5 h-3.5" />
-          <span>Revision Editor</span>
+          <FileText className="w-3.5 h-3.5 text-[#191919]" />
+          <span>Revision Studio</span>
         </button>
         <button
           onClick={() => setActiveTab('history')}
-          className={`px-3.5 py-1.5 rounded-lg font-semibold transition flex items-center space-x-2 ${
+          className={`px-3.5 py-1.5 rounded-xl font-bold transition flex items-center space-x-2 ${
             activeTab === 'history'
-              ? 'bg-slate-950 text-white shadow-sm'
-              : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-[#F6C324] text-[#191919] shadow-sm'
+              : 'text-slate-600 hover:text-[#191919] hover:bg-[#FFFFF0]'
           }`}
         >
-          <History className="w-3.5 h-3.5" />
+          <History className="w-3.5 h-3.5 text-[#191919]" />
           <span>Version History ({submission.versions.length})</span>
         </button>
       </div>

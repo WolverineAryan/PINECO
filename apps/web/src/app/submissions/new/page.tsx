@@ -16,7 +16,7 @@ import { useToast } from '@/components/Toast';
 
 export default function NewSubmissionPage() {
   const router = useRouter();
-  const { workspaceId, currentUser } = useRole();
+  const { workspaceId, currentUser, activeProduct } = useRole();
   const { success, error: toastError } = useToast();
 
   const [title, setTitle] = useState('');
@@ -65,6 +65,7 @@ export default function NewSubmissionPage() {
           channel,
           content: content.trim(),
           workspace_id: workspaceId,
+          product_id: activeProduct?.id || undefined,
         },
         currentUser.id
       );
@@ -85,9 +86,14 @@ export default function NewSubmissionPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">New Content Submission</h1>
+        <div className="flex items-center space-x-2">
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#191919]">Scan Content</h1>
+          <span className="text-[10px] font-mono bg-[#FFFFF0] border border-[#F6C324] text-[#191919] font-bold px-2 py-0.5 rounded-full">
+            📁 {activeProduct?.name || 'All Assets'}
+          </span>
+        </div>
         <p className="text-xs text-slate-500 mt-1">
-          Submit draft copy to execute deterministic policy checks, disclaimer presence verification, and factual claim evidence analysis.
+          Submit draft copy to execute deterministic policy checks, disclaimer verification, and factual claim analysis for this product.
         </p>
       </div>
 
@@ -181,16 +187,16 @@ export default function NewSubmissionPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="flex items-center space-x-2 bg-slate-950 hover:bg-slate-800 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-sm transition disabled:opacity-50"
+            className="flex items-center space-x-2 bg-[#F6C324] hover:bg-[#E5B520] text-[#191919] font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition disabled:opacity-50 active:scale-95"
           >
             {submitting ? (
               <>
-                <RefreshCw className="w-4 h-4 animate-spin text-emerald-400" />
+                <RefreshCw className="w-4 h-4 animate-spin text-[#191919]" />
                 <span>Running Governance Pipeline...</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 text-emerald-400" />
+                <Sparkles className="w-4 h-4 text-[#191919]" />
                 <span>Submit & Run Review &rarr;</span>
               </>
             )}

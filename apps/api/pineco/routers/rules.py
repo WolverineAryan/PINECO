@@ -14,12 +14,15 @@ router = APIRouter(prefix="/rules", tags=["Brand Rules"])
 @router.get("", response_model=List[RuleResponse])
 def list_rules(
     workspace_id: Optional[str] = Query(default=None),
+    product_id: Optional[str] = Query(default=None),
     category: Optional[str] = Query(default=None),
     enabled: Optional[bool] = Query(default=None),
     db: Session = Depends(get_db),
 ):
     ws_id = workspace_id or settings.DEFAULT_WORKSPACE_ID
     query = db.query(BrandRule).filter(BrandRule.workspace_id == ws_id)
+    if product_id:
+        query = query.filter((BrandRule.product_id == product_id) | (BrandRule.product_id.is_(None)))
     if category:
         query = query.filter(BrandRule.category == category)
     if enabled is not None:
@@ -36,6 +39,7 @@ def create_rule(
     ws_id = payload.workspace_id or settings.DEFAULT_WORKSPACE_ID
     rule = BrandRule(
         workspace_id=ws_id,
+        product_id=payload.product_id,
         name=payload.name,
         category=payload.category,
         description=payload.description,

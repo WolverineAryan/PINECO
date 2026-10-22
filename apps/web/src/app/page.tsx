@@ -124,12 +124,12 @@ export default function LandingPage() {
         </p>
 
         {/* Hero CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <Link
             href="/dashboard"
             className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-[#F6C324] hover:bg-[#e5b41e] text-[#191919] font-bold text-sm px-7 py-3.5 rounded-xl shadow-md hover:shadow-lg transition active:scale-95"
           >
-            <span>Launch Command Center</span>
+            <span>Explore Demo Workspace</span>
             <ArrowRight className="w-4 h-4 text-[#191919]" />
           </Link>
           <button
@@ -137,7 +137,7 @@ export default function LandingPage() {
             className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-white hover:bg-[#FFFFF0] border border-[#E8E8DC] text-[#191919] font-semibold text-sm px-6 py-3.5 rounded-xl shadow-sm transition"
           >
             <UserCheck className="w-4 h-4 text-slate-600" />
-            <span>Select Demo Persona (JWT)</span>
+            <span>Persona Access (JWT)</span>
           </button>
         </div>
 

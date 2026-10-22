@@ -14,11 +14,14 @@ router = APIRouter(prefix="/facts", tags=["Approved Facts"])
 @router.get("", response_model=List[FactResponse])
 def list_facts(
     workspace_id: Optional[str] = Query(default=None),
+    product_id: Optional[str] = Query(default=None),
     status: Optional[str] = Query(default=None),
     db: Session = Depends(get_db),
 ):
     ws_id = workspace_id or settings.DEFAULT_WORKSPACE_ID
     query = db.query(ApprovedFact).filter(ApprovedFact.workspace_id == ws_id)
+    if product_id:
+        query = query.filter((ApprovedFact.product_id == product_id) | (ApprovedFact.product_id.is_(None)))
     if status:
         query = query.filter(ApprovedFact.approval_status == status)
     return query.order_by(ApprovedFact.created_at.desc()).all()
@@ -33,6 +36,7 @@ def create_fact(
     ws_id = payload.workspace_id or settings.DEFAULT_WORKSPACE_ID
     fact = ApprovedFact(
         workspace_id=ws_id,
+        product_id=payload.product_id,
         statement=payload.statement,
         source_title=payload.source_title,
         source_reference=payload.source_reference,
