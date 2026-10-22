@@ -12,14 +12,17 @@ import {
   Copy,
   Check,
   UserCheck,
+  Search,
+  Sparkles,
+  Compass,
 } from 'lucide-react';
-import { useRole, UserRole } from './RoleContext';
+import { useRole } from './RoleContext';
 import { useToast } from './Toast';
 import { api } from '@/lib/api';
 
 export function Header() {
   const pathname = usePathname();
-  const { role, setRole, currentUser, workspaceId } = useRole();
+  const { role, setRole, currentUser, workspaceId, openAuthModal } = useRole();
   const { success } = useToast();
   const [apiHealthy, setApiHealthy] = useState<boolean | null>(null);
   const [engineVersion, setEngineVersion] = useState<string>('');
@@ -41,15 +44,11 @@ export function Header() {
     setTimeout(() => setCopiedWs(false), 2000);
   };
 
-  const navItems = [
-    { label: 'Dashboard', href: '/', icon: Layers },
-    { label: 'Brand Knowledge', href: '/knowledge', icon: BookOpen },
-    { label: 'Audit Trail', href: '/audit', icon: Clock },
-  ];
+  const isLanding = pathname === '/landing';
 
   return (
     <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-50 transition-all">
-      {/* Top Telemetry & Switcher Bar */}
+      {/* Top Banner */}
       <div className="bg-slate-950 text-slate-300 text-xs px-4 sm:px-6 lg:px-8 py-1.5 flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80">
         <div className="flex items-center space-x-3">
           <span className="bg-slate-800 text-slate-300 border border-slate-700/80 text-[10px] uppercase tracking-wider px-2 py-0.5 rounded font-mono font-medium">
@@ -73,7 +72,6 @@ export function Header() {
         </div>
 
         <div className="flex items-center space-x-4">
-          {/* Live API Health indicator */}
           <div className="flex items-center space-x-1.5 text-[11px]">
             <span
               className={`w-1.5 h-1.5 rounded-full ${
@@ -91,21 +89,15 @@ export function Header() {
 
           <span className="text-slate-800">|</span>
 
-          {/* Role Switcher */}
-          <div className="flex items-center space-x-1.5 text-[11px]">
-            <UserCheck className="w-3 h-3 text-slate-400" />
-            <span className="text-slate-400">Actor:</span>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value as UserRole)}
-              className="bg-slate-900 text-slate-200 text-[11px] border border-slate-800 rounded px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-slate-600 cursor-pointer font-medium"
-            >
-              <option value="creator">Sarah Chen (Creator)</option>
-              <option value="brand_manager">Marcus Vance (Brand Manager)</option>
-              <option value="reviewer">Elena Rostova (Compliance Reviewer)</option>
-              <option value="admin">Alex Thorne (Administrator)</option>
-            </select>
-          </div>
+          {/* Active Persona / Sign In Button */}
+          <button
+            onClick={openAuthModal}
+            className="flex items-center space-x-1.5 text-[11px] text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 px-2.5 py-0.5 rounded transition"
+          >
+            <UserCheck className="w-3 h-3 text-emerald-400" />
+            <span>{currentUser.name}</span>
+            <span className="text-[10px] text-slate-400 font-mono capitalize">({role.replace('_', ' ')})</span>
+          </button>
         </div>
       </div>
 
@@ -127,28 +119,61 @@ export function Header() {
           </Link>
 
           <nav className="hidden md:flex items-center space-x-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-tight transition ${
-                    isActive
-                      ? 'bg-slate-100 text-slate-950 shadow-sm border border-slate-200/80'
-                      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
-                  }`}
-                >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-slate-900' : 'text-slate-400'}`} />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
+            <Link
+              href="/"
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-tight transition ${
+                pathname === '/'
+                  ? 'bg-slate-100 text-slate-950 shadow-sm border border-slate-200/80'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>CRM Dashboard</span>
+            </Link>
+            <Link
+              href="/knowledge"
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-tight transition ${
+                pathname === '/knowledge'
+                  ? 'bg-slate-100 text-slate-950 shadow-sm border border-slate-200/80'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Brand Knowledge</span>
+            </Link>
+            <Link
+              href="/audit"
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-tight transition ${
+                pathname === '/audit'
+                  ? 'bg-slate-100 text-slate-950 shadow-sm border border-slate-200/80'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              <Clock className="w-3.5 h-3.5" />
+              <span>Audit Trail</span>
+            </Link>
+            <Link
+              href="/landing"
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-tight transition ${
+                pathname === '/landing'
+                  ? 'bg-slate-100 text-slate-950 shadow-sm border border-slate-200/80'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              <Compass className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Product Page</span>
+            </Link>
           </nav>
         </div>
 
         <div className="flex items-center space-x-3">
+          <button
+            onClick={openAuthModal}
+            className="hidden sm:flex items-center space-x-1.5 text-xs text-slate-600 hover:text-slate-950 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition font-medium"
+          >
+            <UserCheck className="w-3.5 h-3.5" />
+            <span>Switch Persona</span>
+          </button>
           <Link
             href="/submissions/new"
             className="flex items-center space-x-1.5 bg-slate-950 hover:bg-slate-800 text-white text-xs font-medium px-3.5 py-2 rounded-lg shadow-sm hover:shadow transition duration-150"
