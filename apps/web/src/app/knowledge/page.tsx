@@ -14,6 +14,7 @@ import {
   Search,
   X,
   HelpCircle,
+  Folder,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { BrandRule, ApprovedFact } from '@/lib/types';
@@ -178,8 +179,9 @@ export default function KnowledgePage() {
             <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-black">
               Brand Policies & Knowledge
             </h1>
-            <span className="text-[10px] font-mono bg-neutral-100 border border-neutral-300 text-black font-bold px-2 py-0.5 rounded-full">
-              📁 {activeProduct?.name || 'All Assets'}
+            <span className="text-[10px] font-mono bg-neutral-100 border border-neutral-300 text-black font-bold px-2 py-0.5 rounded-full flex items-center space-x-1">
+              <Folder className="w-3 h-3 text-neutral-600" />
+              <span>{activeProduct?.name || 'All Assets'}</span>
             </span>
           </div>
           <p className="text-xs text-neutral-500 mt-1">

@@ -9,6 +9,7 @@ import {
   AlertTriangle,
   Lightbulb,
   CheckCircle2,
+  Folder,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useRole } from '@/components/RoleContext';
@@ -88,8 +89,9 @@ export default function NewSubmissionPage() {
       <div>
         <div className="flex items-center space-x-2">
           <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-black">Scan Content</h1>
-          <span className="text-[10px] font-mono bg-neutral-100 border border-neutral-300 text-black font-bold px-2 py-0.5 rounded-full">
-            📁 {activeProduct?.name || 'All Assets'}
+          <span className="text-[10px] font-mono bg-neutral-100 border border-neutral-300 text-black font-bold px-2 py-0.5 rounded-full flex items-center space-x-1">
+            <Folder className="w-3 h-3 text-neutral-600" />
+            <span>{activeProduct?.name || 'All Assets'}</span>
           </span>
         </div>
         <p className="text-xs text-slate-500 mt-1">

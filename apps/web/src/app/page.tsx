@@ -32,6 +32,7 @@ import {
   Terminal,
   Eye,
   Fingerprint,
+  Folder,
 } from 'lucide-react';
 import { useRole } from '@/components/RoleContext';
 
@@ -226,8 +227,9 @@ export default function LandingPage() {
                 <span className="w-2.5 h-2.5 rounded-full bg-white/30" />
                 <span className="w-2.5 h-2.5 rounded-full bg-white/30" />
                 <span className="w-2.5 h-2.5 rounded-full bg-white/30" />
-                <span className="font-mono text-neutral-300 font-semibold text-[11px] ml-2">
-                  📁 PINECO // PRODUCT COMPLIANCE STREAM [v2.4-PROD]
+                <span className="font-mono text-neutral-300 font-semibold text-[11px] ml-2 flex items-center space-x-1.5">
+                  <Folder className="w-3 h-3 text-neutral-400" />
+                  <span>PINECO // PRODUCT COMPLIANCE STREAM [v2.4-PROD]</span>
                 </span>
               </div>
 
@@ -277,7 +279,8 @@ export default function LandingPage() {
                 {/* Inline Detection Annotations */}
                 <div className="mt-4 pt-3 border-t border-neutral-200 flex flex-wrap items-center gap-2 text-[10px]">
                   <span className="bg-black text-white px-2 py-0.5 rounded font-bold flex items-center space-x-1">
-                    <span>⚠️ Rule Violation Intercepted</span>
+                    <AlertTriangle className="w-3 h-3 text-white" />
+                    <span>Rule Violation Intercepted</span>
                   </span>
                   <span className="bg-white border border-neutral-300 text-neutral-700 px-2 py-0.5 rounded font-medium">
                     Evidence Check: Fact #F-001 (Verified)
@@ -301,7 +304,10 @@ export default function LandingPage() {
                   <div className="mt-3 space-y-2 text-xs">
                     <div className="flex items-center justify-between text-[11px]">
                       <span className="text-neutral-600">Deterministic Engine</span>
-                      <span className="font-mono font-bold text-black">✓ Passed</span>
+                      <span className="font-mono font-bold text-black flex items-center space-x-1">
+                        <CheckCircle2 className="w-3 h-3 text-black" />
+                        <span>Passed</span>
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-[11px]">
                       <span className="text-neutral-600">AI Claim Validation</span>

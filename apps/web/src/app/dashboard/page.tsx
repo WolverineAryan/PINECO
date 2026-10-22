@@ -13,6 +13,7 @@ import {
   Sparkles,
   PlusCircle,
   FolderPlus,
+  Folder,
   Send,
   Eye,
   Layers,
@@ -104,8 +105,9 @@ export default function ProductComplianceDashboard() {
               {activeProduct?.category || 'General'}
             </span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-black tracking-tight">
-            📁 {activeProduct?.name || 'All Workspace Assets'}
+          <h1 className="text-xl sm:text-2xl font-extrabold text-black tracking-tight flex items-center space-x-2">
+            <Folder className="w-5 h-5 text-neutral-700" />
+            <span>{activeProduct?.name || 'All Workspace Assets'}</span>
           </h1>
           <p className="text-xs text-neutral-500 max-w-xl">
             {activeProduct?.description || 'Brand compliance guidelines, approved facts, and content review history.'}

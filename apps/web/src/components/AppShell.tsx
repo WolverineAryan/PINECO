@@ -9,14 +9,15 @@ import {
   Shield,
   Clock,
   UserCheck,
-  Compass,
   Menu,
   X,
   Copy,
   Check,
-  ExternalLink,
-  FolderPlus,
   ChevronDown,
+  Folder,
+  FolderPlus,
+  Bot,
+  Sparkles,
 } from 'lucide-react';
 import { useRole } from './RoleContext';
 import { useToast } from './Toast';
@@ -63,6 +64,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const navItems = [
     { label: 'Compliance Overview', href: '/dashboard', icon: LayoutDashboard },
     { label: 'Brand Guidelines', href: '/knowledge', icon: Shield },
+    { label: 'AI Agent & Automation', href: '/automation', icon: Bot },
     { label: 'Audit Timeline', href: '/audit', icon: Clock },
   ];
 
@@ -80,30 +82,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Desktop Persistent Left Sidebar */}
       <aside className="hidden lg:flex w-64 bg-white border-r border-neutral-200 flex-col shrink-0 min-h-screen fixed inset-y-0 left-0 z-30 shadow-[1px_0_4px_rgba(0,0,0,0.02)]">
-        {/* Brand Header with New Logos */}
-        <div className="px-4 py-3.5 border-b border-neutral-200 flex items-center bg-white">
+        {/* Brand Header */}
+        <div className="h-16 px-4 border-b border-neutral-200 flex items-center bg-white">
           <Link href="/dashboard" className="flex items-center w-full group">
             <img
               src="/logo-navbar.png"
               alt="Pineco"
-              className="h-11 sm:h-12 w-auto max-w-[210px] object-contain transition group-hover:opacity-90"
+              className="h-9 w-full object-contain object-left transition group-hover:opacity-90"
             />
           </Link>
         </div>
 
         {/* Product Folder Selection Card */}
         <div className="p-3 border-b border-neutral-200 bg-neutral-50/70 space-y-2">
-          <div className="flex items-center justify-between text-[11px]">
+          <div className="flex items-center space-x-1.5 text-[11px]">
+            <Folder className="w-3.5 h-3.5 text-neutral-500" />
             <span className="font-mono text-[9px] uppercase font-bold tracking-wider text-neutral-500">
-              Product Space (Folder)
+              Product Workspace
             </span>
-            <button
-              onClick={() => setShowCreateProduct(true)}
-              className="text-[10px] font-bold text-black hover:underline flex items-center space-x-0.5"
-            >
-              <FolderPlus className="w-3 h-3 text-black" />
-              <span>+ New</span>
-            </button>
           </div>
 
           <div className="relative">
@@ -116,11 +112,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               className="w-full text-xs font-bold text-black bg-white border border-neutral-300 hover:border-black rounded-xl px-2.5 py-2 appearance-none focus:outline-none focus:ring-1 focus:ring-black cursor-pointer shadow-xs pr-7 truncate"
             >
               {products.length === 0 ? (
-                <option value="">(No product folders yet)</option>
+                <option value="">(No product workspaces)</option>
               ) : (
                 products.map((p) => (
                   <option key={p.id} value={p.id}>
-                    📁 {p.name}
+                    {p.name}
                   </option>
                 ))
               )}
@@ -160,18 +156,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
-
-          <div className="pt-4 px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400 font-mono">
-            Navigation
-          </div>
-          <Link
-            href="/"
-            className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-neutral-600 hover:text-black hover:bg-neutral-100 transition"
-          >
-            <Compass className="w-4 h-4 text-neutral-500" />
-            <span>Product Landing</span>
-            <ExternalLink className="w-3 h-3 text-neutral-400 ml-auto" />
-          </Link>
         </nav>
 
         {/* Quick Scan Action in Sidebar */}
@@ -235,8 +219,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="flex items-center space-x-2 text-xs font-medium text-neutral-600">
               <span className="text-neutral-400">Products</span>
               <span className="text-neutral-300">/</span>
-              <span className="font-bold text-black flex items-center space-x-1">
-                <span>📁 {activeProduct?.name || 'All Workspace Assets'}</span>
+              <span className="font-bold text-black flex items-center space-x-1.5">
+                <Folder className="w-3.5 h-3.5 text-neutral-600" />
+                <span>{activeProduct?.name || 'All Workspace Assets'}</span>
               </span>
             </div>
           </div>
@@ -276,7 +261,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               >
                 {products.map((p) => (
                   <option key={p.id} value={p.id}>
-                    📁 {p.name}
+                    {p.name}
                   </option>
                 ))}
               </select>
