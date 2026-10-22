@@ -175,14 +175,14 @@ export default function KnowledgePage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center space-x-2">
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#191919]">
+            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-black">
               Brand Policies & Knowledge
             </h1>
-            <span className="text-[10px] font-mono bg-[#FFFFF0] border border-[#F6C324] text-[#191919] font-bold px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-mono bg-neutral-100 border border-neutral-300 text-black font-bold px-2 py-0.5 rounded-full">
               📁 {activeProduct?.name || 'All Assets'}
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-neutral-500 mt-1">
             Authoritative deterministic policies, prohibited terms, disclaimers, and verified corporate facts for this product.
           </p>
         </div>
@@ -190,17 +190,17 @@ export default function KnowledgePage() {
           {activeTab === 'rules' ? (
             <button
               onClick={() => setShowRuleModal(true)}
-              className="flex items-center space-x-1.5 bg-[#F6C324] hover:bg-[#E5B520] text-[#191919] text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition active:scale-95"
+              className="flex items-center space-x-1.5 bg-black hover:bg-neutral-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs transition active:scale-95"
             >
-              <Plus className="w-3.5 h-3.5 text-[#191919]" />
+              <Plus className="w-3.5 h-3.5 text-white" />
               <span>New Brand Rule</span>
             </button>
           ) : (
             <button
               onClick={() => setShowFactModal(true)}
-              className="flex items-center space-x-1.5 bg-[#F6C324] hover:bg-[#E5B520] text-[#191919] text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition active:scale-95"
+              className="flex items-center space-x-1.5 bg-black hover:bg-neutral-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs transition active:scale-95"
             >
-              <Plus className="w-3.5 h-3.5 text-[#191919]" />
+              <Plus className="w-3.5 h-3.5 text-white" />
               <span>Add Approved Fact</span>
             </button>
           )}

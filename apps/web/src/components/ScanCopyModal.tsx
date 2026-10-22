@@ -75,23 +75,23 @@ export function ScanCopyModal({ isOpen, onClose, defaultChannel = 'social' }: Sc
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl max-w-xl w-full p-6 border border-[#E8E8DC] shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between pb-3 border-b border-[#E8E8DC]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="bg-white rounded-2xl max-w-xl w-full p-6 border border-neutral-200 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between pb-3 border-b border-neutral-200">
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#F6C324] text-[#191919] flex items-center justify-center font-bold">
-              <FileCheck className="w-4 h-4 text-[#191919]" />
+            <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-bold">
+              <FileCheck className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-[#191919]">Scan Content for Brand Compliance</h2>
-              <p className="text-[11px] text-slate-500">
-                Product Scope: <strong className="text-[#191919]">{activeProduct?.name || 'All Workspace Assets'}</strong>
+              <h2 className="text-base font-bold text-black">Scan Content for Brand Compliance</h2>
+              <p className="text-[11px] text-neutral-500">
+                Product Scope: <strong className="text-black">{activeProduct?.name || 'All Workspace Assets'}</strong>
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
+            className="p-1 rounded-lg text-neutral-400 hover:text-black hover:bg-neutral-100 transition"
           >
             <X className="w-4 h-4" />
           </button>
@@ -100,23 +100,23 @@ export function ScanCopyModal({ isOpen, onClose, defaultChannel = 'social' }: Sc
         <form onSubmit={handleScan} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="sm:col-span-2 space-y-1">
-              <label className="text-xs font-semibold text-[#191919]">Content Asset Title *</label>
+              <label className="text-xs font-semibold text-black">Content Asset Title *</label>
               <input
                 type="text"
                 required
                 placeholder="e.g. Q4 Product Announcement, Instagram Copy"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#F6C324] bg-[#FFFFF0]/40 text-[#191919]"
+                className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:outline-none focus:ring-1 focus:ring-black bg-white text-black"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-[#191919]">Publishing Channel</label>
+              <label className="text-xs font-semibold text-black">Publishing Channel</label>
               <select
                 value={channel}
                 onChange={(e) => setChannel(e.target.value)}
-                className="w-full text-xs px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#F6C324] bg-white text-[#191919]"
+                className="w-full text-xs px-3 py-2.5 rounded-xl border border-neutral-300 focus:outline-none focus:ring-1 focus:ring-black bg-white text-black"
               >
                 <option value="social">Social Media (LinkedIn, X)</option>
                 <option value="press_release">Press Release</option>
@@ -130,21 +130,21 @@ export function ScanCopyModal({ isOpen, onClose, defaultChannel = 'social' }: Sc
 
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-[#191919]">Draft Content to Audit *</label>
+              <label className="text-xs font-semibold text-black">Draft Content to Audit *</label>
               <div className="flex items-center space-x-1.5 text-[11px]">
-                <span className="text-slate-400">Load Template:</span>
+                <span className="text-neutral-400">Load Template:</span>
                 <button
                   type="button"
                   onClick={() => loadExample('violation')}
-                  className="text-amber-700 hover:underline font-medium"
+                  className="text-neutral-700 hover:text-black hover:underline font-bold"
                 >
                   Violations Sample
                 </button>
-                <span className="text-slate-300">|</span>
+                <span className="text-neutral-300">|</span>
                 <button
                   type="button"
                   onClick={() => loadExample('clean')}
-                  className="text-emerald-700 hover:underline font-medium"
+                  className="text-neutral-700 hover:text-black hover:underline font-bold"
                 >
                   Clean Sample
                 </button>
@@ -156,34 +156,34 @@ export function ScanCopyModal({ isOpen, onClose, defaultChannel = 'social' }: Sc
               placeholder="Paste promotional copy, marketing slogans, claims, or disclaimers here..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="w-full text-xs p-3.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#F6C324] bg-[#FFFFF0]/40 text-[#191919] leading-relaxed resize-none font-sans"
+              className="w-full text-xs p-3.5 rounded-xl border border-neutral-300 focus:outline-none focus:ring-1 focus:ring-black bg-white text-black leading-relaxed resize-none font-sans"
             />
           </div>
 
-          <div className="p-3 bg-[#FFFFF0] border border-[#F6C324]/50 rounded-xl flex items-start space-x-2.5 text-[11px] text-slate-700">
-            <Sparkles className="w-4 h-4 text-[#F6C324] shrink-0 mt-0.5" />
+          <div className="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex items-start space-x-2.5 text-[11px] text-neutral-700">
+            <Sparkles className="w-4 h-4 text-black shrink-0 mt-0.5" />
             <div>
-              <span className="font-semibold text-[#191919]">Multi-Stage Governance Pipeline:</span>
-              <p className="mt-0.5 text-slate-600">
+              <span className="font-bold text-black">Multi-Stage Governance Pipeline:</span>
+              <p className="mt-0.5 text-neutral-600">
                 Instantly matches prohibited terminology, checks required disclaimers, and verifies extracted claims against verified company evidence before human sign-off.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center justify-end space-x-2 pt-2 border-t border-[#E8E8DC]">
+          <div className="flex items-center justify-end space-x-2 pt-2 border-t border-neutral-200">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 transition"
+              className="px-4 py-2 text-xs font-medium text-neutral-600 hover:text-black transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting || !title.trim() || !content.trim()}
-              className="flex items-center space-x-1.5 px-5 py-2.5 text-xs font-bold bg-[#F6C324] hover:bg-[#E5B520] text-[#191919] rounded-xl shadow-sm transition disabled:opacity-50"
+              className="flex items-center space-x-1.5 px-5 py-2.5 text-xs font-bold bg-black hover:bg-neutral-800 text-white rounded-xl shadow-xs transition disabled:opacity-50"
             >
-              <Send className="w-3.5 h-3.5 text-[#191919]" />
+              <Send className="w-3.5 h-3.5 text-white" />
               <span>{submitting ? 'Running Compliance Scan...' : 'Run Compliance Scan'}</span>
             </button>
           </div>

@@ -4,25 +4,19 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  ShieldCheck,
   LayoutDashboard,
   PlusCircle,
   Shield,
-  FileText,
   Clock,
-  Sparkles,
   UserCheck,
   Compass,
   Menu,
   X,
   Copy,
   Check,
-  Search,
   ExternalLink,
-  Folder,
   FolderPlus,
   ChevronDown,
-  Layers,
 } from 'lucide-react';
 import { useRole } from './RoleContext';
 import { useToast } from './Toast';
@@ -40,7 +34,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     products,
     activeProduct,
     setActiveProduct,
-    isDemoMode,
   } = useRole();
   const { success } = useToast();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -53,7 +46,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   if (isLanding) {
     return (
-      <div className="min-h-screen bg-[#FFFFF0] text-[#191919]">
+      <div className="min-h-screen bg-white text-black">
         <AuthModal />
         {children}
       </div>
@@ -74,7 +67,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FFFFF0] text-[#191919] flex">
+    <div className="min-h-screen bg-white text-black flex">
       <AuthModal />
       <CreateProductModal
         isOpen={showCreateProduct}
@@ -86,38 +79,37 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       />
 
       {/* Desktop Persistent Left Sidebar */}
-      <aside className="hidden lg:flex w-64 bg-white border-r border-[#E8E8DC] flex-col shrink-0 min-h-screen fixed inset-y-0 left-0 z-30 shadow-[1px_0_10px_rgba(0,0,0,0.02)]">
-        {/* Brand Header */}
-        <div className="p-4 border-b border-[#E8E8DC] flex items-center justify-between bg-white">
+      <aside className="hidden lg:flex w-64 bg-white border-r border-neutral-200 flex-col shrink-0 min-h-screen fixed inset-y-0 left-0 z-30 shadow-[1px_0_4px_rgba(0,0,0,0.02)]">
+        {/* Brand Header with New Logos */}
+        <div className="p-4 border-b border-neutral-200 flex items-center justify-between bg-white">
           <Link href="/" className="flex items-center space-x-2.5 group">
-            <div className="w-8 h-8 rounded-xl bg-[#F6C324] flex items-center justify-center text-[#191919] shadow-sm font-bold transition-transform group-hover:scale-105">
-              <ShieldCheck className="w-4 h-4 text-[#191919]" />
-            </div>
-            <div>
-              <span className="text-base font-extrabold tracking-tight text-[#191919] block">
-                Pineco
-              </span>
-              <span className="text-[9px] uppercase tracking-widest font-mono text-slate-500 block -mt-1 font-semibold">
-                Brand Governance
-              </span>
-            </div>
+            <img
+              src="/logo-mark.jpg"
+              alt="Pineco"
+              className="w-8 h-8 rounded-lg object-contain border border-neutral-200 shadow-xs"
+            />
+            <img
+              src="/logo-text.png"
+              alt="PINECO"
+              className="h-4.5 w-auto object-contain"
+            />
           </Link>
-          <span className="text-[10px] font-mono bg-[#FFFFF0] border border-[#E8E8DC] text-[#191919] px-2 py-0.5 rounded font-bold">
-            PROD
+          <span className="text-[10px] font-mono bg-neutral-100 border border-neutral-300 text-black px-2 py-0.5 rounded font-bold">
+            OS
           </span>
         </div>
 
         {/* Product Folder Selection Card */}
-        <div className="p-3 border-b border-[#E8E8DC] bg-[#FFFFF0]/60 space-y-2">
+        <div className="p-3 border-b border-neutral-200 bg-neutral-50/70 space-y-2">
           <div className="flex items-center justify-between text-[11px]">
-            <span className="font-mono text-[9px] uppercase font-bold tracking-wider text-slate-500">
+            <span className="font-mono text-[9px] uppercase font-bold tracking-wider text-neutral-500">
               Product Space (Folder)
             </span>
             <button
               onClick={() => setShowCreateProduct(true)}
-              className="text-[10px] font-bold text-[#191919] hover:underline flex items-center space-x-0.5"
+              className="text-[10px] font-bold text-black hover:underline flex items-center space-x-0.5"
             >
-              <FolderPlus className="w-3 h-3 text-[#191919]" />
+              <FolderPlus className="w-3 h-3 text-black" />
               <span>+ New</span>
             </button>
           </div>
@@ -129,7 +121,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 const found = products.find((p) => p.id === e.target.value);
                 if (found) setActiveProduct(found);
               }}
-              className="w-full text-xs font-bold text-[#191919] bg-white border border-[#E8E8DC] hover:border-[#F6C324] rounded-xl px-2.5 py-2 appearance-none focus:outline-none focus:ring-1 focus:ring-[#F6C324] cursor-pointer shadow-sm pr-7 truncate"
+              className="w-full text-xs font-bold text-black bg-white border border-neutral-300 hover:border-black rounded-xl px-2.5 py-2 appearance-none focus:outline-none focus:ring-1 focus:ring-black cursor-pointer shadow-xs pr-7 truncate"
             >
               {products.length === 0 ? (
                 <option value="">(No product folders yet)</option>
@@ -141,20 +133,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 ))
               )}
             </select>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-3 pointer-events-none" />
+            <ChevronDown className="w-3.5 h-3.5 text-neutral-400 absolute right-2.5 top-3 pointer-events-none" />
           </div>
 
           {activeProduct && (
-            <div className="text-[10px] text-slate-500 font-mono truncate px-1 flex items-center justify-between">
+            <div className="text-[10px] text-neutral-500 font-mono truncate px-1 flex items-center justify-between">
               <span>{activeProduct.category}</span>
-              <span className="text-emerald-700 font-bold">Active Scope</span>
+              <span className="text-black font-bold">Active Scope</span>
             </div>
           )}
         </div>
 
         {/* Navigation Items */}
         <nav className="flex-1 p-3 space-y-1 text-xs font-medium">
-          <div className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+          <div className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400 font-mono">
             Product Compliance
           </div>
 
@@ -167,26 +159,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 className={`flex items-center space-x-2.5 px-3 py-2.5 rounded-xl font-semibold transition-all duration-150 ${
                   isActive
-                    ? 'bg-[#F6C324] text-[#191919] shadow-sm font-bold'
-                    : 'text-slate-600 hover:text-[#191919] hover:bg-[#FFFFF0]'
+                    ? 'bg-black text-white shadow-xs font-bold'
+                    : 'text-neutral-600 hover:text-black hover:bg-neutral-100'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-[#191919]' : 'text-slate-500'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-neutral-500'}`} />
                 <span>{item.label}</span>
               </Link>
             );
           })}
 
-          <div className="pt-4 px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+          <div className="pt-4 px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-neutral-400 font-mono">
             Navigation
           </div>
           <Link
             href="/"
-            className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-slate-600 hover:text-[#191919] hover:bg-[#FFFFF0] transition"
+            className="flex items-center space-x-2.5 px-3 py-2 rounded-xl text-neutral-600 hover:text-black hover:bg-neutral-100 transition"
           >
-            <Compass className="w-4 h-4 text-slate-500" />
+            <Compass className="w-4 h-4 text-neutral-500" />
             <span>Product Landing</span>
-            <ExternalLink className="w-3 h-3 text-slate-400 ml-auto" />
+            <ExternalLink className="w-3 h-3 text-neutral-400 ml-auto" />
           </Link>
         </nav>
 
@@ -194,27 +186,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="p-3 mx-3 mb-2">
           <button
             onClick={() => setShowScanCopy(true)}
-            className="w-full flex items-center justify-center space-x-2 bg-[#F6C324] hover:bg-[#e5b41e] text-[#191919] text-xs font-bold py-2.5 rounded-xl shadow-sm transition active:scale-95"
+            className="w-full flex items-center justify-center space-x-2 bg-black hover:bg-neutral-800 text-white text-xs font-bold py-2.5 rounded-xl shadow-xs transition active:scale-95"
           >
-            <PlusCircle className="w-4 h-4 text-[#191919]" />
+            <PlusCircle className="w-4 h-4 text-white" />
             <span>Scan New Copy</span>
           </button>
         </div>
 
         {/* User Card in Sidebar Footer */}
-        <div className="p-3 border-t border-[#E8E8DC] bg-white flex items-center justify-between">
+        <div className="p-3 border-t border-neutral-200 bg-white flex items-center justify-between">
           <button
             onClick={openAuthModal}
             className="flex items-center space-x-2.5 text-left flex-1 min-w-0 group hover:opacity-90 transition"
           >
-            <div className="w-8 h-8 rounded-lg bg-[#F6C324] text-[#191919] flex items-center justify-center font-mono font-bold text-xs shrink-0 shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-mono font-bold text-xs shrink-0 shadow-xs">
               {currentUser.avatar}
             </div>
             <div className="flex-1 min-w-0">
-              <span className="text-xs font-bold text-[#191919] block truncate">
+              <span className="text-xs font-bold text-black block truncate">
                 {currentUser.name}
               </span>
-              <span className="text-[10px] text-slate-500 block truncate capitalize font-mono font-medium">
+              <span className="text-[10px] text-neutral-500 block truncate capitalize font-mono font-medium">
                 {role.replace('_', ' ')}
               </span>
             </div>
@@ -223,7 +215,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <button
             onClick={openAuthModal}
             title="Switch Persona / Inspect JWT"
-            className="p-1.5 rounded-lg text-slate-400 hover:text-[#191919] hover:bg-[#FFFFF0] transition"
+            className="p-1.5 rounded-lg text-neutral-400 hover:text-black hover:bg-neutral-100 transition"
           >
             <UserCheck className="w-4 h-4" />
           </button>
@@ -233,18 +225,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Main Content Area */}
       <div className="flex-1 lg:pl-64 flex flex-col min-w-0">
         {/* Top Header Bar */}
-        <header className="h-16 bg-white/90 backdrop-blur-md border-b border-[#E8E8DC] px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-20">
+        <header className="h-16 bg-white/90 backdrop-blur-md border-b border-neutral-200 px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-20">
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg text-slate-600 hover:text-[#191919] hover:bg-[#FFFFF0]"
+              className="lg:hidden p-2 rounded-lg text-neutral-600 hover:text-black hover:bg-neutral-100"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
-            <div className="flex items-center space-x-2 text-xs font-medium text-slate-600">
-              <span className="text-slate-400">Products</span>
-              <span className="text-slate-300">/</span>
-              <span className="font-bold text-[#191919] flex items-center space-x-1">
+            <div className="flex items-center space-x-2 text-xs font-medium text-neutral-600">
+              <span className="text-neutral-400">Products</span>
+              <span className="text-neutral-300">/</span>
+              <span className="font-bold text-black flex items-center space-x-1">
                 <span>📁 {activeProduct?.name || 'All Workspace Assets'}</span>
               </span>
             </div>
@@ -253,17 +245,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center space-x-2.5">
             <button
               onClick={() => setShowCreateProduct(true)}
-              className="hidden sm:flex items-center space-x-1.5 text-xs text-[#191919] bg-white border border-[#E8E8DC] hover:border-[#F6C324] px-3 py-2 rounded-xl transition font-semibold shadow-sm"
+              className="hidden sm:flex items-center space-x-1.5 text-xs text-black bg-white border border-neutral-300 hover:border-black px-3 py-2 rounded-xl transition font-semibold shadow-xs"
             >
-              <FolderPlus className="w-3.5 h-3.5 text-slate-500" />
+              <FolderPlus className="w-3.5 h-3.5 text-neutral-500" />
               <span>New Folder</span>
             </button>
 
             <button
               onClick={() => setShowScanCopy(true)}
-              className="flex items-center space-x-1.5 bg-[#F6C324] hover:bg-[#e5b41e] text-[#191919] text-xs font-bold px-4 py-2 rounded-xl shadow-sm transition active:scale-95"
+              className="flex items-center space-x-1.5 bg-black hover:bg-neutral-800 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs transition active:scale-95"
             >
-              <PlusCircle className="w-4 h-4 text-[#191919]" />
+              <PlusCircle className="w-4 h-4 text-white" />
               <span>Scan Content</span>
             </button>
           </div>
@@ -271,9 +263,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-white border-b border-[#E8E8DC] p-4 space-y-2 text-xs font-medium">
-            <div className="pb-2 border-b border-slate-100">
-              <span className="text-[10px] font-mono text-slate-400 block mb-1">Active Product:</span>
+          <div className="lg:hidden bg-white border-b border-neutral-200 p-4 space-y-2 text-xs font-medium">
+            <div className="pb-2 border-b border-neutral-100">
+              <span className="text-[10px] font-mono text-neutral-400 block mb-1">Active Product:</span>
               <select
                 value={activeProduct?.id || ''}
                 onChange={(e) => {
@@ -281,7 +273,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   if (found) setActiveProduct(found);
                   setMobileMenuOpen(false);
                 }}
-                className="w-full text-xs font-bold p-2 border border-slate-200 rounded-lg"
+                className="w-full text-xs font-bold p-2 border border-neutral-300 rounded-lg text-black bg-white"
               >
                 {products.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -296,7 +288,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center space-x-2.5 px-3 py-2 rounded-xl ${
-                  pathname === item.href ? 'bg-[#F6C324] text-[#191919] font-bold' : 'text-slate-600 hover:bg-[#FFFFF0]'
+                  pathname === item.href ? 'bg-black text-white font-bold' : 'text-neutral-600 hover:bg-neutral-100'
                 }`}
               >
                 <item.icon className="w-4 h-4" />
@@ -308,7 +300,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 setMobileMenuOpen(false);
                 setShowScanCopy(true);
               }}
-              className="w-full flex items-center justify-center space-x-1.5 bg-[#F6C324] text-[#191919] p-2 rounded-xl font-bold"
+              className="w-full flex items-center justify-center space-x-1.5 bg-black text-white p-2 rounded-xl font-bold"
             >
               <PlusCircle className="w-4 h-4" />
               <span>Scan New Copy</span>
@@ -317,7 +309,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         )}
 
         {/* Inner Page View */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto bg-neutral-50/40 min-h-[calc(100vh-4rem)]">
           {children}
         </main>
       </div>

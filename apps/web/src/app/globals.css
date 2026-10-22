@@ -3,15 +3,14 @@
 @tailwind utilities;
 
 :root {
-  --background: #FFFFF0;
-  --foreground: #191919;
-  --brand-yellow: #F6C324;
-  --brand-black: #191919;
-  --brand-white: #FFFFF0;
+  --background: #FFFFFF;
+  --foreground: #000000;
+  --brand-black: #000000;
+  --brand-white: #FFFFFF;
   --surface: #ffffff;
-  --surface-subtle: #fcfcf5;
-  --border: #e8e8dc;
-  --border-yellow: #f8db7a;
+  --surface-subtle: #fafafa;
+  --border: #e5e5e5;
+  --border-strong: #000000;
 }
 
 @layer base {

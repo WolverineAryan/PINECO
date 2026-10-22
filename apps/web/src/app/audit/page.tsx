@@ -49,16 +49,16 @@ export default function AuditPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#191919]">Compliance Audit Log</h1>
-          <p className="text-xs text-slate-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-black">Compliance Audit Log</h1>
+          <p className="text-xs text-neutral-500 mt-1">
             Immutable, append-only chronological log of all revisions, automated scans, reviewer sign-offs, and policy overrides.
           </p>
         </div>
         <button
           onClick={() => loadAudit(true)}
-          className="flex items-center space-x-1.5 bg-white hover:bg-[#FFFFF0] border border-[#E8E8DC] text-[#191919] text-xs font-bold px-4 py-2 rounded-xl shadow-sm transition"
+          className="flex items-center space-x-1.5 bg-white hover:bg-neutral-100 border border-neutral-300 text-black text-xs font-bold px-4 py-2 rounded-xl shadow-xs transition"
         >
-          <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
+          <RefreshCw className="w-3.5 h-3.5 text-neutral-500" />
           <span>Refresh Ledger</span>
         </button>
       </div>

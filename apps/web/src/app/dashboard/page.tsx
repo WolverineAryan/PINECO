@@ -67,13 +67,13 @@ export default function ProductComplianceDashboard() {
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-28 bg-white rounded-2xl border border-[#E8E8DC]" />
+        <div className="h-28 bg-white rounded-2xl border border-neutral-200" />
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-20 bg-white rounded-xl border border-[#E8E8DC]" />
+            <div key={i} className="h-20 bg-white rounded-xl border border-neutral-200" />
           ))}
         </div>
-        <div className="h-64 bg-white rounded-2xl border border-[#E8E8DC]" />
+        <div className="h-64 bg-white rounded-2xl border border-neutral-200" />
       </div>
     );
   }
@@ -94,20 +94,20 @@ export default function ProductComplianceDashboard() {
       <CreateProductModal isOpen={createProductOpen} onClose={() => { setCreateProductOpen(false); reloadProducts(); }} />
 
       {/* Product Scope Banner */}
-      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-[#E8E8DC] shadow-[0_1px_4px_rgba(0,0,0,0.03)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-neutral-200 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center space-x-2">
-            <span className="text-[11px] font-mono uppercase font-bold tracking-wider text-slate-500">
+            <span className="text-[11px] font-mono uppercase font-bold tracking-wider text-neutral-500">
               Active Compliance Folder:
             </span>
-            <span className="text-[10px] font-mono bg-[#FFFFF0] border border-[#F6C324]/50 text-[#191919] font-bold px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-mono bg-neutral-100 border border-neutral-300 text-black font-bold px-2 py-0.5 rounded-full">
               {activeProduct?.category || 'General'}
             </span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-[#191919] tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-black tracking-tight">
             📁 {activeProduct?.name || 'All Workspace Assets'}
           </h1>
-          <p className="text-xs text-slate-500 max-w-xl">
+          <p className="text-xs text-neutral-500 max-w-xl">
             {activeProduct?.description || 'Brand compliance guidelines, approved facts, and content review history.'}
           </p>
         </div>
@@ -115,83 +115,83 @@ export default function ProductComplianceDashboard() {
         <div className="flex items-center space-x-2 shrink-0">
           <button
             onClick={() => setCreateProductOpen(true)}
-            className="flex items-center space-x-1.5 text-xs text-[#191919] bg-white hover:bg-[#FFFFF0] border border-[#E8E8DC] px-3.5 py-2 rounded-xl transition font-semibold"
+            className="flex items-center space-x-1.5 text-xs text-black bg-white hover:bg-neutral-100 border border-neutral-300 px-3.5 py-2 rounded-xl transition font-bold"
           >
-            <FolderPlus className="w-3.5 h-3.5 text-slate-500" />
+            <FolderPlus className="w-3.5 h-3.5 text-neutral-600" />
             <span>New Folder</span>
           </button>
           <button
             onClick={() => setScanModalOpen(true)}
-            className="flex items-center space-x-1.5 bg-[#F6C324] hover:bg-[#E5B520] text-[#191919] text-xs font-bold px-4 py-2 rounded-xl shadow-sm transition active:scale-95"
+            className="flex items-center space-x-1.5 bg-black hover:bg-neutral-800 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs transition active:scale-95"
           >
-            <PlusCircle className="w-4 h-4 text-[#191919]" />
+            <PlusCircle className="w-4 h-4 text-white" />
             <span>Scan Copy</span>
           </button>
         </div>
       </div>
 
-      {/* Metric Counters */}
+      {/* Metric Counters (Clean Black & White) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white p-4 rounded-xl border border-[#E8E8DC] shadow-sm">
-          <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block">
+        <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs">
+          <span className="text-[10px] font-mono font-bold text-neutral-400 uppercase tracking-wider block">
             Scanned Assets
           </span>
-          <span className="text-2xl font-black text-[#191919] mt-0.5 block font-mono">
+          <span className="text-2xl font-black text-black mt-0.5 block font-mono">
             {metrics?.total_submissions || 0}
           </span>
-          <span className="text-[11px] text-slate-500 mt-0.5 block">Submissions in folder</span>
+          <span className="text-[11px] text-neutral-500 mt-0.5 block">Submissions in folder</span>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-[#E8E8DC] shadow-sm">
-          <span className="text-[10px] font-mono font-bold text-emerald-600 uppercase tracking-wider block">
+        <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs">
+          <span className="text-[10px] font-mono font-bold text-neutral-600 uppercase tracking-wider block">
             Approved For Release
           </span>
-          <span className="text-2xl font-black text-emerald-700 mt-0.5 block font-mono">
+          <span className="text-2xl font-black text-black mt-0.5 block font-mono">
             {metrics?.approved_submissions || 0}
           </span>
-          <span className="text-[11px] text-slate-500 mt-0.5 block">Human signed off</span>
+          <span className="text-[11px] text-neutral-500 mt-0.5 block">Human signed off</span>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-[#E8E8DC] shadow-sm">
-          <span className="text-[10px] font-mono font-bold text-amber-600 uppercase tracking-wider block">
+        <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs">
+          <span className="text-[10px] font-mono font-bold text-neutral-600 uppercase tracking-wider block">
             Action Needed
           </span>
-          <span className="text-2xl font-black text-amber-600 mt-0.5 block font-mono">
+          <span className="text-2xl font-black text-black mt-0.5 block font-mono">
             {metrics?.changes_requested_submissions || 0}
           </span>
-          <span className="text-[11px] text-slate-500 mt-0.5 block">Revisions requested</span>
+          <span className="text-[11px] text-neutral-500 mt-0.5 block">Revisions requested</span>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-[#E8E8DC] shadow-sm">
-          <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block">
+        <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs">
+          <span className="text-[10px] font-mono font-bold text-neutral-400 uppercase tracking-wider block">
             Active Guardrails
           </span>
-          <span className="text-2xl font-black text-[#191919] mt-0.5 block font-mono">
+          <span className="text-2xl font-black text-black mt-0.5 block font-mono">
             {(metrics?.total_rules || 0) + (metrics?.total_facts || 0)}
           </span>
-          <span className="text-[11px] text-slate-500 mt-0.5 block">{metrics?.total_rules || 0} rules, {metrics?.total_facts || 0} facts</span>
+          <span className="text-[11px] text-neutral-500 mt-0.5 block">{metrics?.total_rules || 0} rules, {metrics?.total_facts || 0} facts</span>
         </div>
       </div>
 
       {/* Main Content Compliance Stream */}
-      <div className="bg-white rounded-2xl border border-[#E8E8DC] shadow-sm overflow-hidden">
-        <div className="p-4 sm:p-5 border-b border-[#E8E8DC] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div className="bg-white rounded-2xl border border-neutral-200 shadow-xs overflow-hidden">
+        <div className="p-4 sm:p-5 border-b border-neutral-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center space-x-3">
-            <h2 className="text-sm font-bold text-[#191919] uppercase tracking-wide font-mono">
+            <h2 className="text-sm font-bold text-black uppercase tracking-wide font-mono">
               Content Compliance Reviews
             </h2>
-            <span className="text-xs bg-[#FFFFF0] border border-[#E8E8DC] px-2 py-0.5 rounded-full text-slate-600 font-mono font-semibold">
+            <span className="text-xs bg-neutral-100 border border-neutral-200 px-2 py-0.5 rounded-full text-neutral-700 font-mono font-semibold">
               {filteredSubmissions.length} total
             </span>
           </div>
 
           <div className="flex items-center space-x-2 w-full sm:w-auto">
             {/* Filter Tabs */}
-            <div className="flex items-center bg-[#FFFFF0] p-1 rounded-xl border border-[#E8E8DC] text-xs font-semibold">
+            <div className="flex items-center bg-neutral-100 p-1 rounded-xl border border-neutral-200 text-xs font-semibold">
               <button
                 onClick={() => setFilterTab('all')}
                 className={`px-3 py-1 rounded-lg transition ${
-                  filterTab === 'all' ? 'bg-[#F6C324] text-[#191919] shadow-sm' : 'text-slate-600 hover:text-[#191919]'
+                  filterTab === 'all' ? 'bg-black text-white shadow-xs' : 'text-neutral-600 hover:text-black'
                 }`}
               >
                 All
@@ -199,7 +199,7 @@ export default function ProductComplianceDashboard() {
               <button
                 onClick={() => setFilterTab('action_needed')}
                 className={`px-3 py-1 rounded-lg transition ${
-                  filterTab === 'action_needed' ? 'bg-[#F6C324] text-[#191919] shadow-sm' : 'text-slate-600 hover:text-[#191919]'
+                  filterTab === 'action_needed' ? 'bg-black text-white shadow-xs' : 'text-neutral-600 hover:text-black'
                 }`}
               >
                 Needs Action
@@ -207,7 +207,7 @@ export default function ProductComplianceDashboard() {
               <button
                 onClick={() => setFilterTab('approved')}
                 className={`px-3 py-1 rounded-lg transition ${
-                  filterTab === 'approved' ? 'bg-[#F6C324] text-[#191919] shadow-sm' : 'text-slate-600 hover:text-[#191919]'
+                  filterTab === 'approved' ? 'bg-black text-white shadow-xs' : 'text-neutral-600 hover:text-black'
                 }`}
               >
                 Approved
@@ -220,9 +220,9 @@ export default function ProductComplianceDashboard() {
                 placeholder="Search scans..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="text-xs px-3 py-1.5 pl-8 rounded-xl border border-slate-200 bg-[#FFFFF0]/40 text-[#191919] focus:outline-none focus:ring-1 focus:ring-[#F6C324] w-36 sm:w-44"
+                className="text-xs px-3 py-1.5 pl-8 rounded-xl border border-neutral-300 bg-white text-black focus:outline-none focus:ring-1 focus:ring-black w-36 sm:w-44"
               />
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" />
+              <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-2.5 top-2.5 pointer-events-none" />
             </div>
           </div>
         </div>
@@ -230,57 +230,57 @@ export default function ProductComplianceDashboard() {
         {/* Submissions List */}
         {filteredSubmissions.length === 0 ? (
           <div className="p-12 text-center space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-[#FFFFF0] border border-[#E8E8DC] text-slate-400 flex items-center justify-center mx-auto">
-              <FileCheck className="w-6 h-6 text-slate-400" />
+            <div className="w-12 h-12 rounded-2xl bg-neutral-100 border border-neutral-200 text-neutral-400 flex items-center justify-center mx-auto">
+              <FileCheck className="w-6 h-6 text-neutral-500" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-sm font-bold text-[#191919]">No content submissions found</h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              <h3 className="text-sm font-bold text-black">No content submissions found</h3>
+              <p className="text-xs text-neutral-500 max-w-sm mx-auto">
                 No draft copies have been scanned for this product folder yet. Click below to run your first compliance check.
               </p>
             </div>
             <button
               onClick={() => setScanModalOpen(true)}
-              className="inline-flex items-center space-x-1.5 bg-[#F6C324] hover:bg-[#E5B520] text-[#191919] text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm"
+              className="inline-flex items-center space-x-1.5 bg-black hover:bg-neutral-800 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-xs"
             >
-              <PlusCircle className="w-4 h-4 text-[#191919]" />
+              <PlusCircle className="w-4 h-4 text-white" />
               <span>Scan Content Now</span>
             </button>
           </div>
         ) : (
-          <div className="divide-y divide-[#E8E8DC]">
+          <div className="divide-y divide-neutral-200">
             {filteredSubmissions.map((sub) => {
               const isApproved = sub.status === 'approved';
               const isAction = sub.status === 'changes_requested';
               return (
                 <div
                   key={sub.id}
-                  className="p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-[#FFFFF0]/50 transition group"
+                  className="p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-neutral-50/80 transition group"
                 >
                   <div className="space-y-1 flex-1 min-w-0">
                     <div className="flex items-center space-x-2">
-                      <span className="font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+                      <span className="font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-neutral-100 text-neutral-800 border border-neutral-200">
                         {sub.channel}
                       </span>
                       <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-mono ${
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-mono border ${
                           isApproved
-                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                            ? 'bg-black text-white border-black'
                             : isAction
-                            ? 'bg-rose-50 text-rose-800 border border-rose-200'
-                            : 'bg-slate-100 text-slate-700 border border-slate-200'
+                            ? 'bg-neutral-200 text-black border-neutral-400'
+                            : 'bg-white text-neutral-700 border-neutral-300'
                         }`}
                       >
                         {isApproved ? 'Approved for Release' : isAction ? 'Changes Requested' : 'In Review'}
                       </span>
                     </div>
 
-                    <h3 className="text-sm font-bold text-[#191919] truncate group-hover:text-black">
+                    <h3 className="text-sm font-bold text-black truncate group-hover:underline">
                       {sub.title}
                     </h3>
 
-                    <div className="flex items-center space-x-3 text-[11px] text-slate-500">
-                      <span>Created by <strong className="text-slate-700 font-mono">{sub.created_by}</strong></span>
+                    <div className="flex items-center space-x-3 text-[11px] text-neutral-500">
+                      <span>Created by <strong className="text-neutral-800 font-mono">{sub.created_by}</strong></span>
                       <span>&bull;</span>
                       <span>{new Date(sub.updated_at).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
@@ -288,10 +288,10 @@ export default function ProductComplianceDashboard() {
 
                   <Link
                     href={`/submissions/${sub.id}`}
-                    className="flex items-center space-x-1.5 text-xs font-bold bg-white group-hover:bg-[#F6C324] text-[#191919] border border-[#E8E8DC] px-3.5 py-2 rounded-xl transition shadow-sm shrink-0"
+                    className="flex items-center space-x-1.5 text-xs font-bold bg-black hover:bg-neutral-800 text-white px-3.5 py-2 rounded-xl transition shadow-xs shrink-0"
                   >
                     <span>Inspect Evidence</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-[#191919]" />
+                    <ArrowRight className="w-3.5 h-3.5 text-white" />
                   </Link>
                 </div>
               );
@@ -303,17 +303,17 @@ export default function ProductComplianceDashboard() {
       {/* Product Policy & Facts Glance */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Brand Rules Card */}
-        <div className="bg-white p-5 rounded-2xl border border-[#E8E8DC] shadow-sm space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-[#E8E8DC]">
+        <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-xs space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-neutral-200">
             <div className="flex items-center space-x-2">
-              <Shield className="w-4 h-4 text-[#F6C324]" />
-              <h3 className="text-xs font-bold uppercase tracking-wider font-mono text-[#191919]">
-                Brand Guidelines for this Product ({rules.length})
+              <Shield className="w-4 h-4 text-black" />
+              <h3 className="text-xs font-bold uppercase tracking-wider font-mono text-black">
+                Brand Guidelines ({rules.length})
               </h3>
             </div>
             <Link
               href="/knowledge"
-              className="text-xs text-slate-600 hover:text-[#191919] font-bold hover:underline"
+              className="text-xs text-neutral-600 hover:text-black font-bold hover:underline"
             >
               Manage &rarr;
             </Link>
@@ -321,41 +321,41 @@ export default function ProductComplianceDashboard() {
 
           <div className="space-y-2 text-xs">
             {rules.slice(0, 3).map((r) => (
-              <div key={r.id} className="p-2.5 rounded-xl bg-[#FFFFF0]/80 border border-[#E8E8DC] space-y-1">
+              <div key={r.id} className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-200 space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-[#191919] truncate">{r.name}</span>
-                  <span className="text-[10px] font-mono uppercase bg-slate-200 px-1.5 py-0.2 rounded font-semibold text-slate-700">
+                  <span className="font-bold text-black truncate">{r.name}</span>
+                  <span className="text-[10px] font-mono uppercase bg-neutral-200 px-1.5 py-0.2 rounded font-semibold text-neutral-800">
                     {r.category}
                   </span>
                 </div>
                 {r.pattern && (
-                  <p className="text-[11px] text-slate-500 font-mono">
-                    Pattern: &ldquo;<strong className="text-rose-700">{r.pattern}</strong>&rdquo;
+                  <p className="text-[11px] text-neutral-600 font-mono">
+                    Pattern: &ldquo;<strong className="text-black">{r.pattern}</strong>&rdquo;
                     {r.preferred_replacement && (
-                      <span> &rarr; use &ldquo;<strong className="text-emerald-700">{r.preferred_replacement}</strong>&rdquo;</span>
+                      <span> &rarr; use &ldquo;<strong className="text-black font-bold">{r.preferred_replacement}</strong>&rdquo;</span>
                     )}
                   </p>
                 )}
               </div>
             ))}
             {rules.length === 0 && (
-              <p className="text-xs text-slate-400 py-3 text-center">No rules defined yet.</p>
+              <p className="text-xs text-neutral-400 py-3 text-center">No rules defined yet.</p>
             )}
           </div>
         </div>
 
         {/* Approved Facts Card */}
-        <div className="bg-white p-5 rounded-2xl border border-[#E8E8DC] shadow-sm space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-[#E8E8DC]">
+        <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-xs space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-neutral-200">
             <div className="flex items-center space-x-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <h3 className="text-xs font-bold uppercase tracking-wider font-mono text-[#191919]">
+              <CheckCircle2 className="w-4 h-4 text-black" />
+              <h3 className="text-xs font-bold uppercase tracking-wider font-mono text-black">
                 Approved Corporate Facts ({facts.length})
               </h3>
             </div>
             <Link
               href="/knowledge"
-              className="text-xs text-slate-600 hover:text-[#191919] font-bold hover:underline"
+              className="text-xs text-neutral-600 hover:text-black font-bold hover:underline"
             >
               Manage &rarr;
             </Link>
@@ -363,18 +363,18 @@ export default function ProductComplianceDashboard() {
 
           <div className="space-y-2 text-xs">
             {facts.slice(0, 3).map((f) => (
-              <div key={f.id} className="p-2.5 rounded-xl bg-[#FFFFF0]/80 border border-[#E8E8DC] space-y-1">
-                <p className="font-semibold text-[#191919] line-clamp-2">
+              <div key={f.id} className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-200 space-y-1">
+                <p className="font-semibold text-black line-clamp-2">
                   &ldquo;{f.statement}&rdquo;
                 </p>
-                <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono">
+                <div className="flex items-center justify-between text-[10px] text-neutral-500 font-mono">
                   <span>Source: {f.source_title}</span>
-                  <span className="text-emerald-700 font-bold">Verified</span>
+                  <span className="text-black font-bold">Verified</span>
                 </div>
               </div>
             ))}
             {facts.length === 0 && (
-              <p className="text-xs text-slate-400 py-3 text-center">No facts registered yet.</p>
+              <p className="text-xs text-neutral-400 py-3 text-center">No facts registered yet.</p>
             )}
           </div>
         </div>

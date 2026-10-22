@@ -87,8 +87,8 @@ export default function NewSubmissionPage() {
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
         <div className="flex items-center space-x-2">
-          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#191919]">Scan Content</h1>
-          <span className="text-[10px] font-mono bg-[#FFFFF0] border border-[#F6C324] text-[#191919] font-bold px-2 py-0.5 rounded-full">
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-black">Scan Content</h1>
+          <span className="text-[10px] font-mono bg-neutral-100 border border-neutral-300 text-black font-bold px-2 py-0.5 rounded-full">
             📁 {activeProduct?.name || 'All Assets'}
           </span>
         </div>
@@ -187,16 +187,16 @@ export default function NewSubmissionPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="flex items-center space-x-2 bg-[#F6C324] hover:bg-[#E5B520] text-[#191919] font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition disabled:opacity-50 active:scale-95"
+            className="flex items-center space-x-2 bg-black hover:bg-neutral-800 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-xs transition disabled:opacity-50 active:scale-95"
           >
             {submitting ? (
               <>
-                <RefreshCw className="w-4 h-4 animate-spin text-[#191919]" />
+                <RefreshCw className="w-4 h-4 animate-spin text-white" />
                 <span>Running Governance Pipeline...</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 text-[#191919]" />
+                <Sparkles className="w-4 h-4 text-white" />
                 <span>Submit & Run Review &rarr;</span>
               </>
             )}

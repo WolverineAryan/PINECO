@@ -16,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className="bg-[#FFFFF0] text-[#191919] antialiased min-h-screen flex flex-col font-sans selection:bg-[#F6C324] selection:text-[#191919]">
+      <body className="bg-white text-black antialiased min-h-screen flex flex-col font-sans selection:bg-black selection:text-white">
         <RoleProvider>
           <ToastProvider>
             <AppShell>{children}</AppShell>

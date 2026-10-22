@@ -86,20 +86,22 @@ export function AuthModal() {
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200/80 animate-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+      <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-neutral-200 animate-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between pb-4 border-b border-neutral-200">
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-lg bg-slate-950 flex items-center justify-center text-white">
-              <Key className="w-4 h-4 text-emerald-400" />
-            </div>
+            <img
+              src="/logo-mark.jpg"
+              alt="Pineco"
+              className="w-8 h-8 rounded-lg object-contain border border-neutral-200 shadow-xs"
+            />
             <div>
-              <h2 className="text-base font-bold text-slate-900">Enterprise Authentication</h2>
-              <p className="text-[11px] text-slate-400">Cryptographic JWT bearer session & RBAC</p>
+              <h2 className="text-base font-bold text-black">Enterprise Authentication</h2>
+              <p className="text-[11px] text-neutral-500">Cryptographic JWT bearer session & RBAC</p>
             </div>
           </div>
           <button
             onClick={closeAuthModal}
-            className="text-slate-400 hover:text-slate-700 p-1 rounded-lg transition"
+            className="text-neutral-400 hover:text-black p-1 rounded-lg transition"
           >
             <X className="w-4 h-4" />
           </button>
