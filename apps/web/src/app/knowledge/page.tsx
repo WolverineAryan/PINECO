@@ -24,6 +24,7 @@ import { api } from '@/lib/api';
 import { BrandRule, ApprovedFact } from '@/lib/types';
 import { useRole } from '@/components/RoleContext';
 import { useToast } from '@/components/Toast';
+import { KnowledgeSkeleton } from '@/components/Skeleton';
 
 export default function KnowledgePage() {
   const { workspaceId, currentUser, activeProduct } = useRole();
@@ -167,13 +168,7 @@ export default function KnowledgePage() {
   );
 
   if (loading) {
-    return (
-      <div className="space-y-6 max-w-6xl mx-auto animate-pulse">
-        <div className="h-20 bg-white rounded-2xl border border-neutral-200" />
-        <div className="h-14 bg-white rounded-xl border border-neutral-200" />
-        <div className="h-96 bg-white rounded-2xl border border-neutral-200" />
-      </div>
-    );
+    return <KnowledgeSkeleton />;
   }
 
   return (

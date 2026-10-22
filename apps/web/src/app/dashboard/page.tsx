@@ -29,6 +29,8 @@ import { useRole } from '@/components/RoleContext';
 import { useToast } from '@/components/Toast';
 import { ScanCopyModal } from '@/components/ScanCopyModal';
 import { CreateProductModal } from '@/components/CreateProductModal';
+import { DashboardSkeleton } from '@/components/Skeleton';
+import { ScrollReveal } from '@/components/ScrollReveal';
 
 export default function ProductComplianceDashboard() {
   const { workspaceId, currentUser, activeProduct, products, reloadProducts } = useRole();
@@ -68,17 +70,7 @@ export default function ProductComplianceDashboard() {
   }, [workspaceId, activeProduct?.id]);
 
   if (loading) {
-    return (
-      <div className="space-y-6 animate-pulse">
-        <div className="h-28 bg-white rounded-2xl border border-neutral-200" />
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-20 bg-white rounded-xl border border-neutral-200" />
-          ))}
-        </div>
-        <div className="h-64 bg-white rounded-2xl border border-neutral-200" />
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   const submissions = data?.recent_submissions || [];
@@ -126,9 +118,9 @@ export default function ProductComplianceDashboard() {
           </button>
           <button
             onClick={() => setScanModalOpen(true)}
-            className="flex items-center space-x-1.5 bg-black hover:bg-neutral-900 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs transition active:scale-95 hover:shadow-[0_0_15px_-2px_rgba(124,58,237,0.35)]"
+            className="flex items-center space-x-1.5 bg-gradient-to-r from-purple-700 via-purple-600 to-indigo-600 hover:from-purple-800 hover:to-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs transition active:scale-95 hover:shadow-[0_0_20px_rgba(124,58,237,0.45)] border border-purple-400/30"
           >
-            <PlusCircle className="w-4 h-4 text-purple-400" />
+            <PlusCircle className="w-4 h-4 text-purple-200" />
             <span>Scan Copy</span>
           </button>
         </div>

@@ -25,6 +25,7 @@ import { useToast } from './Toast';
 import { AuthModal } from './AuthModal';
 import { CreateProductModal } from './CreateProductModal';
 import { ScanCopyModal } from './ScanCopyModal';
+import { ScrollProgressBar } from './ScrollProgressBar';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -150,8 +151,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 className={`flex items-center space-x-2.5 px-3 py-2.5 rounded-xl font-semibold transition-all duration-150 ${
                   isActive
-                    ? 'bg-black text-white shadow-xs font-bold border-l-2 border-purple-500 ring-1 ring-purple-500/20'
-                    : 'text-neutral-600 hover:text-black hover:bg-neutral-100'
+                    ? 'bg-gradient-to-r from-purple-950 via-black to-black text-white shadow-xs font-bold border-l-3 border-purple-500 ring-1 ring-purple-500/30'
+                    : 'text-neutral-600 hover:text-black hover:bg-purple-50/60'
                 }`}
               >
                 <Icon className={`w-4 h-4 ${isActive ? 'text-purple-400' : 'text-neutral-500'}`} />
@@ -165,9 +166,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="p-3 mx-3 mb-2">
           <button
             onClick={() => setShowScanCopy(true)}
-            className="w-full flex items-center justify-center space-x-2 bg-black hover:bg-neutral-900 text-white text-xs font-bold py-2.5 rounded-xl shadow-xs transition active:scale-95 hover:shadow-[0_0_20px_-3px_rgba(124,58,237,0.35)]"
+            className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-700 via-purple-600 to-indigo-600 hover:from-purple-800 hover:to-indigo-700 text-white text-xs font-bold py-2.5 rounded-xl shadow-xs transition active:scale-95 hover:shadow-[0_0_22px_rgba(124,58,237,0.45)] border border-purple-400/30"
           >
-            <PlusCircle className="w-4 h-4 text-purple-400" />
+            <PlusCircle className="w-4 h-4 text-purple-200" />
             <span>Scan New Copy</span>
           </button>
         </div>
@@ -202,13 +203,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content Area (60% White dominant canvas with subtle purple radial backdrop) */}
-      <div className="flex-1 lg:pl-64 flex flex-col min-w-0">
+      <div className="flex-1 lg:pl-64 flex flex-col min-w-0 relative">
+        {/* Dynamic Glowing Purple Scroll Progress Bar */}
+        <ScrollProgressBar />
+
         {/* Top Header Bar */}
-        <header className="h-16 bg-white/90 backdrop-blur-md border-b border-neutral-200 px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-20">
+        <header className="h-16 bg-white/90 backdrop-blur-md border-b border-neutral-200/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-20">
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg text-neutral-600 hover:text-black hover:bg-neutral-100"
+              className="lg:hidden p-2 rounded-lg text-neutral-600 hover:text-purple-700 hover:bg-purple-50"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -223,22 +227,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span className="text-neutral-400">Products</span>
               <span className="text-neutral-300">/</span>
               <span className="font-bold text-black flex items-center space-x-1.5">
-                <Folder className="w-3.5 h-3.5 text-neutral-600" />
+                <Folder className="w-3.5 h-3.5 text-purple-600" />
                 <span>{activeProduct?.name || 'All Workspace Assets'}</span>
               </span>
             </div>
           </div>
 
           <div className="flex items-center space-x-3">
-            <div className="hidden sm:flex items-center space-x-2 bg-purple-50/80 border border-purple-200/80 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold text-purple-950">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
+            <div className="hidden sm:flex items-center space-x-2 bg-purple-100/80 border border-purple-300 px-3 py-1 rounded-full text-[10px] font-mono font-bold text-purple-950 shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse" />
               <span>SENTINEL ONLINE</span>
             </div>
 
             <button
               onClick={copyWorkspace}
               title="Copy active Workspace ID"
-              className="hidden md:flex items-center space-x-1.5 text-[11px] font-mono text-neutral-600 hover:text-black border border-neutral-200 hover:border-black bg-white px-2.5 py-1.5 rounded-xl transition"
+              className="hidden md:flex items-center space-x-1.5 text-[11px] font-mono text-neutral-600 hover:text-purple-700 border border-neutral-200 hover:border-purple-300 bg-white px-2.5 py-1.5 rounded-xl transition"
             >
               {copiedWs ? (
                 <>
@@ -255,7 +259,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
             <button
               onClick={() => setShowScanCopy(true)}
-              className="flex items-center space-x-1.5 bg-black hover:bg-neutral-900 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl shadow-xs transition active:scale-95 hover:shadow-[0_0_15px_-2px_rgba(124,58,237,0.3)]"
+              className="flex items-center space-x-1.5 bg-black hover:bg-neutral-900 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl shadow-xs transition active:scale-95 hover:shadow-[0_0_15px_-2px_rgba(124,58,237,0.35)] border border-purple-500/20"
             >
               <PlusCircle className="w-3.5 h-3.5 text-purple-400" />
               <span>Scan Copy</span>

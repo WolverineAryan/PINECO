@@ -19,6 +19,7 @@ import { api } from '@/lib/api';
 import { AuditEvent } from '@/lib/types';
 import { useRole } from '@/components/RoleContext';
 import { useToast } from '@/components/Toast';
+import { AuditSkeleton } from '@/components/Skeleton';
 
 export default function AuditPage() {
   const { workspaceId } = useRole();
@@ -59,13 +60,7 @@ export default function AuditPage() {
   });
 
   if (loading) {
-    return (
-      <div className="space-y-6 max-w-6xl mx-auto animate-pulse">
-        <div className="h-20 bg-white rounded-2xl border border-neutral-200" />
-        <div className="h-16 bg-white rounded-xl border border-neutral-200" />
-        <div className="h-96 bg-white rounded-2xl border border-neutral-200" />
-      </div>
-    );
+    return <AuditSkeleton />;
   }
 
   return (

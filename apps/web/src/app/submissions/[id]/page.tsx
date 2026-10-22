@@ -25,6 +25,7 @@ import { api } from '@/lib/api';
 import { SubmissionDetail, Finding, Review, ContentVersion, AuditEvent } from '@/lib/types';
 import { useRole } from '@/components/RoleContext';
 import { useToast } from '@/components/Toast';
+import { SubmissionDetailSkeleton } from '@/components/Skeleton';
 
 export default function SubmissionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -171,18 +172,7 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
   };
 
   if (loading) {
-    return (
-      <div className="space-y-6 max-w-6xl mx-auto animate-pulse">
-        <div className="h-6 w-32 bg-white rounded-lg border border-neutral-200" />
-        <div className="h-32 bg-white rounded-2xl border border-neutral-200" />
-        <div className="h-12 bg-white rounded-xl border border-neutral-200" />
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-36 bg-white rounded-2xl border border-neutral-200" />
-          ))}
-        </div>
-      </div>
-    );
+    return <SubmissionDetailSkeleton />;
   }
 
   if (error || !submission) {

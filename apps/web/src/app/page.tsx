@@ -42,6 +42,8 @@ import {
   Wand2,
 } from 'lucide-react';
 import { useRole } from '@/components/RoleContext';
+import { ScrollProgressBar } from '@/components/ScrollProgressBar';
+import { ScrollReveal } from '@/components/ScrollReveal';
 
 export default function LandingPage() {
   const { openAuthModal } = useRole();
@@ -173,6 +175,9 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white text-black relative selection:bg-purple-600 selection:text-white">
+      {/* Glowing Purple Scroll Progress Bar */}
+      <ScrollProgressBar />
+
       {/* ======================================================== */}
       {/* 1. Fluid Ambient Purple Mesh Background for entire Hero */}
       {/* ======================================================== */}
@@ -616,57 +621,60 @@ export default function LandingPage() {
         </div>
 
         {/* 4 Interactive 3D Metrics Cards */}
-        <div className="pt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-5xl mx-auto text-left">
-          <div className="glass-panel p-5 rounded-2xl border border-neutral-200 hover:border-purple-400 shadow-sm card-3d-hover group">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-2xl sm:text-3xl font-extrabold text-black font-mono block">68%</span>
-              <div className="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center group-hover:bg-purple-600 transition-colors">
-                <Zap className="w-4 h-4 text-purple-600 group-hover:text-white transition-colors" />
+        <ScrollReveal delayMs={100}>
+          <div className="pt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-5xl mx-auto text-left">
+            <div className="glass-panel p-5 rounded-2xl border border-neutral-200 hover:border-purple-400 shadow-sm card-3d-hover group">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-2xl sm:text-3xl font-extrabold text-black font-mono block">68%</span>
+                <div className="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center group-hover:bg-purple-600 transition-colors">
+                  <Zap className="w-4 h-4 text-purple-600 group-hover:text-white transition-colors" />
+                </div>
               </div>
+              <span className="text-xs text-neutral-700 font-bold block">Faster Review Velocity</span>
+              <span className="text-[10px] text-neutral-400 block mt-0.5">Automated claim pre-filtering</span>
             </div>
-            <span className="text-xs text-neutral-700 font-bold block">Faster Review Velocity</span>
-            <span className="text-[10px] text-neutral-400 block mt-0.5">Automated claim pre-filtering</span>
-          </div>
 
-          <div className="glass-panel p-5 rounded-2xl border border-neutral-200 hover:border-purple-400 shadow-sm card-3d-hover group">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-2xl sm:text-3xl font-extrabold text-black font-mono block">0</span>
-              <div className="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center group-hover:bg-purple-600 transition-colors">
-                <ShieldCheck className="w-4 h-4 text-purple-600 group-hover:text-white transition-colors" />
+            <div className="glass-panel p-5 rounded-2xl border border-neutral-200 hover:border-purple-400 shadow-sm card-3d-hover group">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-2xl sm:text-3xl font-extrabold text-black font-mono block">0</span>
+                <div className="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center group-hover:bg-purple-600 transition-colors">
+                  <ShieldCheck className="w-4 h-4 text-purple-600 group-hover:text-white transition-colors" />
+                </div>
               </div>
+              <span className="text-xs text-neutral-700 font-bold block">Unbacked Claims Published</span>
+              <span className="text-[10px] text-neutral-400 block mt-0.5">Strict corporate evidence matching</span>
             </div>
-            <span className="text-xs text-neutral-700 font-bold block">Unbacked Claims Published</span>
-            <span className="text-[10px] text-neutral-400 block mt-0.5">Strict corporate evidence matching</span>
-          </div>
 
-          <div className="glass-panel p-5 rounded-2xl border border-neutral-200 hover:border-purple-400 shadow-sm card-3d-hover group">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-2xl sm:text-3xl font-extrabold text-black font-mono block">100%</span>
-              <div className="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center group-hover:bg-purple-600 transition-colors">
-                <Lock className="w-4 h-4 text-purple-600 group-hover:text-white transition-colors" />
+            <div className="glass-panel p-5 rounded-2xl border border-neutral-200 hover:border-purple-400 shadow-sm card-3d-hover group">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-2xl sm:text-3xl font-extrabold text-black font-mono block">100%</span>
+                <div className="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center group-hover:bg-purple-600 transition-colors">
+                  <Lock className="w-4 h-4 text-purple-600 group-hover:text-white transition-colors" />
+                </div>
               </div>
+              <span className="text-xs text-neutral-700 font-bold block">SHA-256 Traceability</span>
+              <span className="text-[10px] text-neutral-400 block mt-0.5">Immutable audit compliance trail</span>
             </div>
-            <span className="text-xs text-neutral-700 font-bold block">SHA-256 Traceability</span>
-            <span className="text-[10px] text-neutral-400 block mt-0.5">Immutable audit compliance trail</span>
-          </div>
 
-          <div className="glass-panel p-5 rounded-2xl border border-neutral-200 hover:border-purple-400 shadow-sm card-3d-hover group">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-2xl sm:text-3xl font-extrabold text-black font-mono block">0.04s</span>
-              <div className="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center group-hover:bg-purple-600 transition-colors">
-                <Activity className="w-4 h-4 text-purple-600 group-hover:text-white transition-colors" />
+            <div className="glass-panel p-5 rounded-2xl border border-neutral-200 hover:border-purple-400 shadow-sm card-3d-hover group">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-2xl sm:text-3xl font-extrabold text-black font-mono block">0.04s</span>
+                <div className="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center group-hover:bg-purple-600 transition-colors">
+                  <Activity className="w-4 h-4 text-purple-600 group-hover:text-white transition-colors" />
+                </div>
               </div>
+              <span className="text-xs text-neutral-700 font-bold block">Regex Intercept Latency</span>
+              <span className="text-[10px] text-neutral-400 block mt-0.5">Instant deterministic pre-checks</span>
             </div>
-            <span className="text-xs text-neutral-700 font-bold block">Regex Intercept Latency</span>
-            <span className="text-[10px] text-neutral-400 block mt-0.5">Instant deterministic pre-checks</span>
           </div>
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* ======================================================== */}
       {/* 5. The 4-Step Chain of Custody with 3D Elevate Cards */}
       {/* ======================================================== */}
-      <section id="how-it-works" className="py-20 px-4 sm:px-8 max-w-6xl mx-auto space-y-12">
+      <ScrollReveal delayMs={100}>
+        <section id="how-it-works" className="py-20 px-4 sm:px-8 max-w-6xl mx-auto space-y-12">
         <div className="text-center space-y-2 max-w-xl mx-auto">
           <span className="text-xs font-mono uppercase tracking-widest text-purple-600 font-bold">
             End-To-End Architecture
@@ -733,10 +741,12 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* ======================================================== */}
       {/* 6. Live Interactive ROI & Risk Reduction Calculator */}
       {/* ======================================================== */}
+      <ScrollReveal delayMs={100}>
       <section id="roi-calculator" className="py-16 px-4 sm:px-8 max-w-5xl mx-auto">
         <div className="text-center space-y-2 mb-8">
           <span className="text-xs font-mono uppercase tracking-widest text-purple-600 font-bold">
@@ -848,10 +858,12 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* ======================================================== */}
       {/* 7. Industry Solutions Section with Purple Badges */}
       {/* ======================================================== */}
+      <ScrollReveal delayMs={100}>
       <section id="solutions" className="py-16 px-4 sm:px-8 max-w-6xl mx-auto space-y-10">
         <div className="text-center space-y-2 max-w-2xl mx-auto">
           <span className="text-xs font-mono uppercase tracking-widest text-purple-600 font-bold">
@@ -927,10 +939,12 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* ======================================================== */}
       {/* 8. 3-Layered Defense Architecture */}
       {/* ======================================================== */}
+      <ScrollReveal delayMs={100}>
       <section id="architecture" className="py-16 px-4 sm:px-8 max-w-6xl mx-auto space-y-10">
         <div className="text-center space-y-2 max-w-2xl mx-auto">
           <span className="text-xs font-mono uppercase tracking-widest text-purple-600 font-bold">
@@ -1039,10 +1053,12 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* ======================================================== */}
       {/* 9. Comparison Matrix: Traditional vs Pineco */}
       {/* ======================================================== */}
+      <ScrollReveal delayMs={100}>
       <section id="comparison" className="py-16 px-4 sm:px-8 max-w-5xl mx-auto space-y-8">
         <div className="text-center space-y-2">
           <span className="text-xs font-mono uppercase tracking-widest text-purple-600 font-bold">
@@ -1102,10 +1118,12 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* ======================================================== */}
       {/* 10. Enterprise Security & Compliance Credentials */}
       {/* ======================================================== */}
+      <ScrollReveal delayMs={100}>
       <section id="security" className="py-16 px-4 sm:px-8 max-w-6xl mx-auto space-y-10">
         <div className="text-center space-y-2 max-w-xl mx-auto">
           <span className="text-xs font-mono uppercase tracking-widest text-purple-600 font-bold">
@@ -1148,10 +1166,12 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* ======================================================== */}
       {/* 11. Frequently Asked Questions (FAQ) */}
       {/* ======================================================== */}
+      <ScrollReveal delayMs={100}>
       <section id="faq" className="py-16 px-4 sm:px-8 max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-2">
           <span className="text-xs font-mono uppercase tracking-widest text-purple-600 font-bold">
@@ -1192,10 +1212,12 @@ export default function LandingPage() {
           })}
         </div>
       </section>
+      </ScrollReveal>
 
       {/* ======================================================== */}
       {/* 12. Bottom CTA Banner */}
       {/* ======================================================== */}
+      <ScrollReveal delayMs={100}>
       <section className="py-20 px-4 sm:px-8 max-w-5xl mx-auto text-center">
         <div className="bg-black text-white rounded-3xl p-8 sm:p-14 border border-purple-500/40 shadow-2xl relative overflow-hidden space-y-6 glow-purple-card">
           <div className="absolute top-0 right-0 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
@@ -1229,6 +1251,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* ======================================================== */}
       {/* 13. Footer */}
