@@ -345,13 +345,13 @@ def propose_policy(
 
     # Pattern 1: Terminology prohibition & replacement
     replace_match = re.search(
-        r"(?:never use|don'?t say|forbid|prohibit|avoid|replace)\s+['\"]?([^'\",\n]+)['\"]?(?:,\s*|\s+)(?:say|with|use|instead of|recommend)\s+['\"]?([^'\"\.\n]+)['\"]?",
+        r"(?:never\s+(?:use|say|claim|mention)|don'?t\s+(?:use|say)|forbid|prohibit|avoid|replace)\s+['\"]?([^'\",\n]+)['\"]?(?:,\s*|\s+)(?:say|with|use|instead of|recommend|suggest)\s+['\"]?([^'\"\.\n]+)['\"]?",
         prompt,
         re.IGNORECASE,
     )
     if not replace_match:
         simple_prohibit = re.search(
-            r"(?:never use|don'?t say|forbid|prohibit|avoid)\s+['\"]?([^'\",\n]+)['\"]?",
+            r"(?:never\s+(?:use|say|claim|mention)|don'?t\s+(?:use|say)|forbid|prohibit|avoid)\s+['\"]?([^'\",\n]+)['\"]?",
             prompt,
             re.IGNORECASE,
         )

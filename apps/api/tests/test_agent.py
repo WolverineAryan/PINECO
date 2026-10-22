@@ -40,3 +40,14 @@ def test_agent_propose_policy(client: TestClient):
     assert len(data["rules"]) >= 1
     assert any(r["pattern"] == "cheap solution" or "cheap" in r["pattern"] for r in data["rules"])
 
+    # Test phrase with 'Never say ... suggest ...'
+    payload2 = {
+        "prompt": "Never say 'guaranteed 100% returns', suggest 'proven performance' instead",
+    }
+    resp2 = client.post("/api/v1/agent/propose-policy", json=payload2)
+    assert resp2.status_code == 200
+    data2 = resp2.json()
+    assert len(data2["rules"]) >= 1
+    assert data2["rules"][0]["pattern"] == "guaranteed 100% returns"
+    assert "proven performance" in data2["rules"][0]["preferred_replacement"]
+
