@@ -67,7 +67,7 @@ export default function LandingPage() {
             <img
               src="/logo-navbar.png"
               alt="Pineco"
-              className="h-8 w-auto object-contain"
+              className="h-10 sm:h-12 w-auto object-contain transition group-hover:opacity-90"
             />
           </Link>
 

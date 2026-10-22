@@ -81,12 +81,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Desktop Persistent Left Sidebar */}
       <aside className="hidden lg:flex w-64 bg-white border-r border-neutral-200 flex-col shrink-0 min-h-screen fixed inset-y-0 left-0 z-30 shadow-[1px_0_4px_rgba(0,0,0,0.02)]">
         {/* Brand Header with New Logos */}
-        <div className="p-4 border-b border-neutral-200 flex items-center bg-white">
-          <Link href="/dashboard" className="flex items-center group">
+        <div className="px-4 py-3.5 border-b border-neutral-200 flex items-center bg-white">
+          <Link href="/dashboard" className="flex items-center w-full group">
             <img
               src="/logo-navbar.png"
               alt="Pineco"
-              className="h-7 w-auto object-contain"
+              className="h-11 sm:h-12 w-auto max-w-[210px] object-contain transition group-hover:opacity-90"
             />
           </Link>
         </div>
@@ -229,7 +229,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <img
                 src="/logo-navbar.png"
                 alt="Pineco"
-                className="h-6 w-auto object-contain"
+                className="h-8 w-auto object-contain"
               />
             </Link>
             <div className="flex items-center space-x-2 text-xs font-medium text-neutral-600">
