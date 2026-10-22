@@ -225,6 +225,39 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </span>
             </div>
           </div>
+
+          <div className="flex items-center space-x-3">
+            <div className="hidden sm:flex items-center space-x-2 bg-neutral-100 border border-neutral-300 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold text-black">
+              <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
+              <span>SENTINEL ONLINE</span>
+            </div>
+
+            <button
+              onClick={copyWorkspace}
+              title="Copy active Workspace ID"
+              className="hidden md:flex items-center space-x-1.5 text-[11px] font-mono text-neutral-600 hover:text-black border border-neutral-200 hover:border-black bg-white px-2.5 py-1.5 rounded-xl transition"
+            >
+              {copiedWs ? (
+                <>
+                  <Check className="w-3 h-3 text-black" />
+                  <span>Copied</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3 h-3 text-neutral-400" />
+                  <span>WS: {workspaceId.slice(0, 8)}...</span>
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={() => setShowScanCopy(true)}
+              className="flex items-center space-x-1.5 bg-black hover:bg-neutral-800 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl shadow-xs transition active:scale-95"
+            >
+              <PlusCircle className="w-3.5 h-3.5 text-white" />
+              <span>Scan Copy</span>
+            </button>
+          </div>
         </header>
 
         {/* Mobile Navigation Drawer */}
