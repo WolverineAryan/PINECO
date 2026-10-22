@@ -225,24 +225,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </span>
             </div>
           </div>
-
-          <div className="flex items-center space-x-2.5">
-            <button
-              onClick={() => setShowCreateProduct(true)}
-              className="hidden sm:flex items-center space-x-1.5 text-xs text-black bg-white border border-neutral-300 hover:border-black px-3 py-2 rounded-xl transition font-semibold shadow-xs"
-            >
-              <FolderPlus className="w-3.5 h-3.5 text-neutral-500" />
-              <span>New Folder</span>
-            </button>
-
-            <button
-              onClick={() => setShowScanCopy(true)}
-              className="flex items-center space-x-1.5 bg-black hover:bg-neutral-800 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs transition active:scale-95"
-            >
-              <PlusCircle className="w-4 h-4 text-white" />
-              <span>Scan Content</span>
-            </button>
-          </div>
         </header>
 
         {/* Mobile Navigation Drawer */}
