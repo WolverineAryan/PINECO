@@ -82,16 +82,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <aside className="hidden lg:flex w-64 bg-white border-r border-neutral-200 flex-col shrink-0 min-h-screen fixed inset-y-0 left-0 z-30 shadow-[1px_0_4px_rgba(0,0,0,0.02)]">
         {/* Brand Header with New Logos */}
         <div className="p-4 border-b border-neutral-200 flex items-center justify-between bg-white">
-          <Link href="/" className="flex items-center space-x-2.5 group">
+          <Link href="/dashboard" className="flex items-center group">
             <img
-              src="/logo-mark.jpg"
+              src="/logo-navbar.png"
               alt="Pineco"
-              className="w-8 h-8 rounded-lg object-contain border border-neutral-200 shadow-xs"
-            />
-            <img
-              src="/logo-text.png"
-              alt="PINECO"
-              className="h-4.5 w-auto object-contain"
+              className="h-7 w-auto object-contain"
             />
           </Link>
           <span className="text-[10px] font-mono bg-neutral-100 border border-neutral-300 text-black px-2 py-0.5 rounded font-bold">
@@ -233,6 +228,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
+            <Link href="/dashboard" className="lg:hidden flex items-center">
+              <img
+                src="/logo-navbar.png"
+                alt="Pineco"
+                className="h-6 w-auto object-contain"
+              />
+            </Link>
             <div className="flex items-center space-x-2 text-xs font-medium text-neutral-600">
               <span className="text-neutral-400">Products</span>
               <span className="text-neutral-300">/</span>

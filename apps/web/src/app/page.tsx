@@ -63,16 +63,11 @@ export default function LandingPage() {
       {/* Landing Navbar */}
       <nav className="h-20 border-b border-neutral-200 bg-white/90 backdrop-blur-md sticky top-0 z-50 px-4 sm:px-8">
         <div className="max-w-7xl mx-auto h-full flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-3 group">
+          <Link href="/" className="flex items-center group">
             <img
-              src="/logo-mark.jpg"
+              src="/logo-navbar.png"
               alt="Pineco"
-              className="w-10 h-10 rounded-xl object-contain border border-neutral-200 shadow-xs"
-            />
-            <img
-              src="/logo-text.png"
-              alt="PINECO"
-              className="h-5.5 w-auto object-contain"
+              className="h-8 w-auto object-contain"
             />
           </Link>
 
