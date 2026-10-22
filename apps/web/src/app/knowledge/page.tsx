@@ -201,26 +201,26 @@ export default function KnowledgePage() {
         <div className="flex items-center space-x-2.5 shrink-0">
           <Link
             href="/automation"
-            className="flex items-center space-x-1.5 text-xs font-bold text-neutral-700 hover:text-black border border-neutral-300 hover:border-black bg-white px-3.5 py-2.5 rounded-xl transition shadow-xs"
+            className="flex items-center space-x-1.5 text-xs font-bold text-purple-700 hover:text-purple-900 border border-purple-200 hover:border-purple-400 bg-purple-50/50 hover:bg-purple-50 px-3.5 py-2.5 rounded-xl transition shadow-xs"
           >
-            <Bot className="w-3.5 h-3.5 text-neutral-600" />
+            <Bot className="w-3.5 h-3.5 text-purple-600" />
             <span>AI Rule Architect &rarr;</span>
           </Link>
 
           {activeTab === 'rules' ? (
             <button
               onClick={() => setShowRuleModal(true)}
-              className="flex items-center space-x-1.5 bg-black hover:bg-neutral-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs transition active:scale-95"
+              className="flex items-center space-x-1.5 bg-black hover:bg-neutral-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs transition active:scale-95 hover:shadow-[0_0_15px_-2px_rgba(124,58,237,0.35)]"
             >
-              <Plus className="w-3.5 h-3.5 text-white" />
+              <Plus className="w-3.5 h-3.5 text-purple-400" />
               <span>New Brand Rule</span>
             </button>
           ) : (
             <button
               onClick={() => setShowFactModal(true)}
-              className="flex items-center space-x-1.5 bg-black hover:bg-neutral-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs transition active:scale-95"
+              className="flex items-center space-x-1.5 bg-black hover:bg-neutral-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs transition active:scale-95 hover:shadow-[0_0_15px_-2px_rgba(124,58,237,0.35)]"
             >
-              <Plus className="w-3.5 h-3.5 text-white" />
+              <Plus className="w-3.5 h-3.5 text-purple-400" />
               <span>Add Approved Fact</span>
             </button>
           )}
@@ -313,7 +313,7 @@ export default function KnowledgePage() {
                       </td>
                       <td className="py-4 px-5 font-mono text-[11px]">
                         {rule.preferred_replacement ? (
-                          <span className="bg-black text-white px-2 py-0.5 rounded font-bold">
+                          <span className="bg-purple-50 border border-purple-200 text-purple-900 px-2 py-0.5 rounded font-bold">
                             &quot;{rule.preferred_replacement}&quot;
                           </span>
                         ) : (
@@ -329,7 +329,7 @@ export default function KnowledgePage() {
                         <button
                           onClick={() => handleToggleRule(rule)}
                           className={`w-10 h-5.5 rounded-full transition-colors relative inline-block ${
-                            rule.enabled ? 'bg-black' : 'bg-neutral-300'
+                            rule.enabled ? 'bg-purple-600' : 'bg-neutral-300'
                           }`}
                           title={rule.enabled ? 'Click to disable' : 'Click to enable'}
                         >
@@ -397,8 +397,8 @@ export default function KnowledgePage() {
                         {fact.valid_until ? `Until ${new Date(fact.valid_until).toLocaleDateString()}` : 'Perpetual'}
                       </td>
                       <td className="py-4 px-5">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase inline-flex items-center space-x-1 bg-black text-white">
-                          <CheckCircle2 className="w-3 h-3 text-white" />
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase inline-flex items-center space-x-1 bg-purple-50 text-purple-900 border border-purple-200">
+                          <CheckCircle2 className="w-3 h-3 text-purple-600" />
                           <span>{fact.approval_status}</span>
                         </span>
                       </td>

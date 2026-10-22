@@ -420,8 +420,8 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                       {/* Evidence Status Pill */}
                       <div className="flex items-center space-x-2">
                         {finding.evidence_status === 'supported' && (
-                          <span className="bg-black text-white text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold uppercase inline-flex items-center space-x-1">
-                            <CheckCircle2 className="w-3 h-3 text-white" />
+                          <span className="bg-purple-50 border border-purple-200 text-purple-900 text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold uppercase inline-flex items-center space-x-1">
+                            <CheckCircle2 className="w-3 h-3 text-purple-600" />
                             <span>Supported by Evidence</span>
                           </span>
                         )}
@@ -462,7 +462,7 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                     {/* Rule / Fact Links */}
                     {finding.rule && (
                       <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-3 text-xs flex items-start space-x-2 text-black">
-                        <Shield className="w-4 h-4 text-black shrink-0 mt-0.5" />
+                        <Shield className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
                         <div>
                           <span className="font-bold">Brand Policy Rule: </span>
                           <span>{finding.rule.name}</span>
@@ -473,7 +473,7 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
 
                     {finding.fact && (
                       <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-3 text-xs flex items-start space-x-2 text-black">
-                        <CheckCircle2 className="w-4 h-4 text-black shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
                         <div>
                           <span className="font-bold">Authoritative Ground Truth: </span>
                           <span>{finding.fact.source_title} (Ref: {finding.fact.source_reference})</span>
@@ -486,14 +486,14 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
 
                     {/* Suggested Correction */}
                     {finding.suggested_correction && (
-                      <div className="bg-neutral-100 border border-neutral-300 rounded-xl p-3 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                      <div className="bg-purple-50/60 border border-purple-200 rounded-xl p-3.5 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                         <div>
-                          <span className="font-bold text-black block">Suggested Compliant Correction:</span>
-                          <span className="text-neutral-800 font-mono text-[11px]">{finding.suggested_correction}</span>
+                          <span className="font-bold text-purple-950 block">Suggested Compliant Correction:</span>
+                          <span className="text-purple-800 font-mono text-[11px]">{finding.suggested_correction}</span>
                         </div>
                         <button
                           onClick={() => applySuggestedCorrection(finding.suggested_correction!)}
-                          className="bg-black hover:bg-neutral-800 text-white font-bold text-[11px] px-3.5 py-1.5 rounded-lg transition shrink-0 shadow-xs flex items-center space-x-1"
+                          className="bg-purple-600 hover:bg-purple-700 text-white font-bold text-[11px] px-3.5 py-1.5 rounded-lg transition shrink-0 shadow-xs flex items-center space-x-1"
                         >
                           <span>Apply to Revision</span>
                           <span>&rarr;</span>

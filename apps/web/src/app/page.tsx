@@ -109,16 +109,17 @@ export default function LandingPage() {
       <section className="relative pt-12 pb-20 px-4 sm:px-8 max-w-7xl mx-auto text-center space-y-8 overflow-hidden">
         {/* Subtle Background Radial Glow and Monochrome Grid */}
         <div className="absolute inset-0 -z-10 bg-grid-monochrome opacity-60 [mask-image:radial-gradient(ellipse_at_50%_25%,black_45%,transparent_85%)]" />
+        <div className="absolute inset-0 -z-10 bg-purple-radial opacity-70 pointer-events-none" />
 
         {/* Floating Brand Badge */}
-        <div className="inline-flex items-center space-x-2.5 glass-pill px-4 py-1.5 rounded-full text-xs font-mono text-black shadow-sm">
+        <div className="inline-flex items-center space-x-2.5 glass-pill px-4 py-1.5 rounded-full text-xs font-mono text-black shadow-sm border border-purple-200">
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-black" />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-600 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-600" />
           </span>
           <span className="font-bold tracking-tight">Enterprise Brand Governance System</span>
           <span className="text-neutral-300">•</span>
-          <span className="text-neutral-500 font-medium">CodeAxis Round 2</span>
+          <span className="text-purple-700 font-semibold">CodeAxis Round 2</span>
         </div>
 
         {/* Primary Hero Typography */}
@@ -126,7 +127,7 @@ export default function LandingPage() {
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-black leading-[1.08]">
             Before You Publish Marketing Copy,{' '}
             <span className="relative inline-block">
-              <span className="relative z-10 underline decoration-neutral-300 underline-offset-8">
+              <span className="relative z-10 underline decoration-purple-600 underline-offset-8">
                 Prove Every Claim.
               </span>
             </span>
@@ -141,16 +142,16 @@ export default function LandingPage() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <Link
             href="/dashboard"
-            className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-black hover:bg-neutral-800 text-white font-bold text-sm px-8 py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 active:scale-95 group"
+            className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-black hover:bg-neutral-900 text-white font-bold text-sm px-8 py-3.5 rounded-xl shadow-md transition-all duration-200 active:scale-95 group hover:shadow-[0_0_25px_-5px_rgba(124,58,237,0.45)]"
           >
             <span>Explore Demo Workspace</span>
-            <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-4 h-4 text-purple-400 group-hover:translate-x-1 transition-transform" />
           </Link>
           <button
             onClick={openAuthModal}
-            className="w-full sm:w-auto flex items-center justify-center space-x-2 glass-pill hover:bg-neutral-100 text-black font-bold text-sm px-7 py-3.5 rounded-xl transition shadow-xs"
+            className="w-full sm:w-auto flex items-center justify-center space-x-2 glass-pill hover:bg-purple-50 hover:border-purple-300 text-black font-bold text-sm px-7 py-3.5 rounded-xl transition shadow-xs"
           >
-            <UserCheck className="w-4 h-4 text-black" />
+            <UserCheck className="w-4 h-4 text-purple-600" />
             <span>Persona Access (JWT)</span>
           </button>
         </div>
@@ -249,7 +250,7 @@ export default function LandingPage() {
               {/* Left Column: Live Document Scanner (8 cols) */}
               <div className="lg:col-span-8 bg-neutral-50/90 rounded-2xl p-5 border border-neutral-200 relative overflow-hidden font-mono text-xs sm:text-[13px] leading-relaxed text-black">
                 {/* Micro-animated Scanning Laser Beam */}
-                <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-black to-transparent shadow-[0_0_8px_rgba(0,0,0,0.6)] animate-scan-beam pointer-events-none" />
+                <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-purple-600 to-transparent shadow-[0_0_12px_rgba(124,58,237,0.8)] animate-scan-beam pointer-events-none" />
 
                 <div className="flex items-center justify-between pb-3 mb-3 border-b border-neutral-200 text-[11px] text-neutral-500">
                   <div className="flex items-center space-x-1.5">

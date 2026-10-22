@@ -4,13 +4,17 @@
 
 :root {
   --background: #FFFFFF;
-  --foreground: #000000;
-  --brand-black: #000000;
+  --foreground: #09090B;
+  --brand-black: #0A0A0B;
   --brand-white: #FFFFFF;
-  --surface: #ffffff;
-  --surface-subtle: #fafafa;
-  --border: #e5e5e5;
-  --border-strong: #000000;
+  --brand-purple: #7C3AED;
+  --brand-purple-hover: #6D28D9;
+  --brand-purple-light: #F5F3FF;
+  --brand-purple-border: #DDD6FE;
+  --surface: #FFFFFF;
+  --surface-subtle: #FAFAFA;
+  --border: #E4E4E7;
+  --border-strong: #09090B;
 }
 
 @layer base {
@@ -26,29 +30,45 @@
   }
 }
 
-/* Glassmorphism & 3D Visual Tokens */
+/* Glassmorphism & 3D Visual Tokens with 60% White / 30% Black / 10% Purple */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.9);
 }
 
+.glass-panel-purple {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(124, 58, 237, 0.22);
+  box-shadow: 0 20px 40px -15px rgba(124, 58, 237, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.95);
+}
+
 .glass-panel-dark {
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(10, 10, 11, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.15);
 }
 
 .glass-pill {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 0, 0, 0.09);
-  box-shadow: 0 6px 16px -2px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(124, 58, 237, 0.18);
+  box-shadow: 0 6px 16px -2px rgba(124, 58, 237, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.purple-glow {
+  box-shadow: 0 0 25px -4px rgba(124, 58, 237, 0.25);
+}
+
+.purple-glow-sm {
+  box-shadow: 0 0 15px -2px rgba(124, 58, 237, 0.2);
 }
 
 /* 3D Perspective & Floating Micro-animations */
@@ -76,10 +96,10 @@
     opacity: 0;
   }
   15% {
-    opacity: 0.8;
+    opacity: 0.9;
   }
   85% {
-    opacity: 0.8;
+    opacity: 0.9;
   }
   100% {
     top: 100%;
@@ -134,33 +154,16 @@
   transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateY(-4px);
 }
 
-/* Monochrome Grid Background */
+/* Subtle Grid Background with Purple Vignette */
 .bg-grid-monochrome {
   background-size: 32px 32px;
   background-image: 
-    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
 }
 
-/* Subtle Shimmer Animation for Custom Loading States */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-.skeleton-shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(232, 232, 220, 0.5) 25%,
-    rgba(255, 255, 240, 0.9) 37%,
-    rgba(232, 232, 220, 0.5) 63%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.8s ease-in-out infinite;
+.bg-purple-radial {
+  background: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.08) 0%, transparent 60%);
 }
 
 /* Custom Scrollbar */
@@ -172,9 +175,9 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d4d4c4;
+  background: #D4D4D8;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #191919;
+  background: #7C3AED;
 }

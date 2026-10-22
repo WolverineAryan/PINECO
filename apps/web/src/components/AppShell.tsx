@@ -80,7 +80,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         onClose={() => setShowScanCopy(false)}
       />
 
-      {/* Desktop Persistent Left Sidebar */}
+      {/* Desktop Persistent Left Sidebar (30% Black / Neutral structure) */}
       <aside className="hidden lg:flex w-64 bg-white border-r border-neutral-200 flex-col shrink-0 min-h-screen fixed inset-y-0 left-0 z-30 shadow-[1px_0_4px_rgba(0,0,0,0.02)]">
         {/* Brand Header */}
         <div className="h-16 px-4 border-b border-neutral-200 flex items-center bg-white">
@@ -109,7 +109,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 const found = products.find((p) => p.id === e.target.value);
                 if (found) setActiveProduct(found);
               }}
-              className="w-full text-xs font-bold text-black bg-white border border-neutral-300 hover:border-black rounded-xl px-2.5 py-2 appearance-none focus:outline-none focus:ring-1 focus:ring-black cursor-pointer shadow-xs pr-7 truncate"
+              className="w-full text-xs font-bold text-black bg-white border border-neutral-300 hover:border-black rounded-xl px-2.5 py-2 appearance-none focus:outline-none focus:ring-1 focus:ring-purple-600 focus:border-purple-600 cursor-pointer shadow-xs pr-7 truncate transition"
             >
               {products.length === 0 ? (
                 <option value="">(No product workspaces)</option>
@@ -127,7 +127,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {activeProduct && (
             <div className="text-[10px] text-neutral-500 font-mono truncate px-1 flex items-center justify-between">
               <span>{activeProduct.category}</span>
-              <span className="text-black font-bold">Active Scope</span>
+              <span className="text-[10px] bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.2 rounded-full font-bold">
+                Active Scope
+              </span>
             </div>
           )}
         </div>
@@ -147,11 +149,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 className={`flex items-center space-x-2.5 px-3 py-2.5 rounded-xl font-semibold transition-all duration-150 ${
                   isActive
-                    ? 'bg-black text-white shadow-xs font-bold'
+                    ? 'bg-black text-white shadow-xs font-bold border-l-2 border-purple-500 ring-1 ring-purple-500/20'
                     : 'text-neutral-600 hover:text-black hover:bg-neutral-100'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-neutral-500'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-purple-400' : 'text-neutral-500'}`} />
                 <span>{item.label}</span>
               </Link>
             );
@@ -162,9 +164,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="p-3 mx-3 mb-2">
           <button
             onClick={() => setShowScanCopy(true)}
-            className="w-full flex items-center justify-center space-x-2 bg-black hover:bg-neutral-800 text-white text-xs font-bold py-2.5 rounded-xl shadow-xs transition active:scale-95"
+            className="w-full flex items-center justify-center space-x-2 bg-black hover:bg-neutral-900 text-white text-xs font-bold py-2.5 rounded-xl shadow-xs transition active:scale-95 hover:shadow-[0_0_20px_-3px_rgba(124,58,237,0.35)]"
           >
-            <PlusCircle className="w-4 h-4 text-white" />
+            <PlusCircle className="w-4 h-4 text-purple-400" />
             <span>Scan New Copy</span>
           </button>
         </div>
@@ -175,14 +177,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             onClick={openAuthModal}
             className="flex items-center space-x-2.5 text-left flex-1 min-w-0 group hover:opacity-90 transition"
           >
-            <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-mono font-bold text-xs shrink-0 shadow-xs">
+            <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-mono font-bold text-xs shrink-0 shadow-xs border border-purple-500/30">
               {currentUser.avatar}
             </div>
             <div className="flex-1 min-w-0">
               <span className="text-xs font-bold text-black block truncate">
                 {currentUser.name}
               </span>
-              <span className="text-[10px] text-neutral-500 block truncate capitalize font-mono font-medium">
+              <span className="text-[10px] text-purple-600 block truncate capitalize font-mono font-bold">
                 {role.replace('_', ' ')}
               </span>
             </div>
@@ -191,14 +193,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <button
             onClick={openAuthModal}
             title="Switch Persona / Inspect JWT"
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-black hover:bg-neutral-100 transition"
+            className="p-1.5 rounded-lg text-neutral-400 hover:text-purple-600 hover:bg-purple-50 transition"
           >
             <UserCheck className="w-4 h-4" />
           </button>
         </div>
       </aside>
 
-      {/* Main Content Area */}
+      {/* Main Content Area (60% White dominant canvas with subtle purple radial backdrop) */}
       <div className="flex-1 lg:pl-64 flex flex-col min-w-0">
         {/* Top Header Bar */}
         <header className="h-16 bg-white/90 backdrop-blur-md border-b border-neutral-200 px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-20">
@@ -227,8 +229,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center space-x-3">
-            <div className="hidden sm:flex items-center space-x-2 bg-neutral-100 border border-neutral-300 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold text-black">
-              <span className="w-1.5 h-1.5 rounded-full bg-black animate-pulse" />
+            <div className="hidden sm:flex items-center space-x-2 bg-purple-50/80 border border-purple-200/80 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold text-purple-950">
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
               <span>SENTINEL ONLINE</span>
             </div>
 
@@ -239,8 +241,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               {copiedWs ? (
                 <>
-                  <Check className="w-3 h-3 text-black" />
-                  <span>Copied</span>
+                  <Check className="w-3 h-3 text-purple-600" />
+                  <span className="text-purple-600 font-bold">Copied</span>
                 </>
               ) : (
                 <>
@@ -252,9 +254,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
             <button
               onClick={() => setShowScanCopy(true)}
-              className="flex items-center space-x-1.5 bg-black hover:bg-neutral-800 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl shadow-xs transition active:scale-95"
+              className="flex items-center space-x-1.5 bg-black hover:bg-neutral-900 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl shadow-xs transition active:scale-95 hover:shadow-[0_0_15px_-2px_rgba(124,58,237,0.3)]"
             >
-              <PlusCircle className="w-3.5 h-3.5 text-white" />
+              <PlusCircle className="w-3.5 h-3.5 text-purple-400" />
               <span>Scan Copy</span>
             </button>
           </div>
@@ -287,10 +289,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center space-x-2.5 px-3 py-2 rounded-xl ${
-                  pathname === item.href ? 'bg-black text-white font-bold' : 'text-neutral-600 hover:bg-neutral-100'
+                  pathname === item.href ? 'bg-black text-white font-bold border-l-2 border-purple-500' : 'text-neutral-600 hover:bg-neutral-100'
                 }`}
               >
-                <item.icon className="w-4 h-4" />
+                <item.icon className="w-4 h-4 text-purple-400" />
                 <span>{item.label}</span>
               </Link>
             ))}
@@ -301,14 +303,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               }}
               className="w-full flex items-center justify-center space-x-1.5 bg-black text-white p-2 rounded-xl font-bold"
             >
-              <PlusCircle className="w-4 h-4" />
+              <PlusCircle className="w-4 h-4 text-purple-400" />
               <span>Scan New Copy</span>
             </button>
           </div>
         )}
 
-        {/* Inner Page View */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto bg-neutral-50/40 min-h-[calc(100vh-4rem)]">
+        {/* Inner Page View (60% White dominant canvas with subtle purple radial top glow) */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto bg-neutral-50/40 bg-purple-radial min-h-[calc(100vh-4rem)]">
           {children}
         </main>
       </div>
