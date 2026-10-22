@@ -1,568 +1,543 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import {
-  FileText,
-  CheckCircle2,
-  AlertCircle,
-  Clock,
-  Shield,
-  ArrowRight,
-  RefreshCw,
+  ShieldCheck,
   Sparkles,
+  ArrowRight,
+  CheckCircle2,
   AlertTriangle,
-  FileCheck,
-  TrendingUp,
+  HelpCircle,
+  FileText,
+  Lock,
+  GitBranch,
+  Layers,
+  Search,
+  Check,
+  ChevronRight,
+  UserCheck,
   BarChart3,
   ExternalLink,
-  Filter,
-  UserCheck,
-  Search,
-  Eye,
-  SlidersHorizontal,
-  ChevronRight,
-  HelpCircle,
-  X,
-  Compass,
+  Cpu,
+  BookOpen,
+  Scale,
+  Building2,
+  HeartPulse,
+  Briefcase,
+  HelpCircle as QuestionIcon,
+  ChevronDown,
 } from 'lucide-react';
-import { api } from '@/lib/api';
-import { DashboardSummary, Submission } from '@/lib/types';
 import { useRole } from '@/components/RoleContext';
-import { useToast } from '@/components/Toast';
-import { AuthModal } from '@/components/AuthModal';
 
-export default function CrmDashboardPage() {
-  const { workspaceId, currentUser, openAuthModal } = useRole();
-  const { success, error: toastError } = useToast();
-  const [data, setData] = useState<DashboardSummary | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [resetting, setResetting] = useState(false);
+export default function LandingPage() {
+  const { openAuthModal } = useRole();
+  const [activeTab, setActiveTab] = useState<'violations' | 'compliant'>('violations');
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
-  // CRM Pipeline Filter state
-  const [pipelineTab, setPipelineTab] = useState<'all' | 'action_needed' | 'in_review' | 'approved'>('all');
-  const [crmSearch, setCrmSearch] = useState('');
-
-  // CRM Quick Drawer Preview
-  const [selectedSub, setSelectedSub] = useState<Submission | null>(null);
-
-  const loadDashboard = async (silent = false) => {
-    try {
-      if (!silent) setLoading(true);
-      setError(null);
-      const res = await api.getDashboardSummary(workspaceId);
-      setData(res);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load dashboard metrics');
-    } finally {
-      if (!silent) setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadDashboard();
-  }, [workspaceId]);
-
-  const handleResetDemo = async () => {
-    if (!confirm('Reset the demo workspace back to the initial seeded baseline?')) return;
-    try {
-      setResetting(true);
-      const res = await api.resetDemoData();
-      success('Workspace Reset', res.message);
-      await loadDashboard(true);
-    } catch (err: any) {
-      toastError('Reset Failed', err.message);
-    } finally {
-      setResetting(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="space-y-8 animate-in fade-in duration-300">
-        <div className="h-44 rounded-2xl bg-slate-900/90 skeleton-shimmer" />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 bg-white rounded-xl border border-slate-200/80 skeleton-shimmer" />
-          ))}
-        </div>
-        <div className="h-80 bg-white rounded-2xl border border-slate-200/80 skeleton-shimmer" />
-      </div>
-    );
-  }
-
-  if (error || !data) {
-    return (
-      <div className="bg-rose-50/60 border border-rose-200/80 rounded-2xl p-6 text-rose-900 my-8 shadow-sm">
-        <div className="flex items-center space-x-3 mb-2">
-          <AlertCircle className="w-5 h-5 text-rose-600" />
-          <h2 className="text-sm font-semibold">Backend Connection Unavailable</h2>
-        </div>
-        <p className="text-xs text-rose-700 mb-4 font-mono">
-          {error || 'Unable to communicate with the FastAPI server.'}
-        </p>
-        <button
-          onClick={() => loadDashboard()}
-          className="bg-rose-950 hover:bg-rose-900 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
-        >
-          Retry Connection
-        </button>
-      </div>
-    );
-  }
-
-  const { metrics, recent_submissions, recent_audit_events } = data;
-
-  const filteredPipeline = recent_submissions.filter((sub) => {
-    if (pipelineTab === 'action_needed' && sub.status !== 'changes_requested') return false;
-    if (pipelineTab === 'in_review' && !['draft', 'in_review'].includes(sub.status)) return false;
-    if (pipelineTab === 'approved' && sub.status !== 'approved') return false;
-    if (crmSearch && !sub.title.toLowerCase().includes(crmSearch.toLowerCase()) && !sub.channel.toLowerCase().includes(crmSearch.toLowerCase())) {
-      return false;
-    }
-    return true;
-  });
+  const faqs = [
+    {
+      q: 'How does Pineco prevent AI hallucinations during fact verification?',
+      a: 'Pineco implements an "Evidence before assertion" architecture. The LLM is restricted to analyzing candidate facts retrieved directly from your company’s approved database. Every fact ID returned by the model is validated against real database records; hallucinated IDs are automatically discarded and unbacked claims are conservatively labeled "Unverified".',
+    },
+    {
+      q: 'What is the difference between deterministic rules and AI-assisted checks?',
+      a: 'Deterministic rules execute exact pattern matching with Unicode normalization for non-negotiable policies like prohibited terminology and mandatory forward-looking disclaimers. AI-assisted analysis evaluates nuanced tone and semantic claim alignment against approved documentation.',
+    },
+    {
+      q: 'Does Pineco overwrite previous content versions when a creator revises copy?',
+      a: 'Never. Every edit generates an immutable new version (v1, v2, v3) bound to a SHA-256 cryptographic hash. Prior versions, review findings, and reviewer rationales remain preserved in the permanent compliance audit ledger.',
+    },
+    {
+      q: 'Can reviewers override a flagged policy violation?',
+      a: 'Yes, human reviewers can override specific findings or approve a version despite warnings, but the system strictly mandates a written business rationale that is permanently recorded in the audit trail.',
+    },
+    {
+      q: 'Is our submitted marketing copy used to train external public AI models?',
+      a: 'No. Pineco operates on an enterprise zero-retention model. Copy is only evaluated in-memory against your workspace guidelines through secure HTTPS server-to-server endpoints and is never utilized for public foundation model training.',
+    },
+  ];
 
   return (
-    <div className="space-y-8">
-      <AuthModal />
+    <div className="min-h-screen bg-[#FFFFF0] text-[#191919]">
+      {/* Landing Navbar */}
+      <nav className="h-20 border-b border-[#E8E8DC] bg-white/90 backdrop-blur-md sticky top-0 z-50 px-4 sm:px-8">
+        <div className="max-w-7xl mx-auto h-full flex items-center justify-between">
+          <Link href="/" className="flex items-center space-x-3 group">
+            <div className="w-10 h-10 rounded-xl bg-[#F6C324] flex items-center justify-center text-[#191919] shadow-sm font-bold transition-transform group-hover:scale-105">
+              <ShieldCheck className="w-6 h-6 text-[#191919]" />
+            </div>
+            <div>
+              <span className="text-xl font-extrabold tracking-tight text-[#191919] block">
+                Pineco
+              </span>
+              <span className="text-[10px] uppercase tracking-widest font-mono text-slate-500 block -mt-1 font-bold">
+                Brand Governance OS
+              </span>
+            </div>
+          </Link>
 
-      {/* CRM Command Header Bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-1">
-        <div>
-          <div className="flex items-center space-x-2">
-            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-950">
-              Content Governance Command Center
-            </h1>
-            <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full">
-              LIVE CRM
-            </span>
+          <div className="hidden md:flex items-center space-x-8 text-xs font-semibold text-slate-700">
+            <a href="#how-it-works" className="hover:text-[#191919] transition">How It Works</a>
+            <a href="#inspector" className="hover:text-[#191919] transition">Live Inspector</a>
+            <a href="#features" className="hover:text-[#191919] transition">Governance Engine</a>
+            <a href="#security" className="hover:text-[#191919] transition">Security & Trust</a>
+            <a href="#faq" className="hover:text-[#191919] transition">FAQ</a>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Real-time pipeline monitoring, policy interception, and version-specific review approvals.
-          </p>
+
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={openAuthModal}
+              className="text-xs font-semibold text-[#191919] hover:bg-[#FFFFF0] border border-[#E8E8DC] px-4 py-2 rounded-xl transition"
+            >
+              Sign In
+            </button>
+            <Link
+              href="/dashboard"
+              className="flex items-center space-x-1.5 bg-[#F6C324] hover:bg-[#e5b41e] text-[#191919] text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition active:scale-95"
+            >
+              <span>Launch Platform</span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#191919]" />
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-16 pb-20 px-4 sm:px-8 max-w-6xl mx-auto text-center space-y-8">
+        <div className="inline-flex items-center space-x-2 bg-white border border-[#E8E8DC] px-4 py-1.5 rounded-full text-xs font-mono text-[#191919] shadow-sm">
+          <span className="w-2 h-2 rounded-full bg-[#F6C324] animate-pulse" />
+          <span className="font-bold">Enterprise Brand Governance Platform</span>
+          <span className="text-slate-300">•</span>
+          <span className="text-slate-500">CodeAxis Round 2</span>
         </div>
 
-        <div className="flex items-center space-x-2.5">
+        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#191919] leading-[1.08] max-w-4xl mx-auto">
+          Before You Publish Marketing Copy,{' '}
+          <span className="bg-gradient-to-r from-[#191919] via-slate-800 to-[#e5b41e] bg-clip-text text-transparent">
+            Prove Every Claim.
+          </span>
+        </h1>
+
+        <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          Pineco intercepts enterprise marketing, PR, and social copy before publication. It couples <strong>deterministic rule guardrails</strong> and mandatory disclaimers with <strong>conservative AI claim verification</strong> against approved corporate facts.
+        </p>
+
+        {/* Hero CTAs */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
           <Link
-            href="/landing"
-            className="flex items-center space-x-1.5 text-xs text-slate-600 hover:text-slate-950 bg-white hover:bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl transition shadow-sm font-medium"
+            href="/dashboard"
+            className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-[#F6C324] hover:bg-[#e5b41e] text-[#191919] font-bold text-sm px-7 py-3.5 rounded-xl shadow-md hover:shadow-lg transition active:scale-95"
           >
-            <Compass className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Product Overview</span>
+            <span>Launch Command Center</span>
+            <ArrowRight className="w-4 h-4 text-[#191919]" />
           </Link>
           <button
             onClick={openAuthModal}
-            className="flex items-center space-x-1.5 text-xs text-slate-600 hover:text-slate-950 bg-white hover:bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl transition shadow-sm font-medium"
+            className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-white hover:bg-[#FFFFF0] border border-[#E8E8DC] text-[#191919] font-semibold text-sm px-6 py-3.5 rounded-xl shadow-sm transition"
           >
-            <UserCheck className="w-3.5 h-3.5 text-slate-400" />
-            <span>Persona ({currentUser.name.split(' ')[0]})</span>
+            <UserCheck className="w-4 h-4 text-slate-600" />
+            <span>Select Demo Persona (JWT)</span>
           </button>
-          <Link
-            href="/submissions/new"
-            className="flex items-center space-x-1.5 bg-slate-950 hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2 rounded-xl shadow-sm transition"
-          >
-            <FileCheck className="w-4 h-4 text-emerald-400" />
-            <span>New Review</span>
-          </Link>
         </div>
-      </div>
 
-      {/* Workflow Explainer Banner for Normal Users */}
-      <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-white rounded-2xl p-5 sm:p-6 border border-slate-800/90 shadow-sm relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-80 h-full bg-emerald-500/5 blur-3xl pointer-events-none" />
+        {/* Live Metrics Highlights */}
+        <div className="pt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          <div className="bg-white p-4 rounded-2xl border border-[#E8E8DC] shadow-sm">
+            <span className="text-2xl sm:text-3xl font-extrabold text-[#191919] font-mono block">68%</span>
+            <span className="text-xs text-slate-500 font-medium">Faster Review Velocity</span>
+          </div>
+          <div className="bg-white p-4 rounded-2xl border border-[#E8E8DC] shadow-sm">
+            <span className="text-2xl sm:text-3xl font-extrabold text-[#191919] font-mono block">0</span>
+            <span className="text-xs text-slate-500 font-medium">Unverified Claims Published</span>
+          </div>
+          <div className="bg-white p-4 rounded-2xl border border-[#E8E8DC] shadow-sm">
+            <span className="text-2xl sm:text-3xl font-extrabold text-[#191919] font-mono block">100%</span>
+            <span className="text-xs text-slate-500 font-medium">SHA-256 Version Traceability</span>
+          </div>
+          <div className="bg-white p-4 rounded-2xl border border-[#E8E8DC] shadow-sm">
+            <span className="text-2xl sm:text-3xl font-extrabold text-[#191919] font-mono block">2.0s</span>
+            <span className="text-xs text-slate-500 font-medium">Deterministic Engine Latency</span>
+          </div>
+        </div>
+      </section>
 
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative">
-          <div className="space-y-1.5 max-w-xl">
-            <span className="text-[10px] uppercase font-mono tracking-wider font-semibold text-emerald-400">
-              How It Works
+      {/* Live Interactive Review Inspector Card */}
+      <section id="inspector" className="py-12 px-4 sm:px-8 max-w-5xl mx-auto">
+        <div className="text-center space-y-2 mb-8">
+          <span className="text-xs font-mono uppercase tracking-widest text-slate-400 font-bold">Interactive Sandbox</span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
+            See Pineco Governance in Action
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 max-w-xl mx-auto">
+            Toggle between an unvetted draft copy containing brand violations and a vetted compliant draft.
+          </p>
+        </div>
+
+        <div className="bg-white rounded-3xl border border-[#E8E8DC] shadow-xl overflow-hidden">
+          {/* Header Bar */}
+          <div className="bg-[#191919] text-white px-6 py-4 flex flex-wrap items-center justify-between gap-3 text-xs border-b border-black">
+            <div className="flex items-center space-x-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#F6C324]" />
+              <span className="font-mono text-slate-300 font-semibold text-[11px]">
+                Pineco Live Audit Inspector v1.0
+              </span>
+            </div>
+
+            <div className="flex items-center space-x-2 bg-black/50 p-1 rounded-xl">
+              <button
+                onClick={() => setActiveTab('violations')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition ${
+                  activeTab === 'violations' ? 'bg-[#F6C324] text-[#191919]' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Violation Sample
+              </button>
+              <button
+                onClick={() => setActiveTab('compliant')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition ${
+                  activeTab === 'compliant' ? 'bg-[#F6C324] text-[#191919]' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Compliant Sample
+              </button>
+            </div>
+          </div>
+
+          {/* Inspector Body */}
+          <div className="p-6 sm:p-8 space-y-6">
+            {activeTab === 'violations' ? (
+              <>
+                <div className="p-5 bg-[#FFFFF0] rounded-2xl border border-[#E8E8DC] font-mono text-xs sm:text-sm leading-relaxed text-[#191919]">
+                  Get{' '}
+                  <span className="bg-rose-100 text-rose-900 px-1.5 py-0.5 rounded font-bold border border-rose-300">
+                    guaranteed results
+                  </span>{' '}
+                  with our{' '}
+                  <span className="bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded font-bold border border-amber-300">
+                    cheap
+                  </span>{' '}
+                  software! Pineco{' '}
+                  <span className="bg-rose-100 text-rose-900 px-1.5 py-0.5 rounded font-bold border border-rose-300">
+                    guarantees 100% automated regulatory sign-off without human review
+                  </span>{' '}
+                  and immediately increases sales by{' '}
+                  <span className="bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded font-bold border border-amber-300">
+                    9000%
+                  </span>
+                  !
+                </div>
+
+                <div className="space-y-3">
+                  <div className="bg-rose-50 border border-rose-200 p-4 rounded-2xl flex items-start space-x-3 text-xs text-rose-950">
+                    <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-bold block">Deterministic Rule Violation: &apos;guaranteed results&apos;</span>
+                      <p className="text-[11px] text-rose-800 mt-0.5">
+                        Brand Policy #001 prohibits absolute marketing guarantees. Recommended replacement: <em>&apos;proven approach&apos;</em>.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-rose-50 border border-rose-200 p-4 rounded-2xl flex items-start space-x-3 text-xs text-rose-950">
+                    <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-bold block">Contradicts Corporate Legal Ground Truth: &apos;automated regulatory sign-off&apos;</span>
+                      <p className="text-[11px] text-rose-800 mt-0.5">
+                        Direct conflict with Corporate Legal Charter (Ref: LEG-POL-2026): Pineco is strictly advisory and NEVER issues automated regulatory sign-off without certified human review.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex items-start space-x-3 text-xs text-amber-950">
+                    <HelpCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-bold block">Unverified Claim: &apos;9000% sales increase&apos;</span>
+                      <p className="text-[11px] text-amber-800 mt-0.5">
+                        No approved statistical or benchmark evidence found in database. Under Pineco&apos;s <em>Evidence Before Assertion</em> principle, unverified quantitative claims are held for human review.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="p-5 bg-[#FFFFF0] rounded-2xl border border-[#F6C324]/80 font-mono text-xs sm:text-sm leading-relaxed text-[#191919]">
+                  Our platform provides an accessible and cost-effective proven approach to enterprise brand governance. Pineco reduces compliance turnaround times by up to 68% across enterprise content teams. Past performance is not indicative of future results.
+                </div>
+
+                <div className="space-y-3">
+                  <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl flex items-start space-x-3 text-xs text-emerald-950">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-bold block">Quantitative Claim Verified by Ground Truth</span>
+                      <p className="text-[11px] text-emerald-800 mt-0.5">
+                        Verified against approved &apos;Enterprise Benchmark Report 2026&apos; (Ref: REP-2026-68, Owner: Product Marketing).
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl flex items-start space-x-3 text-xs text-emerald-950">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-bold block">Mandatory Regulatory Disclaimer Present</span>
+                      <p className="text-[11px] text-emerald-800 mt-0.5">
+                        Matches required forward-looking disclaimer rule #003. 100% Policy Compliant.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="bg-[#FFFFF0] px-6 py-4 border-t border-[#E8E8DC] flex items-center justify-between text-xs">
+            <span className="text-slate-600 font-mono text-[11px]">
+              {activeTab === 'violations' ? '4 Actionable Issues Intercepted' : '0 Violations • Ready for Reviewer Sign-off'}
             </span>
-            <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
-              Automated Brand Compliance & Proof of Accuracy
-            </h2>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              1. <strong>Creator</strong> drafts marketing copy. 2. <strong>Pineco</strong> checks prohibited terms, required disclaimers & verified facts. 3. <strong>Reviewer</strong> signs off or requests changes.
+            <Link
+              href="/dashboard"
+              className="font-bold text-[#191919] hover:underline flex items-center space-x-1"
+            >
+              <span>Test in Full Platform &rarr;</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* The 4-Step Chain of Custody */}
+      <section id="how-it-works" className="py-20 px-4 sm:px-8 max-w-6xl mx-auto space-y-12">
+        <div className="text-center space-y-2 max-w-xl mx-auto">
+          <span className="text-xs font-mono uppercase tracking-widest text-slate-400 font-bold">End-To-End Architecture</span>
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#191919]">
+            The 4-Step Governance Chain of Custody
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500">
+            How Pineco eliminates approval bottlenecks and protects brand reputation.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="bg-white p-6 rounded-3xl border border-[#E8E8DC] shadow-sm space-y-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#F6C324] text-[#191919] font-mono font-extrabold text-sm flex items-center justify-center">
+              01
+            </div>
+            <h3 className="text-sm font-bold text-[#191919]">Cryptographic Ingestion</h3>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Creator submits marketing, PR, or social copy. Pineco computes a SHA-256 hash, creating an immutable Version 1 record.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
-            <Link
-              href="/submissions/sub-demo-violation"
-              className="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-rose-300 px-3.5 py-2 rounded-xl text-xs font-medium transition"
-            >
-              Test Violations Sample &rarr;
-            </Link>
-            <Link
-              href="/submissions/sub-demo-clean"
-              className="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-emerald-300 px-3.5 py-2 rounded-xl text-xs font-medium transition"
-            >
-              Test Clean Sample &rarr;
-            </Link>
-            <button
-              onClick={handleResetDemo}
-              disabled={resetting}
-              className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-xl text-xs font-medium transition disabled:opacity-50"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 inline mr-1 text-slate-400 ${resetting ? 'animate-spin' : ''}`} />
-              <span>Reset</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* CRM Stats Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-sm transition hover:shadow-md">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider font-mono">
-              Total Assets
-            </span>
-            <span className="w-2 h-2 rounded-full bg-slate-400" />
-          </div>
-          <span className="text-2xl sm:text-3xl font-extrabold text-slate-950 mt-1 block font-mono">
-            {metrics.total_submissions}
-          </span>
-          <span className="text-[11px] text-slate-500 mt-1 block">In content governance pipeline</span>
-        </div>
-
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-sm transition hover:shadow-md">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider font-mono">
-              Signed Off
-            </span>
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-          </div>
-          <span className="text-2xl sm:text-3xl font-extrabold text-emerald-600 mt-1 block font-mono">
-            {metrics.approved_submissions}
-          </span>
-          <span className="text-[11px] text-slate-500 mt-1 block">Human approved for release</span>
-        </div>
-
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-sm transition hover:shadow-md">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-rose-600 uppercase tracking-wider font-mono">
-              Action Required
-            </span>
-            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-          </div>
-          <span className="text-2xl sm:text-3xl font-extrabold text-rose-600 mt-1 block font-mono">
-            {metrics.changes_requested_submissions}
-          </span>
-          <span className="text-[11px] text-slate-500 mt-1 block">Policy violations flagged</span>
-        </div>
-
-        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-sm transition hover:shadow-md">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-amber-600 uppercase tracking-wider font-mono">
-              In Review Queue
-            </span>
-            <span className="w-2 h-2 rounded-full bg-amber-500" />
-          </div>
-          <span className="text-2xl sm:text-3xl font-extrabold text-amber-600 mt-1 block font-mono">
-            {metrics.pending_submissions}
-          </span>
-          <span className="text-[11px] text-slate-500 mt-1 block">Awaiting compliance sign-off</span>
-        </div>
-      </div>
-
-      {/* Main CRM Content Pipeline Section */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-        {/* Pipeline Controls Bar */}
-        <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-          {/* CRM Filter Tabs */}
-          <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 md:pb-0">
-            <button
-              onClick={() => setPipelineTab('all')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold tracking-tight transition whitespace-nowrap ${
-                pipelineTab === 'all'
-                  ? 'bg-slate-950 text-white shadow-sm'
-                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              All Assets ({recent_submissions.length})
-            </button>
-            <button
-              onClick={() => setPipelineTab('action_needed')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold tracking-tight transition whitespace-nowrap flex items-center space-x-1.5 ${
-                pipelineTab === 'action_needed'
-                  ? 'bg-rose-950 text-rose-200 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              <AlertTriangle className="w-3.5 h-3.5 text-rose-500" />
-              <span>Action Required ({metrics.changes_requested_submissions})</span>
-            </button>
-            <button
-              onClick={() => setPipelineTab('in_review')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold tracking-tight transition whitespace-nowrap ${
-                pipelineTab === 'in_review'
-                  ? 'bg-slate-950 text-white shadow-sm'
-                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              In Review ({metrics.pending_submissions})
-            </button>
-            <button
-              onClick={() => setPipelineTab('approved')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold tracking-tight transition whitespace-nowrap flex items-center space-x-1.5 ${
-                pipelineTab === 'approved'
-                  ? 'bg-emerald-950 text-emerald-200 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Approved ({metrics.approved_submissions})</span>
-            </button>
+          <div className="bg-white p-6 rounded-3xl border border-[#E8E8DC] shadow-sm space-y-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#F6C324] text-[#191919] font-mono font-extrabold text-sm flex items-center justify-center">
+              02
+            </div>
+            <h3 className="text-sm font-bold text-[#191919]">Deterministic Guardrails</h3>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Rules engine checks prohibited terms, suggested phrasing, and required disclaimers with exact character offsets.
+            </p>
           </div>
 
-          {/* CRM Search input */}
-          <div className="relative w-full md:w-64">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
-            <input
-              type="text"
-              value={crmSearch}
-              onChange={(e) => setCrmSearch(e.target.value)}
-              placeholder="Filter pipeline..."
-              className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-slate-900"
-            />
+          <div className="bg-white p-6 rounded-3xl border border-[#E8E8DC] shadow-sm space-y-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#F6C324] text-[#191919] font-mono font-extrabold text-sm flex items-center justify-center">
+              03
+            </div>
+            <h3 className="text-sm font-bold text-[#191919]">Conservative Fact Proof</h3>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Claims are classified as Supported, Contradicted, or Unverified. Hallucinated IDs are discarded at the database boundary.
+            </p>
+          </div>
+
+          <div className="bg-white p-6 rounded-3xl border border-[#E8E8DC] shadow-sm space-y-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#F6C324] text-[#191919] font-mono font-extrabold text-sm flex items-center justify-center">
+              04
+            </div>
+            <h3 className="text-sm font-bold text-[#191919]">Human Decision & Ledger</h3>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Reviewer approves or requests revisions. Overrides strictly require written rationales logged in an append-only audit trail.
+            </p>
           </div>
         </div>
+      </section>
 
-        {/* Pipeline Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="bg-slate-50/60 text-slate-400 font-semibold border-b border-slate-100 uppercase tracking-wider text-[10px] font-mono">
-                <th className="py-3 px-6">Content Asset</th>
-                <th className="py-3 px-6">Channel Scope</th>
-                <th className="py-3 px-6">Author</th>
-                <th className="py-3 px-6">Governance Status</th>
-                <th className="py-3 px-6">Last Action</th>
-                <th className="py-3 px-6 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
-              {filteredPipeline.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-400">
-                    No submissions found matching this CRM pipeline filter.
-                  </td>
-                </tr>
-              ) : (
-                filteredPipeline.map((sub) => {
-                  let statusBadge = (
-                    <span className="bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full font-medium text-[11px]">
-                      {sub.status}
-                    </span>
-                  );
-                  if (sub.status === 'approved') {
-                    statusBadge = (
-                      <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 px-2.5 py-0.5 rounded-full font-medium text-[11px] inline-flex items-center space-x-1">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                        <span>Approved</span>
-                      </span>
-                    );
-                  } else if (sub.status === 'changes_requested') {
-                    statusBadge = (
-                      <span className="bg-rose-50 text-rose-700 border border-rose-200/80 px-2.5 py-0.5 rounded-full font-medium text-[11px] inline-flex items-center space-x-1">
-                        <AlertTriangle className="w-3 h-3 text-rose-600" />
-                        <span>Action Required</span>
-                      </span>
-                    );
-                  } else if (sub.status === 'in_review') {
-                    statusBadge = (
-                      <span className="bg-amber-50 text-amber-700 border border-amber-200/80 px-2.5 py-0.5 rounded-full font-medium text-[11px] inline-flex items-center space-x-1">
-                        <Clock className="w-3 h-3 text-amber-600" />
-                        <span>In Review</span>
-                      </span>
-                    );
-                  }
+      {/* Why Conventional Compliance Fails vs Pineco */}
+      <section className="py-16 px-4 sm:px-8 max-w-6xl mx-auto">
+        <div className="bg-white rounded-3xl border border-[#E8E8DC] p-8 sm:p-12 shadow-sm space-y-10">
+          <div className="max-w-2xl">
+            <span className="text-xs font-mono uppercase tracking-widest text-slate-400 font-bold">The Problem We Solve</span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919] mt-1">
+              Why Traditional Brand Compliance Breaks Down at Scale
+            </h2>
+          </div>
 
-                  return (
-                    <tr
-                      key={sub.id}
-                      onClick={() => setSelectedSub(sub)}
-                      className={`hover:bg-slate-50/80 transition duration-150 cursor-pointer ${
-                        selectedSub?.id === sub.id ? 'bg-slate-50' : ''
-                      }`}
-                    >
-                      <td className="py-4 px-6 font-semibold text-slate-950">
-                        <Link
-                          href={`/submissions/${sub.id}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="hover:text-emerald-700 hover:underline"
-                        >
-                          {sub.title}
-                        </Link>
-                      </td>
-                      <td className="py-4 px-6">
-                        <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-mono text-[10px] uppercase font-bold">
-                          {sub.channel}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6 text-slate-500 font-mono text-[11px]">{sub.created_by}</td>
-                      <td className="py-4 px-6">{statusBadge}</td>
-                      <td className="py-4 px-6 text-slate-400 font-mono text-[11px]">
-                        {new Date(sub.updated_at).toLocaleDateString()},{' '}
-                        {new Date(sub.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </td>
-                      <td className="py-4 px-6 text-right">
-                        <Link
-                          href={`/submissions/${sub.id}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="inline-flex items-center space-x-1 bg-slate-950 hover:bg-slate-800 text-white text-[11px] font-medium px-3 py-1.5 rounded-lg transition"
-                        >
-                          <span>Review</span>
-                          <ArrowRight className="w-3 h-3" />
-                        </Link>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-6 bg-[#FFFFF0] rounded-2xl border border-[#E8E8DC] space-y-2">
+              <span className="text-xs font-mono font-bold text-rose-600 uppercase">Conventional Approach</span>
+              <h4 className="text-sm font-bold text-[#191919]">Static 80-Page PDF Style Guides</h4>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Marketing teams cannot memorize 80-page brand PDF manuals. Rules are ignored, resulting in inconsistent terminology and legal exposure.
+              </p>
+            </div>
+
+            <div className="p-6 bg-white rounded-2xl border border-[#F6C324] space-y-2 shadow-sm">
+              <span className="text-xs font-mono font-bold text-[#F6C324] uppercase">The Pineco Way</span>
+              <h4 className="text-sm font-bold text-[#191919]">Active Deterministic Rule Interception</h4>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Rules live as structured database policies evaluated in real time as copy is written, offering immediate suggested corrections.
+              </p>
+            </div>
+
+            <div className="p-6 bg-[#FFFFF0] rounded-2xl border border-[#E8E8DC] space-y-2">
+              <span className="text-xs font-mono font-bold text-rose-600 uppercase">Conventional Approach</span>
+              <h4 className="text-sm font-bold text-[#191919]">Blind AI Generation & Hallucinations</h4>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Public LLMs invent statistics, cite fictional sources, and write misleading marketing claims with high confident tones.
+              </p>
+            </div>
+
+            <div className="p-6 bg-white rounded-2xl border border-[#F6C324] space-y-2 shadow-sm">
+              <span className="text-xs font-mono font-bold text-[#F6C324] uppercase">The Pineco Way</span>
+              <h4 className="text-sm font-bold text-[#191919]">Grounded Corporate Fact Vault</h4>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Claims are checked exclusively against approved corporate sources with validity dates. Missing evidence is flagged as Unverified.
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* Side Slide-Out Quick Drawer Preview when clicking a row */}
-      {selectedSub && (
-        <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-96 bg-white shadow-2xl border-l border-slate-200 p-6 flex flex-col justify-between animate-in slide-in-from-right duration-200">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <span className="text-[11px] font-mono text-slate-400 uppercase font-semibold">
-                Asset Quick Summary
-              </span>
-              <button
-                onClick={() => setSelectedSub(null)}
-                className="text-slate-400 hover:text-slate-700 p-1 rounded"
+      {/* Enterprise Security & Trust Architecture */}
+      <section id="security" className="py-16 px-4 sm:px-8 max-w-6xl mx-auto space-y-8">
+        <div className="text-center space-y-2 max-w-xl mx-auto">
+          <span className="text-xs font-mono uppercase tracking-widest text-slate-400 font-bold">Enterprise Security</span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
+            Enterprise-Grade Privacy & Guardrail Architecture
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white p-6 rounded-3xl border border-[#E8E8DC] shadow-sm space-y-2.5">
+            <div className="w-9 h-9 rounded-xl bg-[#F6C324] text-[#191919] flex items-center justify-center font-bold">
+              <Lock className="w-4 h-4 text-[#191919]" />
+            </div>
+            <h4 className="text-xs font-bold text-[#191919]">JWT Bearer RBAC</h4>
+            <p className="text-[11px] text-slate-500 leading-relaxed">
+              Backend verifies cryptographically signed JWT bearer tokens for every mutation, enforcing workspace scoping.
+            </p>
+          </div>
+
+          <div className="bg-white p-6 rounded-3xl border border-[#E8E8DC] shadow-sm space-y-2.5">
+            <div className="w-9 h-9 rounded-xl bg-[#F6C324] text-[#191919] flex items-center justify-center font-bold">
+              <ShieldCheck className="w-4 h-4 text-[#191919]" />
+            </div>
+            <h4 className="text-xs font-bold text-[#191919]">Prompt Injection Defense</h4>
+            <p className="text-[11px] text-slate-500 leading-relaxed">
+              Submitted drafts are strictly isolated as passive data. Models cannot execute commands or alter system policies.
+            </p>
+          </div>
+
+          <div className="bg-white p-6 rounded-3xl border border-[#E8E8DC] shadow-sm space-y-2.5">
+            <div className="w-9 h-9 rounded-xl bg-[#F6C324] text-[#191919] flex items-center justify-center font-bold">
+              <GitBranch className="w-4 h-4 text-[#191919]" />
+            </div>
+            <h4 className="text-xs font-bold text-[#191919]">Immutable Versioning</h4>
+            <p className="text-[11px] text-slate-500 leading-relaxed">
+              Every revision generates an explicit new version without overwriting past iterations. Approvals strictly bind only to the reviewed version.
+            </p>
+          </div>
+
+          <div className="bg-white p-6 rounded-3xl border border-[#E8E8DC] shadow-sm space-y-2.5">
+            <div className="w-9 h-9 rounded-xl bg-[#F6C324] text-[#191919] flex items-center justify-center font-bold">
+              <BarChart3 className="w-4 h-4 text-[#191919]" />
+            </div>
+            <h4 className="text-xs font-bold text-[#191919]">Permanent Audit Trail</h4>
+            <p className="text-[11px] text-slate-500 leading-relaxed">
+              Every review decision, override rationale, and policy edit is recorded in an immutable compliance ledger.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Frequently Asked Questions (FAQ) */}
+      <section id="faq" className="py-16 px-4 sm:px-8 max-w-4xl mx-auto space-y-8">
+        <div className="text-center space-y-2">
+          <span className="text-xs font-mono uppercase tracking-widest text-slate-400 font-bold">Frequently Asked Questions</span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
+            Everything You Need to Know About Pineco
+          </h2>
+        </div>
+
+        <div className="space-y-3">
+          {faqs.map((faq, index) => {
+            const isOpen = openFaq === index;
+            return (
+              <div
+                key={index}
+                className="bg-white rounded-2xl border border-[#E8E8DC] overflow-hidden transition"
               >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div>
-              <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-mono text-[10px] uppercase font-bold">
-                {selectedSub.channel}
-              </span>
-              <h3 className="text-base font-bold text-slate-950 mt-1">{selectedSub.title}</h3>
-              <p className="text-[11px] text-slate-400 font-mono mt-0.5">ID: {selectedSub.id}</p>
-            </div>
-
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1 text-xs">
-              <div className="flex justify-between">
-                <span className="text-slate-500">Status:</span>
-                <span className="font-semibold text-slate-900 capitalize">{selectedSub.status.replace('_', ' ')}</span>
+                <button
+                  onClick={() => setOpenFaq(isOpen ? null : index)}
+                  className="w-full text-left p-5 flex items-center justify-between text-xs sm:text-sm font-bold text-[#191919] hover:bg-[#FFFFF0]/80 transition"
+                >
+                  <span>{faq.q}</span>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isOpen && (
+                  <div className="px-5 pb-5 text-xs text-slate-600 leading-relaxed border-t border-[#E8E8DC]/60 pt-3">
+                    {faq.a}
+                  </div>
+                )}
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Author:</span>
-                <span className="font-mono text-slate-800">{selectedSub.created_by}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Last Modified:</span>
-                <span className="font-mono text-slate-500 text-[11px]">
-                  {new Date(selectedSub.updated_at).toLocaleString()}
-                </span>
-              </div>
-            </div>
-          </div>
+            );
+          })}
+        </div>
+      </section>
 
-          <div className="space-y-2 pt-4 border-t border-slate-100">
+      {/* Pre-Footer Banner */}
+      <section className="py-16 px-4 sm:px-8 max-w-5xl mx-auto text-center">
+        <div className="bg-[#191919] text-white rounded-3xl p-8 sm:p-14 space-y-6 shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#F6C324]/10 rounded-full blur-3xl pointer-events-none" />
+
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+            Ready to Experience Intelligent Brand Governance?
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
+            Test the live CRM command center, create policies, and evaluate drafts with instant feedback.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
             <Link
-              href={`/submissions/${selectedSub.id}`}
-              className="w-full flex items-center justify-center space-x-2 bg-slate-950 hover:bg-slate-800 text-white font-semibold text-xs py-2.5 rounded-xl shadow-sm transition"
+              href="/dashboard"
+              className="w-full sm:w-auto bg-[#F6C324] hover:bg-[#e5b41e] text-[#191919] font-bold text-xs px-8 py-3.5 rounded-xl shadow-md transition active:scale-95"
             >
-              <span>Open Detailed Review</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              Open Command Center &rarr;
             </Link>
             <button
-              onClick={() => setSelectedSub(null)}
-              className="w-full text-center text-xs text-slate-500 hover:text-slate-800 py-1.5"
+              onClick={openAuthModal}
+              className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-semibold text-xs px-6 py-3.5 rounded-xl transition"
             >
-              Close Quick Drawer
+              Switch Persona (JWT)
             </button>
           </div>
         </div>
-      )}
+      </section>
 
-      {/* Telemetry Breakdown: Severity & Audit Feed */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider font-mono">
-              Risk Level Distribution
-            </h3>
-            <span className="text-xs text-slate-400 font-mono">{metrics.total_findings} Findings Intercepted</span>
-          </div>
-
-          <div className="space-y-3 pt-1 text-xs">
-            <div>
-              <div className="flex justify-between mb-1">
-                <span className="text-rose-700 font-semibold flex items-center space-x-1.5">
-                  <span className="w-2 h-2 rounded-full bg-rose-500" />
-                  <span>High Severity (Blocks Approval)</span>
-                </span>
-                <span className="font-mono font-bold text-slate-900">{metrics.findings_by_severity.high || 0}</span>
-              </div>
-              <div className="w-full bg-slate-100 rounded-full h-1.5">
-                <div
-                  className="bg-rose-500 h-1.5 rounded-full"
-                  style={{
-                    width: `${metrics.total_findings ? ((metrics.findings_by_severity.high || 0) / metrics.total_findings) * 100 : 0}%`,
-                  }}
-                />
-              </div>
+      {/* Footer */}
+      <footer className="border-t border-[#E8E8DC] bg-white py-10 px-4 sm:px-8 text-xs text-slate-500">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-6 h-6 rounded-lg bg-[#F6C324] flex items-center justify-center text-[#191919] font-bold text-xs">
+              P
             </div>
-
-            <div>
-              <div className="flex justify-between mb-1">
-                <span className="text-amber-700 font-semibold flex items-center space-x-1.5">
-                  <span className="w-2 h-2 rounded-full bg-amber-500" />
-                  <span>Medium Severity (Warnings)</span>
-                </span>
-                <span className="font-mono font-bold text-slate-900">{metrics.findings_by_severity.medium || 0}</span>
-              </div>
-              <div className="w-full bg-slate-100 rounded-full h-1.5">
-                <div
-                  className="bg-amber-500 h-1.5 rounded-full"
-                  style={{
-                    width: `${metrics.total_findings ? ((metrics.findings_by_severity.medium || 0) / metrics.total_findings) * 100 : 0}%`,
-                  }}
-                />
-              </div>
-            </div>
+            <span className="font-extrabold text-[#191919]">Pineco Brand Governance OS</span>
+            <span>•</span>
+            <span>CodeAxis Hackathon Round 2</span>
           </div>
+          <p className="font-mono text-[11px] text-slate-400">
+            60% White (#FFFFF0) • 30% Yellow (#F6C324) • 10% Black (#191919)
+          </p>
         </div>
-
-        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wider font-mono">
-              Recent Audit Log Activity
-            </h3>
-            <Link href="/audit" className="text-xs text-slate-600 hover:text-slate-900 font-medium hover:underline">
-              View Log &rarr;
-            </Link>
-          </div>
-
-          <div className="space-y-2.5">
-            {recent_audit_events.slice(0, 4).map((evt) => (
-              <div key={evt.id} className="flex items-start space-x-3 text-xs p-2.5 bg-slate-50/70 rounded-xl border border-slate-100">
-                <span className="bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-mono text-[9px] uppercase font-bold mt-0.5">
-                  {evt.entity_type}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <span className="font-semibold text-slate-900">{evt.event_type}</span> by{' '}
-                  <span className="font-mono text-slate-700">{evt.actor_id}</span>
-                </div>
-                <span className="text-slate-400 font-mono text-[10px] shrink-0">
-                  {new Date(evt.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      </footer>
     </div>
   );
 }

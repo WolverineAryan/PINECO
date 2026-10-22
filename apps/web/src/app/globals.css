@@ -3,12 +3,15 @@
 @tailwind utilities;
 
 :root {
-  --background: #f8fafc;
-  --foreground: #090d16;
+  --background: #FFFFF0;
+  --foreground: #191919;
+  --brand-yellow: #F6C324;
+  --brand-black: #191919;
+  --brand-white: #FFFFF0;
   --surface: #ffffff;
-  --surface-subtle: #f1f5f9;
-  --border: #e2e8f0;
-  --border-subtle: #edf2f7;
+  --surface-subtle: #fcfcf5;
+  --border: #e8e8dc;
+  --border-yellow: #f8db7a;
 }
 
 @layer base {
@@ -17,7 +20,7 @@
   }
   body {
     color: var(--foreground);
-    background: var(--background);
+    background-color: var(--background);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -37,9 +40,9 @@
 .skeleton-shimmer {
   background: linear-gradient(
     90deg,
-    rgba(226, 232, 240, 0.6) 25%,
-    rgba(241, 245, 249, 0.9) 37%,
-    rgba(226, 232, 240, 0.6) 63%
+    rgba(232, 232, 220, 0.5) 25%,
+    rgba(255, 255, 240, 0.9) 37%,
+    rgba(232, 232, 220, 0.5) 63%
   );
   background-size: 200% 100%;
   animation: shimmer 1.8s ease-in-out infinite;
@@ -54,9 +57,9 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #d4d4c4;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #191919;
 }
