@@ -20,6 +20,7 @@ import {
   BookOpen,
   Check,
   Search,
+  Bot,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { DashboardSummary, Submission, BrandRule, ApprovedFact } from '@/lib/types';
@@ -132,16 +133,109 @@ export default function ProductComplianceDashboard() {
         </div>
       </div>
 
+      {/* Visual Guide: How Pineco Works in 3 Steps */}
+      <div className="bg-white rounded-2xl border border-neutral-200 p-5 sm:p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-neutral-100">
+          <div>
+            <h2 className="text-xs font-bold text-black uppercase tracking-wider font-mono flex items-center space-x-2">
+              <Sparkles className="w-4 h-4 text-black" />
+              <span>How Pineco Protects Your Brand (In 3 Simple Steps)</span>
+            </h2>
+            <p className="text-xs text-neutral-500 mt-0.5">
+              Automated brand compliance and legal risk prevention made simple for any marketing or legal team.
+            </p>
+          </div>
+          <span className="text-[11px] font-mono text-neutral-500 font-semibold">
+            Product Folder: <strong className="text-black">{activeProduct?.name || 'All Workspace Assets'}</strong>
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+          {/* Step 1 */}
+          <div className="p-4 rounded-xl border border-neutral-200 bg-neutral-50/60 space-y-2 relative flex flex-col justify-between">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="w-6 h-6 rounded-full bg-black text-white text-[11px] font-mono font-bold flex items-center justify-center">
+                  1
+                </span>
+                <span className="text-[10px] font-mono font-bold uppercase text-neutral-400">Step 1</span>
+              </div>
+              <h3 className="text-xs font-bold text-black">Set Brand Rules & Guardrails</h3>
+              <p className="text-[11px] text-neutral-500 leading-relaxed">
+                Tell the AI Agent what phrases are forbidden (e.g. &quot;100% guarantee&quot;) or what disclaimers are mandatory. Review and approve before saving.
+              </p>
+            </div>
+            <div className="pt-2">
+              <Link
+                href="/automation"
+                className="inline-flex items-center space-x-1.5 text-xs font-bold text-black hover:underline"
+              >
+                <Bot className="w-3.5 h-3.5 text-neutral-700" />
+                <span>Draft with AI Agent &rarr;</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Step 2 */}
+          <div className="p-4 rounded-xl border border-neutral-200 bg-neutral-50/60 space-y-2 relative flex flex-col justify-between">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="w-6 h-6 rounded-full bg-black text-white text-[11px] font-mono font-bold flex items-center justify-center">
+                  2
+                </span>
+                <span className="text-[10px] font-mono font-bold uppercase text-neutral-400">Step 2</span>
+              </div>
+              <h3 className="text-xs font-bold text-black">Scan Draft Copy in 0.04s</h3>
+              <p className="text-[11px] text-neutral-500 leading-relaxed">
+                Paste any marketing draft, social copy, or email. Pineco audits against your active rules and corporate evidence benchmarks instantly.
+              </p>
+            </div>
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => setScanModalOpen(true)}
+                className="inline-flex items-center space-x-1.5 text-xs font-bold text-black hover:underline"
+              >
+                <PlusCircle className="w-3.5 h-3.5 text-neutral-700" />
+                <span>Scan New Draft &rarr;</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Step 3 */}
+          <div className="p-4 rounded-xl border border-neutral-200 bg-neutral-50/60 space-y-2 relative flex flex-col justify-between">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="w-6 h-6 rounded-full bg-black text-white text-[11px] font-mono font-bold flex items-center justify-center">
+                  3
+                </span>
+                <span className="text-[10px] font-mono font-bold uppercase text-neutral-400">Step 3</span>
+              </div>
+              <h3 className="text-xs font-bold text-black">Review & Approve with Confidence</h3>
+              <p className="text-[11px] text-neutral-500 leading-relaxed">
+                Inspect highlighted violations and AI-recommended compliant rewrites. Approve safe copy for release with full cryptographic audit logging.
+              </p>
+            </div>
+            <div className="pt-2">
+              <span className="text-[11px] font-mono text-neutral-600 font-semibold flex items-center space-x-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-black" />
+                <span>Human sign-off ready</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Metric Counters (Clean Black & White) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs">
           <span className="text-[10px] font-mono font-bold text-neutral-400 uppercase tracking-wider block">
-            Scanned Assets
+            Drafts Scanned
           </span>
           <span className="text-2xl font-black text-black mt-0.5 block font-mono">
             {metrics?.total_submissions || 0}
           </span>
-          <span className="text-[11px] text-neutral-500 mt-0.5 block">Submissions in folder</span>
+          <span className="text-[11px] text-neutral-500 mt-0.5 block">Total drafts checked</span>
         </div>
 
         <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs">
@@ -151,17 +245,17 @@ export default function ProductComplianceDashboard() {
           <span className="text-2xl font-black text-black mt-0.5 block font-mono">
             {metrics?.approved_submissions || 0}
           </span>
-          <span className="text-[11px] text-neutral-500 mt-0.5 block">Human signed off</span>
+          <span className="text-[11px] text-neutral-500 mt-0.5 block">Passed & human signed off</span>
         </div>
 
         <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs">
           <span className="text-[10px] font-mono font-bold text-neutral-600 uppercase tracking-wider block">
-            Action Needed
+            Needs Revisions
           </span>
           <span className="text-2xl font-black text-black mt-0.5 block font-mono">
             {metrics?.changes_requested_submissions || 0}
           </span>
-          <span className="text-[11px] text-neutral-500 mt-0.5 block">Revisions requested</span>
+          <span className="text-[11px] text-neutral-500 mt-0.5 block">Policy warnings flagged</span>
         </div>
 
         <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-xs">

@@ -28,3 +28,15 @@ def test_agent_scan_generates_warnings_and_remediation(client: TestClient):
     # Check that remediation rewrote the prohibited term
     assert "guaranteed results" not in data["remediated_text"]
     assert "proven approach" in data["remediated_text"]
+
+
+def test_agent_propose_policy(client: TestClient):
+    payload = {
+        "prompt": "Never use 'cheap solution', say 'cost-effective platform' instead. And require disclaimer: 'Terms and conditions apply'",
+    }
+    response = client.post("/api/v1/agent/propose-policy", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["rules"]) >= 1
+    assert any(r["pattern"] == "cheap solution" or "cheap" in r["pattern"] for r in data["rules"])
+

@@ -25,9 +25,19 @@ import {
   ChevronRight,
   Play,
   RotateCcw,
+  CheckCheck,
+  X,
+  HelpCircle,
+  Plus,
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import { AgentStatus, AgentScanResponse, WarningItem } from '@/lib/types';
+import {
+  AgentStatus,
+  AgentScanResponse,
+  WarningItem,
+  PolicyProposalResponse,
+  ProposedRuleItem,
+} from '@/lib/types';
 import { useRole } from '@/components/RoleContext';
 import { useToast } from '@/components/Toast';
 
@@ -37,6 +47,16 @@ export default function AutomationAgentPage() {
 
   const [agentStatus, setAgentStatus] = useState<AgentStatus | null>(null);
   const [loadingStatus, setLoadingStatus] = useState(true);
+
+  // AI Policy & Brand Rule Architect state (with Human Approval Step)
+  const [policyPrompt, setPolicyPrompt] = useState(
+    "Never say 'guaranteed 100% returns', suggest 'proven performance' instead"
+  );
+  const [isProposing, setIsProposing] = useState(false);
+  const [proposal, setProposal] = useState<PolicyProposalResponse | null>(null);
+  const [isApproving, setIsApproving] = useState(false);
+  const [approvalSuccess, setApprovalSuccess] = useState(false);
+  const [approvedCount, setApprovedCount] = useState(0);
 
   // Automation Pipeline Toggles
   const [continuousInterceptor, setContinuousInterceptor] = useState(true);
@@ -91,6 +111,90 @@ export default function AutomationAgentPage() {
     }
   };
 
+  // AI Policy Proposal Generator
+  const handleGenerateProposal = async () => {
+    if (!policyPrompt.trim()) return;
+    setIsProposing(true);
+    setApprovalSuccess(false);
+    try {
+      const res = await api.proposePolicy({
+        prompt: policyPrompt.trim(),
+        product_id: activeProduct?.id || null,
+        workspace_id: workspaceId,
+      });
+      setProposal(res);
+      success(
+        'Policy Proposal Ready',
+        'Review the drafted rules below and decide whether to approve or discard.'
+      );
+    } catch (err: any) {
+      toastError('Proposal Generation Failed', err.message || 'Error drafting policy');
+    } finally {
+      setIsProposing(false);
+    }
+  };
+
+  // Human Approval Step Execution
+  const handleApproveProposal = async () => {
+    if (!proposal) return;
+    setIsApproving(true);
+    try {
+      let createdRulesCount = 0;
+      let createdFactsCount = 0;
+
+      // Commit rules
+      for (const rule of proposal.rules) {
+        await api.createRule({
+          name: rule.name,
+          category: rule.category || 'Brand Governance',
+          description: rule.description || rule.explanation,
+          pattern: rule.pattern,
+          preferred_replacement: rule.preferred_replacement || undefined,
+          severity: rule.severity || 'HIGH',
+          channel_scope: 'all',
+          enabled: true,
+          workspace_id: workspaceId,
+          product_id: activeProduct?.id || undefined,
+        });
+        createdRulesCount++;
+      }
+
+      // Commit facts if any
+      for (const fact of proposal.facts) {
+        await api.createFact({
+          statement: fact.statement,
+          source_title: fact.source_title,
+          source_reference: fact.source_reference,
+          owner: fact.owner || 'AI Agent',
+          approval_status: 'approved',
+          workspace_id: workspaceId,
+          product_id: activeProduct?.id || undefined,
+        });
+        createdFactsCount++;
+      }
+
+      const totalCommitted = createdRulesCount + createdFactsCount;
+      setApprovedCount(totalCommitted);
+      setApprovalSuccess(true);
+      setProposal(null);
+      success(
+        'Approved & Committed!',
+        `Successfully added ${createdRulesCount} rule(s) to ${activeProduct?.name || 'Brand Guidelines'}.`
+      );
+    } catch (err: any) {
+      toastError('Failed to Commit Rules', err.message || 'Error saving approved rules');
+    } finally {
+      setIsApproving(false);
+    }
+  };
+
+  // Discard / Reject Proposal
+  const handleDiscardProposal = () => {
+    setProposal(null);
+    setApprovalSuccess(false);
+    success('Proposal Discarded', 'No changes were made to brand rules.');
+  };
+
   const handleRunAgent = async () => {
     if (!testText.trim()) return;
     setIsScanning(true);
@@ -136,6 +240,12 @@ export default function AutomationAgentPage() {
     setScanResult(null);
   };
 
+  const setSamplePrompt = (text: string) => {
+    setPolicyPrompt(text);
+    setProposal(null);
+    setApprovalSuccess(false);
+  };
+
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
       {/* Page Header */}
@@ -154,7 +264,7 @@ export default function AutomationAgentPage() {
             </span>
           </div>
           <p className="text-xs text-neutral-500 mt-1 max-w-2xl">
-            Autonomous pre-flight governance sentinels, automated candidate rewriting, and multi-tier legal & regulatory warning engines.
+            Autonomous pre-flight governance sentinels, AI policy generation with human sign-off, and automated candidate rewriting.
           </p>
         </div>
 
@@ -172,6 +282,297 @@ export default function AutomationAgentPage() {
             <span>ACTIVE SENTINEL</span>
           </div>
         </div>
+      </div>
+
+      {/* FEATURE 1: AI POLICY ARCHITECT WITH FULL HUMAN APPROVAL STEP */}
+      <div className="bg-white rounded-2xl border-2 border-black p-6 space-y-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-neutral-200">
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="px-2 py-0.5 rounded-md bg-black text-white text-[10px] font-mono font-bold uppercase tracking-wider">
+                Human-in-the-Loop Automation
+              </span>
+              <span className="text-xs text-neutral-400 font-mono">•</span>
+              <span className="text-xs font-mono text-neutral-600 font-bold">
+                Product Scope: {activeProduct?.name || 'General Workspace'}
+              </span>
+            </div>
+            <h2 className="text-base sm:text-lg font-black text-black tracking-tight mt-1 flex items-center space-x-2">
+              <Sparkles className="w-5 h-5 text-black" />
+              <span>AI Policy & Brand Rule Architect</span>
+            </h2>
+            <p className="text-xs text-neutral-500 mt-0.5">
+              Describe any rule, forbidden term, or disclaimer in plain English. The AI agent drafts structured rules and presents a <strong className="text-black">full approval step</strong> before anything is added to your brand guidelines.
+            </p>
+          </div>
+
+          <Link
+            href="/knowledge"
+            className="text-xs font-bold text-black border border-neutral-300 hover:border-black bg-neutral-50 hover:bg-white px-3 py-1.5 rounded-xl transition flex items-center space-x-1.5 shrink-0"
+          >
+            <Shield className="w-3.5 h-3.5 text-neutral-600" />
+            <span>View Current Rules &rarr;</span>
+          </Link>
+        </div>
+
+        {/* Input prompt & preset chips */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-neutral-800 uppercase font-mono tracking-wider">
+              Instruction Prompt for AI Agent:
+            </label>
+            <span className="text-[11px] text-neutral-400 font-mono">
+              Natural Language &rarr; Strict Regex & Replacement
+            </span>
+          </div>
+
+          <textarea
+            value={policyPrompt}
+            onChange={(e) => setPolicyPrompt(e.target.value)}
+            rows={3}
+            placeholder="e.g., Never use 'guaranteed 100% returns', suggest 'proven performance' instead..."
+            className="w-full p-3.5 rounded-xl border border-neutral-300 focus:border-black focus:outline-none text-xs font-mono leading-relaxed text-black bg-neutral-50/50"
+          />
+
+          {/* Quick-select prompt suggestions */}
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            <span className="text-[11px] text-neutral-500 font-mono font-semibold">Try examples:</span>
+            <button
+              type="button"
+              onClick={() =>
+                setSamplePrompt("Never say 'guaranteed 100% returns', suggest 'proven performance' instead")
+              }
+              className="text-[11px] font-semibold text-neutral-700 hover:text-black bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 px-2.5 py-1 rounded-lg transition"
+            >
+              Prohibit &quot;guaranteed 100%&quot;
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setSamplePrompt("Forbid calling competitors 'inferior' or 'slow', suggest 'market alternative'")
+              }
+              className="text-[11px] font-semibold text-neutral-700 hover:text-black bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 px-2.5 py-1 rounded-lg transition"
+            >
+              Anti-disparagement rule
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setSamplePrompt("Require mandatory disclaimer: 'Terms and conditions apply to all promotional offers.'")
+              }
+              className="text-[11px] font-semibold text-neutral-700 hover:text-black bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 px-2.5 py-1 rounded-lg transition"
+            >
+              Mandatory promotion disclaimer
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setSamplePrompt("Never mention 'cheap software', always recommend 'cost-effective enterprise platform'")
+              }
+              className="text-[11px] font-semibold text-neutral-700 hover:text-black bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 px-2.5 py-1 rounded-lg transition"
+            >
+              Upgrade &quot;cheap&quot; terminology
+            </button>
+          </div>
+
+          {/* Generate Button */}
+          <div className="flex items-center justify-end pt-2">
+            <button
+              onClick={handleGenerateProposal}
+              disabled={isProposing || !policyPrompt.trim()}
+              className="flex items-center space-x-2 bg-black hover:bg-neutral-800 disabled:opacity-50 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-xs active:scale-95"
+            >
+              {isProposing ? (
+                <>
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  <span>Agent Drafting Rule Proposal...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-3.5 h-3.5 text-white" />
+                  <span>Draft Policy Proposal with AI</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* SUCCESS CONFIRMATION BANNER */}
+        {approvalSuccess && (
+          <div className="p-4 rounded-xl bg-neutral-100 border-2 border-black flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in duration-200">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center shrink-0">
+                <CheckCheck className="w-4 h-4 text-white" />
+              </div>
+              <div className="space-y-0.5">
+                <span className="text-xs font-black text-black uppercase tracking-wider font-mono">
+                  Rules Approved & Activated
+                </span>
+                <p className="text-xs text-neutral-600">
+                  Successfully committed {approvedCount} item(s) to <strong className="text-black">{activeProduct?.name || 'Brand Guidelines'}</strong>. Any draft scanned in this product will now automatically be audited against these rules.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2 shrink-0">
+              <Link
+                href="/knowledge"
+                className="text-xs font-bold bg-black text-white hover:bg-neutral-800 px-3.5 py-2 rounded-xl transition shadow-xs flex items-center space-x-1.5"
+              >
+                <span>View Guidelines</span>
+                <ArrowRight className="w-3 h-3 text-white" />
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* FULL APPROVAL STEP CARD */}
+        {proposal && (
+          <div className="mt-4 p-5 rounded-xl border-2 border-black bg-neutral-50 space-y-5 animate-in fade-in duration-200">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-neutral-300">
+              <div className="space-y-1">
+                <div className="flex items-center space-x-2">
+                  <span className="bg-black text-white text-[10px] font-mono font-bold px-2 py-0.5 rounded uppercase">
+                    Approval Step Required
+                  </span>
+                  <span className="text-xs text-neutral-500 font-mono">
+                    Pending Human Sign-Off
+                  </span>
+                </div>
+                <h3 className="text-sm font-black text-black">
+                  Review AI Proposal Before Adding to Rules
+                </h3>
+                <p className="text-xs text-neutral-600">
+                  {proposal.summary}
+                </p>
+              </div>
+
+              <div className="flex items-center space-x-2 shrink-0">
+                <button
+                  onClick={handleDiscardProposal}
+                  disabled={isApproving}
+                  className="flex items-center space-x-1.5 text-xs font-semibold text-neutral-700 hover:text-black border border-neutral-300 bg-white hover:bg-neutral-100 px-3 py-2 rounded-xl transition"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  <span>Discard</span>
+                </button>
+                <button
+                  onClick={handleApproveProposal}
+                  disabled={isApproving}
+                  className="flex items-center space-x-1.5 text-xs font-bold text-white bg-black hover:bg-neutral-800 px-4 py-2 rounded-xl transition shadow-xs"
+                >
+                  {isApproving ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving to Guidelines...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 text-white" />
+                      <span>Approve & Add to Brand Rules</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Proposed Rules Grid */}
+            <div className="space-y-3">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-black block">
+                Proposed Brand Rules ({proposal.rules.length}):
+              </span>
+
+              {proposal.rules.map((rule, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 rounded-xl border border-neutral-300 bg-white space-y-2 shadow-xs"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs font-bold text-black">{rule.name}</span>
+                      <span className="text-[10px] font-mono bg-neutral-100 border border-neutral-300 text-black px-1.5 py-0.5 rounded">
+                        {rule.category}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-black text-white">
+                      Severity: {rule.severity}
+                    </span>
+                  </div>
+
+                  {/* Pattern & Replacement breakdown */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs font-mono">
+                    <div className="p-2.5 rounded-lg bg-neutral-100 border border-neutral-200">
+                      <span className="text-neutral-500 text-[10px] uppercase font-bold block mb-1">
+                        Forbidden Term / Pattern:
+                      </span>
+                      <span className="text-black font-bold">&quot;{rule.pattern}&quot;</span>
+                    </div>
+
+                    <div className="p-2.5 rounded-lg bg-neutral-100 border border-neutral-200">
+                      <span className="text-neutral-500 text-[10px] uppercase font-bold block mb-1">
+                        Approved Replacement:
+                      </span>
+                      <span className="text-black font-bold">
+                        {rule.preferred_replacement ? `"${rule.preferred_replacement}"` : '(Prohibit without direct replacement)'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-neutral-600 pt-1 leading-relaxed">
+                    <strong className="text-black">Compliance Rationale: </strong>
+                    {rule.explanation || rule.description}
+                  </p>
+                </div>
+              ))}
+
+              {/* Proposed Facts if any */}
+              {proposal.facts && proposal.facts.length > 0 && (
+                <div className="space-y-2 pt-2">
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-black block">
+                    Associated Verified Facts ({proposal.facts.length}):
+                  </span>
+                  {proposal.facts.map((fact, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3 rounded-xl border border-neutral-300 bg-white space-y-1 text-xs"
+                    >
+                      <p className="font-semibold text-black">&quot;{fact.statement}&quot;</p>
+                      <div className="text-[10px] text-neutral-500 font-mono flex items-center space-x-2">
+                        <span>Source: {fact.source_title}</span>
+                        <span>•</span>
+                        <span>Ref: {fact.source_reference}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Bottom Approval Action Bar */}
+            <div className="pt-3 border-t border-neutral-300 flex items-center justify-between">
+              <span className="text-[11px] text-neutral-500 font-mono">
+                Clicking &quot;Approve&quot; saves this directly into Brand Guidelines for {activeProduct?.name || 'your workspace'}.
+              </span>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={handleDiscardProposal}
+                  disabled={isApproving}
+                  className="px-3.5 py-2 text-xs font-semibold text-neutral-600 hover:text-black border border-neutral-300 bg-white rounded-xl transition"
+                >
+                  Discard
+                </button>
+                <button
+                  onClick={handleApproveProposal}
+                  disabled={isApproving}
+                  className="px-4 py-2 text-xs font-bold text-white bg-black hover:bg-neutral-800 rounded-xl transition shadow-xs flex items-center space-x-1.5"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                  <span>Approve & Add to Brand Rules</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Top Telemetry & Status HUD */}
