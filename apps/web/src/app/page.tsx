@@ -77,11 +77,13 @@ export default function LandingPage() {
             />
           </Link>
 
-          <div className="hidden md:flex items-center space-x-8 text-xs font-semibold text-neutral-600">
-            <a href="#how-it-works" className="hover:text-black transition">How It Works</a>
-            <a href="#inspector" className="hover:text-black transition">Live Inspector</a>
-            <a href="#features" className="hover:text-black transition">Governance Engine</a>
-            <a href="#security" className="hover:text-black transition">Security & Trust</a>
+          <div className="hidden md:flex items-center space-x-7 text-xs font-semibold text-neutral-600">
+            <a href="#how-it-works" className="hover:text-black transition">Chain of Custody</a>
+            <a href="#inspector" className="hover:text-black transition">Live Sandbox</a>
+            <a href="#solutions" className="hover:text-black transition">Solutions</a>
+            <a href="#architecture" className="hover:text-black transition">Architecture</a>
+            <a href="#comparison" className="hover:text-black transition">Comparison</a>
+            <a href="#security" className="hover:text-black transition">Security</a>
             <a href="#faq" className="hover:text-black transition">FAQ</a>
           </div>
 
@@ -576,45 +578,400 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Industry-Specific Governance Solutions */}
+      <section id="solutions" className="py-16 px-4 sm:px-8 max-w-6xl mx-auto space-y-10">
+        <div className="text-center space-y-2 max-w-2xl mx-auto">
+          <span className="text-xs font-mono uppercase tracking-widest text-neutral-400 font-bold">
+            Industry Solutions
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-black">
+            Tailored Governance for Highly Regulated Sectors
+          </h2>
+          <p className="text-xs sm:text-sm text-neutral-600">
+            Pre-configured compliance policies designed to protect organizations operating under strict legal and regulatory mandates.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {/* Solution 1: FinTech */}
+          <div className="glass-panel p-6 rounded-2xl border border-neutral-200 hover:border-black transition-all duration-300 space-y-3 group shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center font-bold shadow-xs">
+              <Scale className="w-5 h-5 text-white" />
+            </div>
+            <h3 className="text-sm font-bold text-black">Fintech & Banking</h3>
+            <p className="text-xs text-neutral-600 leading-relaxed">
+              Enforces SEC Rule 206(4)-1 and FINRA communications rules. Automatically intercepts unverified APY, yield, or performance guarantees and mandates safe-harbor disclosures.
+            </p>
+            <div className="pt-2 border-t border-neutral-100 flex flex-wrap gap-1.5 text-[10px] font-mono text-neutral-500">
+              <span className="bg-neutral-100 px-2 py-0.5 rounded">SEC 206(4)-1</span>
+              <span className="bg-neutral-100 px-2 py-0.5 rounded">FDIC Disclaimers</span>
+            </div>
+          </div>
+
+          {/* Solution 2: Healthcare & Life Sciences */}
+          <div className="glass-panel p-6 rounded-2xl border border-neutral-200 hover:border-black transition-all duration-300 space-y-3 group shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center font-bold shadow-xs">
+              <HeartPulse className="w-5 h-5 text-white" />
+            </div>
+            <h3 className="text-sm font-bold text-black">Healthcare & Pharma</h3>
+            <p className="text-xs text-neutral-600 leading-relaxed">
+              Adheres to FDA 21 CFR Part 11 and advertising standards. Requires clinical evidence binding for therapeutic efficacy claims and blocks off-label promotional assertions.
+            </p>
+            <div className="pt-2 border-t border-neutral-100 flex flex-wrap gap-1.5 text-[10px] font-mono text-neutral-500">
+              <span className="bg-neutral-100 px-2 py-0.5 rounded">FDA 21 CFR</span>
+              <span className="bg-neutral-100 px-2 py-0.5 rounded">Clinical Substantiation</span>
+            </div>
+          </div>
+
+          {/* Solution 3: Enterprise B2B SaaS */}
+          <div className="glass-panel p-6 rounded-2xl border border-neutral-200 hover:border-black transition-all duration-300 space-y-3 group shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center font-bold shadow-xs">
+              <Building2 className="w-5 h-5 text-white" />
+            </div>
+            <h3 className="text-sm font-bold text-black">Enterprise B2B SaaS</h3>
+            <p className="text-xs text-neutral-600 leading-relaxed">
+              Verifies SOC 2, ISO 27001, and SLA uptime assertions against corporate data. Prevents uncertified security claims and governs competitive comparison copy.
+            </p>
+            <div className="pt-2 border-t border-neutral-100 flex flex-wrap gap-1.5 text-[10px] font-mono text-neutral-500">
+              <span className="bg-neutral-100 px-2 py-0.5 rounded">SOC 2 Alignment</span>
+              <span className="bg-neutral-100 px-2 py-0.5 rounded">SLA Verification</span>
+            </div>
+          </div>
+
+          {/* Solution 4: Consumer & E-Commerce */}
+          <div className="glass-panel p-6 rounded-2xl border border-neutral-200 hover:border-black transition-all duration-300 space-y-3 group shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center font-bold shadow-xs">
+              <Briefcase className="w-5 h-5 text-white" />
+            </div>
+            <h3 className="text-sm font-bold text-black">Consumer & Retail</h3>
+            <p className="text-xs text-neutral-600 leading-relaxed">
+              Complies with FTC Endorsement & Testimonial guides (16 CFR Part 255). Automatically audits influencer copy, environmental green claims, and discount veracity.
+            </p>
+            <div className="pt-2 border-t border-neutral-100 flex flex-wrap gap-1.5 text-[10px] font-mono text-neutral-500">
+              <span className="bg-neutral-100 px-2 py-0.5 rounded">FTC 16 CFR</span>
+              <span className="bg-neutral-100 px-2 py-0.5 rounded">Greenwashing Shield</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* The 3-Layered Defense Architecture */}
+      <section id="architecture" className="py-16 px-4 sm:px-8 max-w-6xl mx-auto space-y-10">
+        <div className="text-center space-y-2 max-w-2xl mx-auto">
+          <span className="text-xs font-mono uppercase tracking-widest text-neutral-400 font-bold">
+            Technical Architecture
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-black">
+            The 3-Layered Defense Architecture
+          </h2>
+          <p className="text-xs sm:text-sm text-neutral-600">
+            How Pineco achieves zero false assertions by decoupling deterministic regex guardrails from AI claim verification.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Layer 1 */}
+          <div className="glass-panel p-6 rounded-3xl border border-neutral-200 space-y-4 hover:border-black transition shadow-xs">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono font-bold bg-neutral-100 border border-neutral-300 text-black px-2 py-0.5 rounded">
+                LAYER 01
+              </span>
+              <span className="text-[11px] font-mono text-neutral-400 font-bold">0.04s LATENCY</span>
+            </div>
+            <div className="w-10 h-10 rounded-2xl bg-black text-white flex items-center justify-center font-bold">
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <h3 className="text-base font-bold text-black">Deterministic Guardrail Engine</h3>
+            <p className="text-xs text-neutral-600 leading-relaxed">
+              Executes exact pattern matching with full Unicode normalization. Evaluates non-negotiable policies: prohibited terminology, required disclaimers, and suggested phrasing. <strong>Zero hallucination risk.</strong>
+            </p>
+            <ul className="text-[11px] font-mono text-neutral-500 space-y-1.5 pt-2 border-t border-neutral-100">
+              <li className="flex items-center space-x-1.5">
+                <Check className="w-3 h-3 text-black" />
+                <span>Exact character offset boundary matching</span>
+              </li>
+              <li className="flex items-center space-x-1.5">
+                <Check className="w-3 h-3 text-black" />
+                <span>Non-negotiable legal disclaimer injection</span>
+              </li>
+              <li className="flex items-center space-x-1.5">
+                <Check className="w-3 h-3 text-black" />
+                <span>Preferred alternative word suggestions</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Layer 2 */}
+          <div className="glass-panel p-6 rounded-3xl border border-neutral-200 space-y-4 hover:border-black transition shadow-xs">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono font-bold bg-neutral-100 border border-neutral-300 text-black px-2 py-0.5 rounded">
+                LAYER 02
+              </span>
+              <span className="text-[11px] font-mono text-neutral-400 font-bold">GROK-2 LLM</span>
+            </div>
+            <div className="w-10 h-10 rounded-2xl bg-black text-white flex items-center justify-center font-bold">
+              <Sparkles className="w-5 h-5 text-white" />
+            </div>
+            <h3 className="text-base font-bold text-black">Grounded Corporate Fact Vault</h3>
+            <p className="text-xs text-neutral-600 leading-relaxed">
+              Extracts discrete factual assertions using strict Pydantic JSON schemas. Claims are verified strictly against approved corporate evidence with active validity timestamps. Missing evidence defaults to <strong>Unverified</strong>.
+            </p>
+            <ul className="text-[11px] font-mono text-neutral-500 space-y-1.5 pt-2 border-t border-neutral-100">
+              <li className="flex items-center space-x-1.5">
+                <Check className="w-3 h-3 text-black" />
+                <span>Evidence-before-assertion principle</span>
+              </li>
+              <li className="flex items-center space-x-1.5">
+                <Check className="w-3 h-3 text-black" />
+                <span>Database ID verification (rejects fake citations)</span>
+              </li>
+              <li className="flex items-center space-x-1.5">
+                <Check className="w-3 h-3 text-black" />
+                <span>Supported / Contradicted / Unverified status</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Layer 3 */}
+          <div className="glass-panel p-6 rounded-3xl border border-neutral-200 space-y-4 hover:border-black transition shadow-xs">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono font-bold bg-neutral-100 border border-neutral-300 text-black px-2 py-0.5 rounded">
+                LAYER 03
+              </span>
+              <span className="text-[11px] font-mono text-neutral-400 font-bold">SHA-256 LEDGER</span>
+            </div>
+            <div className="w-10 h-10 rounded-2xl bg-black text-white flex items-center justify-center font-bold">
+              <Lock className="w-5 h-5 text-white" />
+            </div>
+            <h3 className="text-base font-bold text-black">Human Gatekeeper & Audit Ledger</h3>
+            <p className="text-xs text-neutral-600 leading-relaxed">
+              Automated review never equals approval. Human reviewers execute binding decisions. Overriding any automated warning strictly mandates a written compliance rationale recorded in the append-only audit trail.
+            </p>
+            <ul className="text-[11px] font-mono text-neutral-500 space-y-1.5 pt-2 border-t border-neutral-100">
+              <li className="flex items-center space-x-1.5">
+                <Check className="w-3 h-3 text-black" />
+                <span>Immutable version tree (v1, v2, v3 snapshots)</span>
+              </li>
+              <li className="flex items-center space-x-1.5">
+                <Check className="w-3 h-3 text-black" />
+                <span>Mandatory rationale requirement for overrides</span>
+              </li>
+              <li className="flex items-center space-x-1.5">
+                <Check className="w-3 h-3 text-black" />
+                <span>Cryptographic actor and timestamp non-repudiation</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Enterprise Comparison Matrix */}
+      <section id="comparison" className="py-16 px-4 sm:px-8 max-w-6xl mx-auto space-y-8">
+        <div className="text-center space-y-2 max-w-2xl mx-auto">
+          <span className="text-xs font-mono uppercase tracking-widest text-neutral-400 font-bold">
+            Platform Comparison
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-black">
+            Why Generic LLMs and Static PDFs Fall Short
+          </h2>
+          <p className="text-xs sm:text-sm text-neutral-600">
+            A head-to-head comparison between Pineco, traditional PDF style guides, and raw generative AI models.
+          </p>
+        </div>
+
+        <div className="bg-white rounded-3xl border border-neutral-200 overflow-hidden shadow-xs">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-neutral-100 border-b border-neutral-200 font-mono text-[11px] uppercase tracking-wider text-black">
+                <tr>
+                  <th className="py-4 px-6 font-bold">Governance Capability</th>
+                  <th className="py-4 px-6 font-bold bg-neutral-200/60 text-black">
+                    Pineco Brand Platform
+                  </th>
+                  <th className="py-4 px-6 font-medium text-neutral-500">Static PDF Manuals</th>
+                  <th className="py-4 px-6 font-medium text-neutral-500">Public LLMs (ChatGPT)</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-200 font-medium">
+                <tr className="hover:bg-neutral-50/50 transition">
+                  <td className="py-4 px-6 font-bold text-black">
+                    Deterministic Terminology Interception
+                  </td>
+                  <td className="py-4 px-6 bg-neutral-50 font-bold text-black flex items-center space-x-1.5">
+                    <Check className="w-3.5 h-3.5 text-black shrink-0" />
+                    <span>Sub-millisecond exact regex & offsets</span>
+                  </td>
+                  <td className="py-4 px-6 text-neutral-500">
+                    Manual human search; 80% ignored
+                  </td>
+                  <td className="py-4 px-6 text-neutral-500">
+                    Probabilistic; drifts across prompts
+                  </td>
+                </tr>
+
+                <tr className="hover:bg-neutral-50/50 transition">
+                  <td className="py-4 px-6 font-bold text-black">
+                    Evidence Fact Substantiation
+                  </td>
+                  <td className="py-4 px-6 bg-neutral-50 font-bold text-black flex items-center space-x-1.5">
+                    <Check className="w-3.5 h-3.5 text-black shrink-0" />
+                    <span>Grounded database cross-examination</span>
+                  </td>
+                  <td className="py-4 px-6 text-neutral-500">
+                    Ad-hoc manual email checks
+                  </td>
+                  <td className="py-4 px-6 text-neutral-500">
+                    Fabricates fake statistics & URLs
+                  </td>
+                </tr>
+
+                <tr className="hover:bg-neutral-50/50 transition">
+                  <td className="py-4 px-6 font-bold text-black">
+                    Hallucination Elimination
+                  </td>
+                  <td className="py-4 px-6 bg-neutral-50 font-bold text-black flex items-center space-x-1.5">
+                    <Check className="w-3.5 h-3.5 text-black shrink-0" />
+                    <span>Discards unbacked database IDs</span>
+                  </td>
+                  <td className="py-4 px-6 text-neutral-500">
+                    Dependent on human memory
+                  </td>
+                  <td className="py-4 px-6 text-neutral-500">
+                    High risk; asserts false claims
+                  </td>
+                </tr>
+
+                <tr className="hover:bg-neutral-50/50 transition">
+                  <td className="py-4 px-6 font-bold text-black">
+                    Immutable Version History
+                  </td>
+                  <td className="py-4 px-6 bg-neutral-50 font-bold text-black flex items-center space-x-1.5">
+                    <Check className="w-3.5 h-3.5 text-black shrink-0" />
+                    <span>SHA-256 hashed version snapshots</span>
+                  </td>
+                  <td className="py-4 px-6 text-neutral-500">
+                    Overwritten Word/Docs copies
+                  </td>
+                  <td className="py-4 px-6 text-neutral-500">
+                    Ephemeral single-session chat
+                  </td>
+                </tr>
+
+                <tr className="hover:bg-neutral-50/50 transition">
+                  <td className="py-4 px-6 font-bold text-black">
+                    Audit Trail & Non-Repudiation
+                  </td>
+                  <td className="py-4 px-6 bg-neutral-50 font-bold text-black flex items-center space-x-1.5">
+                    <Check className="w-3.5 h-3.5 text-black shrink-0" />
+                    <span>Append-only ledger + mandatory rationale</span>
+                  </td>
+                  <td className="py-4 px-6 text-neutral-500">
+                    Scattered email/Slack approvals
+                  </td>
+                  <td className="py-4 px-6 text-neutral-500">
+                    Zero enterprise auditability
+                  </td>
+                </tr>
+
+                <tr className="hover:bg-neutral-50/50 transition">
+                  <td className="py-4 px-6 font-bold text-black">
+                    Product Compliance Isolation
+                  </td>
+                  <td className="py-4 px-6 bg-neutral-50 font-bold text-black flex items-center space-x-1.5">
+                    <Check className="w-3.5 h-3.5 text-black shrink-0" />
+                    <span>Strict product folder scoping</span>
+                  </td>
+                  <td className="py-4 px-6 text-neutral-500">
+                    Monolithic shared drive folders
+                  </td>
+                  <td className="py-4 px-6 text-neutral-500">
+                    Global un-scoped training context
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* Regulatory Standards Supported */}
+      <section className="py-12 px-4 sm:px-8 max-w-6xl mx-auto space-y-6">
+        <div className="text-center space-y-1">
+          <span className="text-[10px] font-mono uppercase tracking-widest text-neutral-400 font-bold">
+            Compliance Alignments
+          </span>
+          <h3 className="text-lg font-bold text-black">
+            Engineered for Global Regulatory Frameworks
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
+          <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-xs space-y-1">
+            <span className="text-xs font-bold text-black block font-mono">SEC Rule 206(4)-1</span>
+            <span className="text-[10px] text-neutral-500 block">Investment Adviser Marketing</span>
+          </div>
+
+          <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-xs space-y-1">
+            <span className="text-xs font-bold text-black block font-mono">FTC 16 CFR Part 255</span>
+            <span className="text-[10px] text-neutral-500 block">Endorsement & Claims Veracity</span>
+          </div>
+
+          <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-xs space-y-1">
+            <span className="text-xs font-bold text-black block font-mono">FDA 21 CFR Part 11</span>
+            <span className="text-[10px] text-neutral-500 block">Electronic Audit & Lineage</span>
+          </div>
+
+          <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-xs space-y-1">
+            <span className="text-xs font-bold text-black block font-mono">EU AI Act (Art. 52)</span>
+            <span className="text-[10px] text-neutral-500 block">AI Transparency & Verification</span>
+          </div>
+
+          <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-xs space-y-1">
+            <span className="text-xs font-bold text-black block font-mono">SOC 2 Type II</span>
+            <span className="text-[10px] text-neutral-500 block">Non-Repudiation Logging</span>
+          </div>
+        </div>
+      </section>
+
       {/* Why Conventional Compliance Fails vs Pineco */}
       <section className="py-16 px-4 sm:px-8 max-w-6xl mx-auto">
-        <div className="bg-white rounded-3xl border border-[#E5E5E5] p-8 sm:p-12 shadow-sm space-y-10">
+        <div className="bg-white rounded-3xl border border-neutral-200 p-8 sm:p-12 shadow-sm space-y-10">
           <div className="max-w-2xl">
-            <span className="text-xs font-mono uppercase tracking-widest text-slate-400 font-bold">The Problem We Solve</span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#000000] mt-1">
+            <span className="text-xs font-mono uppercase tracking-widest text-neutral-400 font-bold">The Problem We Solve</span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black mt-1">
               Why Traditional Brand Compliance Breaks Down at Scale
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-6 bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] space-y-2">
-              <span className="text-xs font-mono font-bold text-rose-600 uppercase">Conventional Approach</span>
-              <h4 className="text-sm font-bold text-[#000000]">Static 80-Page PDF Style Guides</h4>
-              <p className="text-xs text-slate-500 leading-relaxed">
+            <div className="p-6 bg-white rounded-2xl border border-neutral-200 space-y-2">
+              <span className="text-xs font-mono font-bold text-neutral-500 uppercase">Conventional Approach</span>
+              <h4 className="text-sm font-bold text-black">Static 80-Page PDF Style Guides</h4>
+              <p className="text-xs text-neutral-500 leading-relaxed">
                 Marketing teams cannot memorize 80-page brand PDF manuals. Rules are ignored, resulting in inconsistent terminology and legal exposure.
               </p>
             </div>
 
-            <div className="p-6 bg-white rounded-2xl border border-[#000000] space-y-2 shadow-sm">
-              <span className="text-xs font-mono font-bold text-[#000000] uppercase">The Pineco Way</span>
-              <h4 className="text-sm font-bold text-[#000000]">Active Deterministic Rule Interception</h4>
-              <p className="text-xs text-slate-500 leading-relaxed">
+            <div className="p-6 bg-neutral-50 rounded-2xl border border-black space-y-2 shadow-xs">
+              <span className="text-xs font-mono font-bold text-black uppercase">The Pineco Way</span>
+              <h4 className="text-sm font-bold text-black">Active Deterministic Rule Interception</h4>
+              <p className="text-xs text-neutral-600 leading-relaxed">
                 Rules live as structured database policies evaluated in real time as copy is written, offering immediate suggested corrections.
               </p>
             </div>
 
-            <div className="p-6 bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] space-y-2">
-              <span className="text-xs font-mono font-bold text-rose-600 uppercase">Conventional Approach</span>
-              <h4 className="text-sm font-bold text-[#000000]">Blind AI Generation & Hallucinations</h4>
-              <p className="text-xs text-slate-500 leading-relaxed">
+            <div className="p-6 bg-white rounded-2xl border border-neutral-200 space-y-2">
+              <span className="text-xs font-mono font-bold text-neutral-500 uppercase">Conventional Approach</span>
+              <h4 className="text-sm font-bold text-black">Blind AI Generation & Hallucinations</h4>
+              <p className="text-xs text-neutral-500 leading-relaxed">
                 Public LLMs invent statistics, cite fictional sources, and write misleading marketing claims with high confident tones.
               </p>
             </div>
 
-            <div className="p-6 bg-white rounded-2xl border border-[#000000] space-y-2 shadow-sm">
-              <span className="text-xs font-mono font-bold text-[#000000] uppercase">The Pineco Way</span>
-              <h4 className="text-sm font-bold text-[#000000]">Grounded Corporate Fact Vault</h4>
-              <p className="text-xs text-slate-500 leading-relaxed">
+            <div className="p-6 bg-neutral-50 rounded-2xl border border-black space-y-2 shadow-xs">
+              <span className="text-xs font-mono font-bold text-black uppercase">The Pineco Way</span>
+              <h4 className="text-sm font-bold text-black">Grounded Corporate Fact Vault</h4>
+              <p className="text-xs text-neutral-600 leading-relaxed">
                 Claims are checked exclusively against approved corporate sources with validity dates. Missing evidence is flagged as Unverified.
               </p>
             </div>
@@ -711,26 +1068,26 @@ export default function LandingPage() {
 
       {/* Pre-Footer Banner */}
       <section className="py-16 px-4 sm:px-8 max-w-5xl mx-auto text-center">
-        <div className="bg-[#000000] text-white rounded-3xl p-8 sm:p-14 space-y-6 shadow-xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#000000]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="bg-black text-white rounded-3xl p-8 sm:p-14 space-y-6 shadow-xl relative overflow-hidden border border-neutral-800">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl pointer-events-none" />
 
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
             Ready to Experience Intelligent Brand Governance?
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
+          <p className="text-xs sm:text-sm text-neutral-400 max-w-md mx-auto leading-relaxed">
             Test the live CRM command center, create policies, and evaluate drafts with instant feedback.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
             <Link
               href="/dashboard"
-              className="w-full sm:w-auto bg-[#000000] hover:bg-[#262626] text-[#000000] font-bold text-xs px-8 py-3.5 rounded-xl shadow-md transition active:scale-95"
+              className="w-full sm:w-auto bg-white hover:bg-neutral-100 text-black font-bold text-xs px-8 py-3.5 rounded-xl shadow-md transition active:scale-95"
             >
               Open Command Center &rarr;
             </Link>
             <button
               onClick={openAuthModal}
-              className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-semibold text-xs px-6 py-3.5 rounded-xl transition"
+              className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-semibold text-xs px-6 py-3.5 rounded-xl transition border border-white/20"
             >
               Switch Persona (JWT)
             </button>
@@ -739,18 +1096,20 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-[#E5E5E5] bg-white py-10 px-4 sm:px-8 text-xs text-slate-500">
+      <footer className="border-t border-neutral-200 bg-white py-12 px-4 sm:px-8 text-xs text-neutral-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center space-x-2.5">
-            <div className="w-6 h-6 rounded-lg bg-[#000000] flex items-center justify-center text-[#000000] font-bold text-xs">
-              P
-            </div>
-            <span className="font-extrabold text-[#000000]">Pineco Brand Governance OS</span>
-            <span>•</span>
-            <span>CodeAxis Hackathon Round 2</span>
+          <div className="flex items-center space-x-3">
+            <img
+              src="/logo-mark.jpg"
+              alt="Pineco"
+              className="w-6 h-6 rounded-md object-contain border border-neutral-200 shadow-xs"
+            />
+            <span className="font-extrabold text-black">Pineco Brand Governance Platform</span>
+            <span className="text-neutral-300">•</span>
+            <span className="text-neutral-500">CodeAxis Round 2</span>
           </div>
-          <p className="font-mono text-[11px] text-slate-400">
-            60% White (#FFFFFF) • 30% Yellow (#000000) • 10% Black (#000000)
+          <p className="font-mono text-[11px] text-neutral-400">
+            Evidence Before Assertion • Zero False Assertions • SHA-256 Verified
           </p>
         </div>
       </footer>
