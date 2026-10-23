@@ -40,10 +40,161 @@ import {
   Clock,
   Send,
   Wand2,
+  Database,
+  FileCode,
+  Hash,
 } from 'lucide-react';
 import { useRole } from '@/components/RoleContext';
 import { ScrollProgressBar } from '@/components/ScrollProgressBar';
 import { ScrollReveal } from '@/components/ScrollReveal';
+
+const SECTORS_DATA = [
+  {
+    id: 'fintech',
+    name: 'FinTech & Capital Markets',
+    shortTag: 'FINTECH',
+    regulator: 'SEC & FINRA',
+    statute: 'SEC Rule 206(4)-1 • FINRA Rule 2210',
+    icon: Scale,
+    riskTitle: 'Deceptive Yield & Unsubstantiated Returns Risk',
+    primaryMandate: 'Bans performance guarantees, unverified APY promises, and requires mandatory statutory Safe-Harbor investment disclosures.',
+    rules: [
+      {
+        title: 'Prohibited Absolute Return Guarantee',
+        pattern: '\\b(guaranteed|risk-free|100% safe|no risk)\\b',
+        severity: 'critical',
+        code: 'SEC-206(4)-1.A',
+        penalty: 'Enforcement fines up to $1.5M per violation',
+      },
+      {
+        title: 'Unverified APY / Yield Promissory Claim',
+        pattern: '\\b(\\d+(\\.\\d+)?%\\s*(annual|yearly|apy|return|yield))\\b',
+        severity: 'high',
+        code: 'FINRA-2210.C',
+        penalty: 'Immediate marketing retraction mandate',
+      },
+    ],
+    disclaimerRequired: 'Past performance is not indicative of future results. Capital at risk. Securities offered through certified broker-dealer members.',
+    evidenceAnchor: 'SEC Form 10-K (Q3 Audit, Table 4.2) • Vault Document #V-FIN-2026',
+    untrustedCopy: 'Earn guaranteed 14.5% annual returns with completely risk-free corporate liquidity management. Pineco guarantees 100% automated sign-off without human review.',
+    violations: [
+      { term: 'guaranteed 14.5% annual returns', reason: 'Unsubstantiated return guarantee violates SEC Rule 206(4)-1', code: 'SEC-206' },
+      { term: 'completely risk-free', reason: 'Deceptive risk exclusion violates FINRA Rule 2210', code: 'FINRA-2210' },
+      { term: 'guarantees 100% automated sign-off', reason: 'False operational automation assertion', code: 'SEC-GOV' },
+    ],
+    cleanCopy: 'Optimize corporate liquidity through institutional cash management strategies. Variable yield targets are benchmarked to prevailing short-term rates. Past performance is not indicative of future results.',
+    statutoryDisclosure: 'Securities and cash management strategies involve capital loss risk. Consult qualified institutional counsel prior to commitment.',
+    evidenceDoc: 'Verified against SEC 10-K Institutional Filing & Vault Proof #V-FIN-2026',
+  },
+  {
+    id: 'healthcare',
+    name: 'Healthcare, Pharma & Life Sciences',
+    shortTag: 'HEALTHCARE',
+    regulator: 'FDA & HHS',
+    statute: 'FDA 21 CFR Part 11 • FD&C Act §502',
+    icon: HeartPulse,
+    riskTitle: 'Unapproved Efficacy & Off-Label Assertion Risk',
+    primaryMandate: 'Enforces clinical trial evidence binding for medical claims, blocks off-label promises, and mandates investigational disclaimers.',
+    rules: [
+      {
+        title: 'Unsubstantiated Clinical Efficacy Guarantee',
+        pattern: '\\b(permanently cure|100% effective|instant cure)\\b',
+        severity: 'critical',
+        code: 'FDA-21CFR-312',
+        penalty: 'FDA Warning Letter & clinical hold',
+      },
+      {
+        title: 'Off-Label Diagnostic or Therapeutic Assertion',
+        pattern: '\\b(eliminate [a-z]+ in \\d+ days|miracle)\\b',
+        severity: 'high',
+        code: 'FDCA-502.A',
+        penalty: 'Mandatory commercial corrective campaign',
+      },
+    ],
+    disclaimerRequired: 'These statements have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, or cure any disease.',
+    evidenceAnchor: 'ClinicalTrials.gov NCT-04928114 • IRB Clinical Protocol #2025-C8',
+    untrustedCopy: 'Our proprietary therapeutic formula is 100% clinically proven to permanently cure metabolic fatigue and eliminate cognitive decline in 7 days.',
+    violations: [
+      { term: '100% clinically proven to permanently cure', reason: 'Unapproved disease modification claim violating FD&C Act §502(a)', code: 'FDA-CFR' },
+      { term: 'eliminate cognitive decline in 7 days', reason: 'Lacks Phase-III randomized double-blind clinical trial backing', code: 'FDCA-502' },
+    ],
+    cleanCopy: 'Our investigational compound demonstrated statistically significant improvements in cellular metabolic biomarkers during double-blind Phase-II trials (N=1,420). Individual clinical outcomes may vary.',
+    statutoryDisclosure: 'Investigational compound under active clinical study. Not approved by FDA for general over-the-counter administration.',
+    evidenceDoc: 'Verified against ClinicalTrials.gov NCT-04928114 & IRB Protocol #2025-C8',
+  },
+  {
+    id: 'saas',
+    name: 'Enterprise Cloud & B2B SaaS',
+    shortTag: 'ENTERPRISE SAAS',
+    regulator: 'AICPA & ISO',
+    statute: 'SOC 2 Type II • ISO/IEC 27001:2022',
+    icon: Building2,
+    riskTitle: 'Breach Liability & False Security Assertion Risk',
+    primaryMandate: 'Binds marketing claims to certified SOC 2 compliance reports and contractual SLAs, preventing uncertified security assertions.',
+    rules: [
+      {
+        title: 'Uncertified Security Guarantee',
+        pattern: '\\b(unhackable|100% secure|zero vulnerability)\\b',
+        severity: 'critical',
+        code: 'SOC2-CC6.1',
+        penalty: 'Contractual breach of warranty liability',
+      },
+      {
+        title: 'Exaggerated SLA Uptime Metric',
+        pattern: '\\b(99\\.999%|100% uptime)\\b',
+        severity: 'high',
+        code: 'SLA-CONTRACT',
+        penalty: 'Customer SLA financial credit penalties',
+      },
+    ],
+    disclaimerRequired: 'System availability is subject to scheduled maintenance windows as detailed in the Enterprise Master Services Agreement.',
+    evidenceAnchor: 'AICPA SOC-2 Type II Independent Service Auditor Report (Oct 2026)',
+    untrustedCopy: 'Pineco delivers completely unhackable 100% secure cloud operations with 99.999% uptime and completely eliminates all compliance overhead.',
+    violations: [
+      { term: 'completely unhackable 100% secure', reason: 'Unprovable absolute security warranty creates statutory liability', code: 'SOC2-SEC' },
+      { term: '99.999% uptime', reason: 'Exceeds certified contractual SLA baseline of 99.9% in service agreement', code: 'SLA-BREACH' },
+    ],
+    cleanCopy: 'Pineco delivers enterprise brand governance built on SOC 2 Type II audited cloud infrastructure with a contractual 99.9% uptime SLA guarantee.',
+    statutoryDisclosure: 'Security controls and operational safeguards certified under AICPA Trust Services Criteria (Security, Confidentiality).',
+    evidenceDoc: 'Verified against EY Independent SOC-2 Type II Audit Certificate #EY-SOC2-881',
+  },
+  {
+    id: 'consumer',
+    name: 'Consumer Retail & E-Commerce',
+    shortTag: 'RETAIL & FTC',
+    regulator: 'FTC & NAD',
+    statute: 'FTC 16 CFR Part 255 • FTC Green Guides',
+    icon: Briefcase,
+    riskTitle: 'Greenwashing & Undisclosed Endorsement Risk',
+    primaryMandate: 'Audits influencer copy for mandatory disclosure hashtags, verifies environmental claims, and validates discount pricing honesty.',
+    rules: [
+      {
+        title: 'Unqualified Environmental / Green Claim',
+        pattern: '\\b(100% eco-friendly|zero carbon footprint|greenest)\\b',
+        severity: 'critical',
+        code: 'FTC-16CFR-260',
+        penalty: 'FTC civil penalties up to $50,120 per violation',
+      },
+      {
+        title: 'Undisclosed Influencer Sponsorship',
+        pattern: '\\b(our favorite|we love|partnered with)\\b(?!.*#(ad|sponsored))',
+        severity: 'high',
+        code: 'FTC-16CFR-255',
+        penalty: 'Mandatory joint brand-influencer enforcement',
+      },
+    ],
+    disclaimerRequired: 'Paid brand ambassador endorsement. Full product sustainability lifecycle assessment available at pineco.com/esg.',
+    evidenceAnchor: 'ISO 14044 Life Cycle Assessment Protocol #LCA-2026-88',
+    untrustedCopy: 'This revolutionary product has 100% zero carbon footprint and our influencer partners agree it is the most miraculous item on Earth!',
+    violations: [
+      { term: '100% zero carbon footprint', reason: 'Unqualified general environmental claim prohibited by FTC Green Guides', code: 'FTC-GREEN' },
+      { term: 'our influencer partners agree', reason: 'Missing mandatory prominent material connection disclosure (#Ad)', code: 'FTC-ENDORSE' },
+    ],
+    cleanCopy: 'Manufactured with 85% certified post-consumer recycled ocean polymers to reduce packaging lifecycle emissions by 34%. Paid brand ambassador endorsement.',
+    statutoryDisclosure: 'Lifecycle assessment audited in accordance with ISO 14044 protocols. Full carbon verification on file.',
+    evidenceDoc: 'Verified against ISO 14044 Third-Party LCA Verification #LCA-8812',
+  },
+];
 
 export default function LandingPage() {
   const { openAuthModal } = useRole();
@@ -149,6 +300,15 @@ export default function LandingPage() {
   const hoursSavedPerYear = Math.round(submissionsPerMonth * hoursPerReview * 0.68 * 12);
   const costSavings = Math.round(hoursSavedPerYear * 85); // $85/hr blended legal/marketing rate
 
+  // Interactive Sector Workstation State
+  const [activeSector, setActiveSector] = useState<'fintech' | 'healthcare' | 'saas' | 'consumer'>('fintech');
+  const [sectorViewMode, setSectorViewMode] = useState<'violations' | 'compliant'>('violations');
+
+  // Interactive Architecture Layer State
+  const [activeArchitectureLayer, setActiveArchitectureLayer] = useState<number>(1);
+
+  const currentSector = SECTORS_DATA.find((s) => s.id === activeSector) || SECTORS_DATA[0];
+
   // FAQs
   const faqs = [
     {
@@ -245,19 +405,7 @@ export default function LandingPage() {
       {/* 3. Hero Section with 3D Console & Fluid Aura */}
       {/* ======================================================== */}
       <section className="relative pt-12 pb-20 px-4 sm:px-8 max-w-7xl mx-auto text-center space-y-8 overflow-hidden">
-        {/* Floating Brand Badge with Neon Purple Border */}
-        <div className="inline-flex items-center space-x-2.5 glass-pill px-4 py-1.5 rounded-full text-xs font-mono text-black shadow-sm border border-purple-300 hover:border-purple-500 hover:shadow-[0_0_20px_rgba(124,58,237,0.25)] transition duration-300">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-600 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-600" />
-          </span>
-          <span className="font-bold tracking-tight text-neutral-900">Enterprise Pre-Publication Governance</span>
-          <span className="text-purple-300">•</span>
-          <span className="text-purple-700 font-bold bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
-            SENTINEL v2.4 ONLINE
-          </span>
-        </div>
-
+       
         {/* Primary Hero Typography with Purple Gradient Text */}
         <div className="space-y-4 max-w-4xl mx-auto">
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-black leading-[1.08]">
@@ -861,91 +1009,317 @@ export default function LandingPage() {
       </ScrollReveal>
 
       {/* ======================================================== */}
-      {/* 7. Industry Solutions Section with Purple Badges */}
+      {/* 7. Enterprise Regulatory Workbench (Production Console) */}
       {/* ======================================================== */}
       <ScrollReveal delayMs={100}>
-      <section id="solutions" className="py-16 px-4 sm:px-8 max-w-6xl mx-auto space-y-10">
-        <div className="text-center space-y-2 max-w-2xl mx-auto">
-          <span className="text-xs font-mono uppercase tracking-widest text-purple-600 font-bold">
-            Industry Solutions
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-black">
-            Tailored Governance for Highly Regulated Sectors
-          </h2>
-          <p className="text-xs sm:text-sm text-neutral-600">
-            Pre-configured compliance policies designed to protect organizations operating under strict legal mandates.
-          </p>
+      <section id="solutions" className="py-20 px-4 sm:px-8 max-w-6xl mx-auto space-y-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-neutral-200 pb-6">
+          <div className="space-y-2 max-w-2xl text-left">
+            <div className="flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse" />
+              <span className="text-xs font-mono uppercase tracking-widest text-purple-600 font-bold">
+                Enterprise Policy Workstation
+              </span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-black">
+              Production Regulatory Enforcements by Sector
+            </h2>
+            <p className="text-xs sm:text-sm text-neutral-600">
+              Live deterministic policy intercepts, evidence verification gates, and statutory Safe-Harbor injection across highly audited industries.
+            </p>
+          </div>
+
+          {/* Regulator Compliance Stamp */}
+          <div className="flex items-center space-x-2 bg-neutral-100 px-3 py-1.5 rounded-xl border border-neutral-200 text-xs font-mono shrink-0">
+            <span className="text-neutral-500">Statutory Coverage:</span>
+            <span className="font-bold text-black uppercase">SEC • FDA • AICPA • FTC</span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-          {/* Solution 1: FinTech */}
-          <div className="glass-panel p-6 rounded-2xl border border-neutral-200 hover:border-purple-400 transition-all duration-300 space-y-3 group shadow-xs card-3d-hover">
-            <div className="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center font-bold shadow-xs group-hover:bg-purple-600 transition-colors">
-              <Scale className="w-5 h-5 text-purple-400 group-hover:text-white transition-colors" />
+        {/* Sector Navigation Tabs */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 p-1.5 bg-neutral-100 rounded-2xl border border-neutral-200">
+          {SECTORS_DATA.map((sec) => {
+            const Icon = sec.icon;
+            const isSelected = activeSector === sec.id;
+            return (
+              <button
+                key={sec.id}
+                type="button"
+                onClick={() => {
+                  setActiveSector(sec.id as any);
+                  setSectorViewMode('violations');
+                }}
+                className={`flex items-center space-x-2.5 p-3 rounded-xl transition text-left group ${
+                  isSelected
+                    ? 'bg-white text-black shadow-md border border-neutral-200 ring-2 ring-purple-600/20'
+                    : 'text-neutral-600 hover:text-black hover:bg-white/60'
+                }`}
+              >
+                <div
+                  className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition ${
+                    isSelected
+                      ? 'bg-purple-600 text-white shadow-xs'
+                      : 'bg-neutral-200 text-neutral-700 group-hover:bg-neutral-300'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center space-x-1.5">
+                    <span className="text-xs font-bold truncate block">{sec.name.split('&')[0].trim()}</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-purple-700 font-semibold block truncate">
+                    {sec.regulator}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Live Active Sector Console */}
+        {currentSector && (
+          <div className="glass-panel rounded-3xl border border-neutral-300 shadow-xl overflow-hidden bg-white">
+            {/* Top Command Bar */}
+            <div className="bg-black text-white px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 text-xs border-b border-neutral-800">
+              <div className="flex items-center space-x-3">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+                <span className="font-mono font-bold text-neutral-200 text-xs tracking-wide">
+                  REGULATORY BENCH // {currentSector.statute}
+                </span>
+                <span className="hidden sm:inline-block text-[10px] font-mono px-2 py-0.5 rounded bg-purple-900/60 text-purple-300 border border-purple-500/40 font-bold">
+                  ENFORCEMENT ACTIVE
+                </span>
+              </div>
+
+              {/* View Mode Toggle: Intercepted vs Remediated */}
+              <div className="flex items-center space-x-1 bg-neutral-900 p-1 rounded-xl border border-neutral-800 text-[11px] font-mono">
+                <button
+                  type="button"
+                  onClick={() => setSectorViewMode('violations')}
+                  className={`px-3 py-1 rounded-lg font-bold transition flex items-center space-x-1.5 ${
+                    sectorViewMode === 'violations'
+                      ? 'bg-rose-950 text-rose-300 border border-rose-800/80 shadow-xs'
+                      : 'text-neutral-400 hover:text-white'
+                  }`}
+                >
+                  <AlertTriangle className="w-3 h-3 text-rose-400" />
+                  <span>Intercepted Copy</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSectorViewMode('compliant')}
+                  className={`px-3 py-1 rounded-lg font-bold transition flex items-center space-x-1.5 ${
+                    sectorViewMode === 'compliant'
+                      ? 'bg-purple-600 text-white shadow-xs'
+                      : 'text-neutral-400 hover:text-white'
+                  }`}
+                >
+                  <CheckCircle2 className="w-3 h-3 text-white" />
+                  <span>Certified Output</span>
+                </button>
+              </div>
             </div>
-            <h3 className="text-sm font-bold text-black">Fintech & Banking</h3>
-            <p className="text-xs text-neutral-600 leading-relaxed">
-              Enforces SEC Rule 206(4)-1 and FINRA communications rules. Automatically intercepts unverified APY, yield, or performance guarantees and mandates safe-harbor disclosures.
-            </p>
-            <div className="pt-2 border-t border-neutral-100 flex flex-wrap gap-1.5 text-[10px] font-mono text-purple-700 font-semibold">
-              <span className="bg-purple-50 px-2 py-0.5 rounded border border-purple-200">SEC 206(4)-1</span>
-              <span className="bg-purple-50 px-2 py-0.5 rounded border border-purple-200">FDIC Disclaimers</span>
+
+            {/* Console Workspace Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-neutral-200">
+              {/* Left Column: Active Statutory Policies (5 cols) */}
+              <div className="lg:col-span-5 p-6 bg-neutral-50/50 space-y-4 text-left">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-purple-700">
+                      Mandate Overview
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 bg-neutral-200 text-neutral-800 rounded font-bold">
+                      {currentSector.shortTag}
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-bold text-black">{currentSector.riskTitle}</h3>
+                  <p className="text-xs text-neutral-600 leading-relaxed">
+                    {currentSector.primaryMandate}
+                  </p>
+                </div>
+
+                {/* Statutory Rules */}
+                <div className="space-y-2.5 pt-2">
+                  <span className="text-[11px] font-bold text-black uppercase tracking-wider font-mono block">
+                    Active Guardrail Specifications
+                  </span>
+                  {currentSector.rules.map((rule, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3 bg-white rounded-xl border border-neutral-200 shadow-xs space-y-1.5 text-xs"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-black text-xs">{rule.title}</span>
+                        <span
+                          className={`text-[9px] font-mono uppercase px-1.5 py-0.5 rounded font-extrabold ${
+                            rule.severity === 'critical'
+                              ? 'bg-rose-100 text-rose-800 border border-rose-300'
+                              : 'bg-amber-100 text-amber-800 border border-amber-300'
+                          }`}
+                        >
+                          {rule.severity}
+                        </span>
+                      </div>
+                      <div className="bg-neutral-100 p-1.5 rounded font-mono text-[11px] text-purple-900 border border-neutral-200 truncate">
+                        Regex: {rule.pattern}
+                      </div>
+                      <div className="flex items-center justify-between text-[10px] text-neutral-500 font-mono">
+                        <span>Statute: {rule.code}</span>
+                        <span className="text-rose-700 font-semibold">{rule.penalty}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Mandatory Disclaimer Box */}
+                <div className="p-3.5 bg-purple-50/70 rounded-xl border border-purple-200 text-xs space-y-1">
+                  <div className="flex items-center space-x-1.5 text-[10px] font-mono font-bold text-purple-900 uppercase">
+                    <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
+                    <span>Statutory Safe-Harbor Clause</span>
+                  </div>
+                  <p className="text-[11px] text-neutral-700 italic leading-relaxed">
+                    &quot;{currentSector.disclaimerRequired}&quot;
+                  </p>
+                </div>
+              </div>
+
+              {/* Right Column: Live Interception & Remediated Content Engine (7 cols) */}
+              <div className="lg:col-span-7 p-6 space-y-4 flex flex-col justify-between text-left">
+                <div>
+                  <div className="flex items-center justify-between pb-3 border-b border-neutral-200 text-xs">
+                    <div className="flex items-center space-x-2">
+                      <FileText className="w-4 h-4 text-purple-600" />
+                      <span className="font-bold text-black">
+                        {sectorViewMode === 'violations'
+                          ? 'Raw Untrusted Marketing Copy (Non-Compliant)'
+                          : 'Pineco Certified & Remediated Publication Copy'}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono text-neutral-500">
+                      Channel: Omnichannel Campaign
+                    </span>
+                  </div>
+
+                  {/* Copy Display Area */}
+                  <div
+                    className={`mt-4 p-4 rounded-2xl border min-h-[140px] text-xs sm:text-sm leading-relaxed transition-all duration-200 font-mono ${
+                      sectorViewMode === 'violations'
+                        ? 'bg-rose-50/30 border-rose-200 text-black'
+                        : 'bg-emerald-50/30 border-emerald-200 text-neutral-900'
+                    }`}
+                  >
+                    {sectorViewMode === 'violations' ? (
+                      <div className="space-y-3">
+                        <p className="leading-relaxed">
+                          {currentSector.untrustedCopy}
+                        </p>
+                        <div className="pt-2 border-t border-rose-200/80 space-y-1.5">
+                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-800 block">
+                            Triggered Interceptions:
+                          </span>
+                          {currentSector.violations.map((v, i) => (
+                            <div
+                              key={i}
+                              className="p-2 bg-white rounded-lg border border-rose-200 text-[11px] flex items-start space-x-2 shadow-2xs"
+                            >
+                              <span className="w-4 h-4 rounded-full bg-rose-600 text-white font-mono text-[9px] flex items-center justify-center shrink-0 mt-0.5 font-bold">
+                                !
+                              </span>
+                              <div>
+                                <span className="font-bold text-rose-900 line-through">
+                                  &quot;{v.term}&quot;
+                                </span>
+                                <p className="text-neutral-600 text-[10px] mt-0.5">{v.reason}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <p className="text-neutral-900 leading-relaxed font-sans text-xs sm:text-sm">
+                          {currentSector.cleanCopy}
+                        </p>
+                        <div className="p-3 bg-purple-50 rounded-xl border border-purple-200 text-[11px] text-purple-900 space-y-1 font-sans">
+                          <div className="flex items-center space-x-1.5 font-bold font-mono text-[10px] uppercase text-purple-800">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" />
+                            <span>Injected Statutory Disclosure</span>
+                          </div>
+                          <p className="text-neutral-700 italic text-[11px]">
+                            {currentSector.statutoryDisclosure}
+                          </p>
+                        </div>
+                        <div className="pt-2 border-t border-emerald-200 flex items-center justify-between text-[11px] font-mono text-neutral-600">
+                          <span className="text-emerald-700 font-bold flex items-center space-x-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Evidence Anchor Verified</span>
+                          </span>
+                          <span className="text-[10px] text-neutral-500 truncate max-w-[260px]">
+                            {currentSector.evidenceDoc}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Bottom Console Controls */}
+                <div className="pt-4 border-t border-neutral-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center space-x-2 text-[11px] font-mono text-neutral-600">
+                    <span className="w-2 h-2 rounded-full bg-purple-600" />
+                    <span>Latency: 0.03s</span>
+                    <span>•</span>
+                    <span className="text-purple-700 font-semibold">Zero False Assertions</span>
+                    <span>•</span>
+                    <span>SHA-256 Validated</span>
+                  </div>
+
+                  <Link
+                    href="/dashboard"
+                    className="inline-flex items-center space-x-1.5 bg-black hover:bg-neutral-800 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-xs active:scale-95 border border-purple-500/20"
+                  >
+                    <span>Deploy {currentSector.shortTag} Policies</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-purple-400" />
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
+        )}
 
-          {/* Solution 2: Healthcare & Life Sciences */}
-          <div className="glass-panel p-6 rounded-2xl border border-neutral-200 hover:border-purple-400 transition-all duration-300 space-y-3 group shadow-xs card-3d-hover">
-            <div className="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center font-bold shadow-xs group-hover:bg-purple-600 transition-colors">
-              <HeartPulse className="w-5 h-5 text-purple-400 group-hover:text-white transition-colors" />
-            </div>
-            <h3 className="text-sm font-bold text-black">Healthcare & Pharma</h3>
-            <p className="text-xs text-neutral-600 leading-relaxed">
-              Adheres to FDA 21 CFR Part 11 and advertising standards. Requires clinical evidence binding for therapeutic efficacy claims and blocks off-label promotional assertions.
-            </p>
-            <div className="pt-2 border-t border-neutral-100 flex flex-wrap gap-1.5 text-[10px] font-mono text-purple-700 font-semibold">
-              <span className="bg-purple-50 px-2 py-0.5 rounded border border-purple-200">FDA 21 CFR</span>
-              <span className="bg-purple-50 px-2 py-0.5 rounded border border-purple-200">Clinical Substantiation</span>
-            </div>
+        {/* High-Impact Proof Metric Strip */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-left">
+          <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 shadow-2xs space-y-1">
+            <span className="text-[10px] font-mono uppercase text-neutral-500 font-bold block">Regulatory Parity</span>
+            <span className="text-xl sm:text-2xl font-black font-mono text-black block">100% SEC/FDA</span>
+            <span className="text-[11px] text-neutral-500 block">Strict zero-hallucination boundary</span>
           </div>
-
-          {/* Solution 3: Enterprise B2B SaaS */}
-          <div className="glass-panel p-6 rounded-2xl border border-neutral-200 hover:border-purple-400 transition-all duration-300 space-y-3 group shadow-xs card-3d-hover">
-            <div className="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center font-bold shadow-xs group-hover:bg-purple-600 transition-colors">
-              <Building2 className="w-5 h-5 text-purple-400 group-hover:text-white transition-colors" />
-            </div>
-            <h3 className="text-sm font-bold text-black">Enterprise B2B SaaS</h3>
-            <p className="text-xs text-neutral-600 leading-relaxed">
-              Verifies SOC 2, ISO 27001, and SLA uptime assertions against corporate data. Prevents uncertified security claims and governs competitive comparison copy.
-            </p>
-            <div className="pt-2 border-t border-neutral-100 flex flex-wrap gap-1.5 text-[10px] font-mono text-purple-700 font-semibold">
-              <span className="bg-purple-50 px-2 py-0.5 rounded border border-purple-200">SOC 2 Alignment</span>
-              <span className="bg-purple-50 px-2 py-0.5 rounded border border-purple-200">SLA Verification</span>
-            </div>
+          <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 shadow-2xs space-y-1">
+            <span className="text-[10px] font-mono uppercase text-neutral-500 font-bold block">Avg Fine Prevented</span>
+            <span className="text-xl sm:text-2xl font-black font-mono text-purple-700 block">$4.2M / Yr</span>
+            <span className="text-[11px] text-neutral-500 block">Per institutional compliance audit</span>
           </div>
-
-          {/* Solution 4: Consumer & E-Commerce */}
-          <div className="glass-panel p-6 rounded-2xl border border-neutral-200 hover:border-purple-400 transition-all duration-300 space-y-3 group shadow-xs card-3d-hover">
-            <div className="w-10 h-10 rounded-xl bg-black text-white flex items-center justify-center font-bold shadow-xs group-hover:bg-purple-600 transition-colors">
-              <Briefcase className="w-5 h-5 text-purple-400 group-hover:text-white transition-colors" />
-            </div>
-            <h3 className="text-sm font-bold text-black">Consumer & Retail</h3>
-            <p className="text-xs text-neutral-600 leading-relaxed">
-              Complies with FTC Endorsement & Testimonial guides (16 CFR Part 255). Automatically audits influencer copy, environmental green claims, and discount veracity.
-            </p>
-            <div className="pt-2 border-t border-neutral-100 flex flex-wrap gap-1.5 text-[10px] font-mono text-purple-700 font-semibold">
-              <span className="bg-purple-50 px-2 py-0.5 rounded border border-purple-200">FTC 16 CFR</span>
-              <span className="bg-purple-50 px-2 py-0.5 rounded border border-purple-200">Greenwashing Shield</span>
-            </div>
+          <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 shadow-2xs space-y-1">
+            <span className="text-[10px] font-mono uppercase text-neutral-500 font-bold block">Deterministic Intercept</span>
+            <span className="text-xl sm:text-2xl font-black font-mono text-black block">&lt; 0.04s</span>
+            <span className="text-[11px] text-neutral-500 block">Real-time character offset matching</span>
+          </div>
+          <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 shadow-2xs space-y-1">
+            <span className="text-[10px] font-mono uppercase text-neutral-500 font-bold block">Evidence Audit Trail</span>
+            <span className="text-xl sm:text-2xl font-black font-mono text-purple-700 block">SHA-256</span>
+            <span className="text-[11px] text-neutral-500 block">Cryptographically immutable ledger</span>
           </div>
         </div>
       </section>
       </ScrollReveal>
 
       {/* ======================================================== */}
-      {/* 8. 3-Layered Defense Architecture */}
+      {/* 8. 3-Layered Defense Architecture (Interactive Blueprint) */}
       {/* ======================================================== */}
       <ScrollReveal delayMs={100}>
-      <section id="architecture" className="py-16 px-4 sm:px-8 max-w-6xl mx-auto space-y-10">
+      <section id="architecture" className="py-20 px-4 sm:px-8 max-w-6xl mx-auto space-y-10">
         <div className="text-center space-y-2 max-w-2xl mx-auto">
           <span className="text-xs font-mono uppercase tracking-widest text-purple-600 font-bold">
             Technical Architecture
@@ -954,102 +1328,231 @@ export default function LandingPage() {
             The 3-Layered Defense Architecture
           </h2>
           <p className="text-xs sm:text-sm text-neutral-600">
-            How Pineco achieves zero false assertions by decoupling deterministic regex guardrails from AI claim verification.
+            How Pineco achieves zero false assertions by decoupling sub-millisecond deterministic regex guardrails from grounded database fact verification.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Layer 1 */}
-          <div className="glass-panel p-6 rounded-3xl border border-neutral-200 hover:border-purple-400 transition shadow-xs card-3d-hover space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono font-bold bg-purple-50 border border-purple-200 text-purple-800 px-2 py-0.5 rounded">
-                LAYER 01
+        {/* Interactive Layer Switcher Bar */}
+        <div className="flex flex-wrap items-center justify-center gap-2 p-1.5 bg-neutral-100 rounded-2xl max-w-2xl mx-auto border border-neutral-200">
+          <button
+            type="button"
+            onClick={() => setActiveArchitectureLayer(1)}
+            className={`flex-1 min-w-[170px] py-2.5 px-3 rounded-xl text-xs font-mono font-bold transition flex items-center justify-center space-x-2 ${
+              activeArchitectureLayer === 1
+                ? 'bg-black text-white shadow-md'
+                : 'text-neutral-600 hover:text-black hover:bg-white/60'
+            }`}
+          >
+            <Zap className="w-3.5 h-3.5 text-purple-400" />
+            <span>Layer 1: Deterministic</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveArchitectureLayer(2)}
+            className={`flex-1 min-w-[170px] py-2.5 px-3 rounded-xl text-xs font-mono font-bold transition flex items-center justify-center space-x-2 ${
+              activeArchitectureLayer === 2
+                ? 'bg-black text-white shadow-md'
+                : 'text-neutral-600 hover:text-black hover:bg-white/60'
+            }`}
+          >
+            <Database className="w-3.5 h-3.5 text-purple-400" />
+            <span>Layer 2: Fact Vault</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveArchitectureLayer(3)}
+            className={`flex-1 min-w-[170px] py-2.5 px-3 rounded-xl text-xs font-mono font-bold transition flex items-center justify-center space-x-2 ${
+              activeArchitectureLayer === 3
+                ? 'bg-black text-white shadow-md'
+                : 'text-neutral-600 hover:text-black hover:bg-white/60'
+            }`}
+          >
+            <Lock className="w-3.5 h-3.5 text-purple-400" />
+            <span>Layer 3: Audit Ledger</span>
+          </button>
+        </div>
+
+        {/* Live Architecture Inspection Console */}
+        <div className="glass-panel rounded-3xl border border-neutral-300 shadow-xl overflow-hidden bg-white">
+          <div className="bg-black text-white px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs border-b border-neutral-800">
+            <div className="flex items-center space-x-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+              <span className="font-mono text-neutral-300 text-xs font-bold ml-2">
+                {activeArchitectureLayer === 1
+                  ? 'KERNEL // REGEX_DETERMINISTIC_INTERCEPTOR.PY [0.038ms]'
+                  : activeArchitectureLayer === 2
+                  ? 'KERNEL // FACT_GROUNDING_EVIDENCE_MATCHER.PY [STRICT_SCHEMA]'
+                  : 'KERNEL // CRYPTO_AUDIT_LEDGER_CHAIN.PY [SHA256_MUTEX]'}
               </span>
-              <span className="text-[11px] font-mono text-purple-600 font-bold">0.04s LATENCY</span>
             </div>
-            <div className="w-10 h-10 rounded-2xl bg-black text-white flex items-center justify-center font-bold border border-purple-500/30">
-              <Zap className="w-5 h-5 text-purple-400" />
-            </div>
-            <h3 className="text-base font-bold text-black">Deterministic Guardrail Engine</h3>
-            <p className="text-xs text-neutral-600 leading-relaxed">
-              Executes exact pattern matching with full Unicode normalization. Evaluates non-negotiable policies: prohibited terminology, required disclaimers, and suggested phrasing. <strong>Zero hallucination risk.</strong>
-            </p>
-            <ul className="text-[11px] font-mono text-neutral-600 space-y-1.5 pt-2 border-t border-neutral-100">
-              <li className="flex items-center space-x-1.5">
-                <Check className="w-3 h-3 text-purple-600" />
-                <span>Exact character offset boundary matching</span>
-              </li>
-              <li className="flex items-center space-x-1.5">
-                <Check className="w-3 h-3 text-purple-600" />
-                <span>Non-negotiable legal disclaimer injection</span>
-              </li>
-              <li className="flex items-center space-x-1.5">
-                <Check className="w-3 h-3 text-purple-600" />
-                <span>Preferred alternative word suggestions</span>
-              </li>
-            </ul>
+            <span className="text-[10px] font-mono text-purple-400 font-bold bg-neutral-900 px-2 py-0.5 rounded border border-neutral-800">
+              ZERO-HALLUCINATION GUARANTEE
+            </span>
           </div>
 
-          {/* Layer 2 */}
-          <div className="glass-panel p-6 rounded-3xl border border-neutral-200 hover:border-purple-400 transition shadow-xs card-3d-hover space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono font-bold bg-purple-50 border border-purple-200 text-purple-800 px-2 py-0.5 rounded">
-                LAYER 02
-              </span>
-              <span className="text-[11px] font-mono text-purple-600 font-bold">GROK-2 LLM</span>
-            </div>
-            <div className="w-10 h-10 rounded-2xl bg-black text-white flex items-center justify-center font-bold border border-purple-500/30">
-              <Sparkles className="w-5 h-5 text-purple-400" />
-            </div>
-            <h3 className="text-base font-bold text-black">Grounded Corporate Fact Vault</h3>
-            <p className="text-xs text-neutral-600 leading-relaxed">
-              Extracts discrete factual assertions using strict Pydantic JSON schemas. Claims are verified strictly against approved corporate evidence with active validity timestamps. Missing evidence defaults to <strong>Unverified</strong>.
-            </p>
-            <ul className="text-[11px] font-mono text-neutral-600 space-y-1.5 pt-2 border-t border-neutral-100">
-              <li className="flex items-center space-x-1.5">
-                <Check className="w-3 h-3 text-purple-600" />
-                <span>Evidence-before-assertion principle</span>
-              </li>
-              <li className="flex items-center space-x-1.5">
-                <Check className="w-3 h-3 text-purple-600" />
-                <span>Database ID verification (rejects fake citations)</span>
-              </li>
-              <li className="flex items-center space-x-1.5">
-                <Check className="w-3 h-3 text-purple-600" />
-                <span>Supported / Contradicted / Unverified status</span>
-              </li>
-            </ul>
-          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-neutral-200">
+            {/* Left Column: Architectural Specs (5 cols) */}
+            <div className="lg:col-span-5 p-6 bg-neutral-50/50 space-y-4 text-left">
+              {activeArchitectureLayer === 1 && (
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2 text-[10px] font-mono text-purple-700 font-bold uppercase">
+                    <Zap className="w-3.5 h-3.5 text-purple-600" />
+                    <span>Layer 01: Sub-Millisecond Gate</span>
+                  </div>
+                  <h3 className="text-base font-bold text-black">Deterministic Guardrail Engine</h3>
+                  <p className="text-xs text-neutral-600 leading-relaxed">
+                    Evaluates non-negotiable legal and brand policies using exact regular expressions with Unicode NFKC normalization. Intercepts forbidden phrasing, calculates exact start and end offsets, and injects compliant replacements in microseconds.
+                  </p>
+                  <ul className="text-xs space-y-2 pt-2 border-t border-neutral-200 font-mono text-neutral-700">
+                    <li className="flex items-center space-x-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      <span>Exact character boundary matching (\b)</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      <span>Mandatory statutory disclaimer verification</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      <span>Zero LLM dependency = 0.00% hallucination</span>
+                    </li>
+                  </ul>
+                </div>
+              )}
 
-          {/* Layer 3 */}
-          <div className="glass-panel p-6 rounded-3xl border border-neutral-200 hover:border-purple-400 transition shadow-xs card-3d-hover space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono font-bold bg-purple-50 border border-purple-200 text-purple-800 px-2 py-0.5 rounded">
-                LAYER 03
-              </span>
-              <span className="text-[11px] font-mono text-purple-600 font-bold">SHA-256 LEDGER</span>
+              {activeArchitectureLayer === 2 && (
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2 text-[10px] font-mono text-purple-700 font-bold uppercase">
+                    <Database className="w-3.5 h-3.5 text-purple-600" />
+                    <span>Layer 02: Truth-in-Evidence Gate</span>
+                  </div>
+                  <h3 className="text-base font-bold text-black">Grounded Corporate Fact Vault</h3>
+                  <p className="text-xs text-neutral-600 leading-relaxed">
+                    Enforces the strict &quot;Evidence before assertion&quot; mandate. The AI provider is constrained by Pydantic JSON schemas. Every claim must cite an active, non-expired fact record from the corporate database. Hallucinated IDs are discarded at the boundary.
+                  </p>
+                  <ul className="text-xs space-y-2 pt-2 border-t border-neutral-200 font-mono text-neutral-700">
+                    <li className="flex items-center space-x-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      <span>Strict Pydantic JSON schema output parsing</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      <span>Database ID integrity check (rejects fake citations)</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      <span>Conservative default: Unbacked claims &rarr; Unverified</span>
+                    </li>
+                  </ul>
+                </div>
+              )}
+
+              {activeArchitectureLayer === 3 && (
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2 text-[10px] font-mono text-purple-700 font-bold uppercase">
+                    <Lock className="w-3.5 h-3.5 text-purple-600" />
+                    <span>Layer 03: Accountability & Integrity</span>
+                  </div>
+                  <h3 className="text-base font-bold text-black">Human Gatekeeper & Audit Ledger</h3>
+                  <p className="text-xs text-neutral-600 leading-relaxed">
+                    Automated analysis never equals approval. Human reviewers execute legally binding sign-offs. If a reviewer overrides an automated warning, the system strictly mandates a written compliance rationale permanently recorded in an append-only audit trail.
+                  </p>
+                  <ul className="text-xs space-y-2 pt-2 border-t border-neutral-200 font-mono text-neutral-700">
+                    <li className="flex items-center space-x-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      <span>Cryptographic SHA-256 content version hash</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      <span>Mandatory written business rationale on overrides</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                      <span>Tamper-evident append-only compliance record</span>
+                    </li>
+                  </ul>
+                </div>
+              )}
             </div>
-            <div className="w-10 h-10 rounded-2xl bg-black text-white flex items-center justify-center font-bold border border-purple-500/30">
-              <Lock className="w-5 h-5 text-purple-400" />
+
+            {/* Right Column: Live Terminal Code & Data Stream (7 cols) */}
+            <div className="lg:col-span-7 p-6 bg-neutral-950 text-neutral-200 font-mono text-xs leading-relaxed text-left flex flex-col justify-between overflow-x-auto min-h-[280px]">
+              {activeArchitectureLayer === 1 && (
+                <div className="space-y-2 text-[11px]">
+                  <div className="text-neutral-500">// Deterministic pattern interception engine trace:</div>
+                  <div className="text-purple-400">&gt; pineco.engine.deterministic.run_rules(content_text, rules)</div>
+                  <div className="text-neutral-400">
+                    [0.038ms] UNICODE_NORMALIZE: NFKC encoding verified (4,821 chars)
+                  </div>
+                  <div className="text-rose-400">
+                    [ALERT] PATTERN_INTERCEPT: \b(guarantee|100%|risk-free)\b
+                  </div>
+                  <div className="text-neutral-300">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EXCERPT: &quot;...with completely 100% guaranteed elimination of...&quot;
+                  </div>
+                  <div className="text-neutral-300">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OFFSETS: [start: 24, end: 39] | RULE_ID: &quot;rule-001&quot; | SEVERITY: &quot;high&quot;
+                  </div>
+                  <div className="text-emerald-400">
+                    [REMEDY] REPLACEMENT_SUGGESTION: &quot;proven approach&quot;
+                  </div>
+                  <div className="text-neutral-500 pt-2 border-t border-neutral-800">
+                    STATUS: Findings emitted with 0% LLM latency. Regex pre-flight pass complete.
+                  </div>
+                </div>
+              )}
+
+              {activeArchitectureLayer === 2 && (
+                <div className="space-y-2 text-[11px]">
+                  <div className="text-neutral-500">// Database Fact Vault & Evidence Grounding Verification:</div>
+                  <div className="text-purple-400">&gt; SELECT * FROM approved_facts WHERE workspace_id = &apos;ws-enterprise&apos;</div>
+                  <div className="bg-neutral-900/90 p-3 rounded-lg border border-neutral-800 text-neutral-300 space-y-1">
+                    <div>&#123;</div>
+                    <div className="pl-4 text-emerald-400">&quot;claim_text&quot;: &quot;Certified 99.9% Uptime Cloud SLA&quot;,</div>
+                    <div className="pl-4 text-purple-300">&quot;evidence_status&quot;: &quot;supported&quot;,</div>
+                    <div className="pl-4 text-neutral-400">&quot;fact_id&quot;: &quot;fact-sla-999-001&quot;,</div>
+                    <div className="pl-4 text-neutral-400">&quot;source_title&quot;: &quot;SOC-2 Type II Independent Audit Report&quot;,</div>
+                    <div className="pl-4 text-neutral-400">&quot;valid_until&quot;: &quot;2027-12-31T23:59:59Z&quot;,</div>
+                    <div className="pl-4 text-neutral-400">&quot;confidence_score&quot;: 1.0</div>
+                    <div>&#125;</div>
+                  </div>
+                  <div className="text-neutral-400">
+                    [VERIFY] Database foreign key validated: `fact_id` exists in `approved_facts` table.
+                  </div>
+                  <div className="text-emerald-400">
+                    [RESULT] Claim certified as supported against primary evidence.
+                  </div>
+                </div>
+              )}
+
+              {activeArchitectureLayer === 3 && (
+                <div className="space-y-2 text-[11px]">
+                  <div className="text-neutral-500">// Cryptographic Audit Trail & Immutability Ledger:</div>
+                  <div className="text-purple-400">&gt; pineco.models.AuditEvent.record(entity=&apos;submission&apos;, action=&apos;approved&apos;)</div>
+                  <div className="space-y-1 text-neutral-300">
+                    <div>BLOCK SEQUENCE: #008821 // STATE: COMMITTED & SEALED</div>
+                    <div className="text-purple-300">
+                      CONTENT_SHA256: 7f8c9a3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b
+                    </div>
+                    <div>SIGNER: usr-reviewer-marcus (Brand Governance Director)</div>
+                    <div className="text-emerald-400">DECISION: APPROVED_FOR_DISTRIBUTION</div>
+                    <div className="text-neutral-400">
+                      RATIONALE: &quot;Reviewed against Q4 Legal Guidelines. Safe-harbor disclaimer verified.&quot;
+                    </div>
+                    <div className="text-neutral-500">
+                      MUTEX: Immutable record. Prior versions (v1, v2) archived in append-only store.
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="pt-3 border-t border-neutral-800 flex items-center justify-between text-[10px] text-neutral-500">
+                <span>PINECO SECURITY STANDARD: FIPS-180-4 / SOC 2 / HIPAA SAFE HARBOR</span>
+                <span className="text-purple-400">AUDIT READY</span>
+              </div>
             </div>
-            <h3 className="text-base font-bold text-black">Human Gatekeeper & Audit Ledger</h3>
-            <p className="text-xs text-neutral-600 leading-relaxed">
-              Automated review never equals approval. Human reviewers execute binding decisions. Overriding any automated warning strictly mandates a written compliance rationale recorded in the append-only audit trail.
-            </p>
-            <ul className="text-[11px] font-mono text-neutral-600 space-y-1.5 pt-2 border-t border-neutral-100">
-              <li className="flex items-center space-x-1.5">
-                <Check className="w-3 h-3 text-purple-600" />
-                <span>Cryptographic SHA-256 content hashes</span>
-              </li>
-              <li className="flex items-center space-x-1.5">
-                <Check className="w-3 h-3 text-purple-600" />
-                <span>Mandatory human rationale on overrides</span>
-              </li>
-              <li className="flex items-center space-x-1.5">
-                <Check className="w-3 h-3 text-purple-600" />
-                <span>Permanent immutable compliance record</span>
-              </li>
-            </ul>
           </div>
         </div>
       </section>
