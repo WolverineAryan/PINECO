@@ -11,7 +11,6 @@ import {
   UserCheck,
   Menu,
   X,
-  Copy,
   Check,
   ChevronDown,
   Folder,
@@ -41,7 +40,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   } = useRole();
   const { success } = useToast();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [copiedWs, setCopiedWs] = useState(false);
   const [showCreateProduct, setShowCreateProduct] = useState(false);
   const [showScanCopy, setShowScanCopy] = useState(false);
   const [roleMenuOpen, setRoleMenuOpen] = useState(false);
@@ -57,13 +55,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-
-  const copyWorkspace = () => {
-    navigator.clipboard.writeText(workspaceId);
-    setCopiedWs(true);
-    success('Workspace ID Copied', workspaceId);
-    setTimeout(() => setCopiedWs(false), 2000);
-  };
 
   const navItems = [
     { label: 'Compliance Overview', href: '/dashboard', icon: LayoutDashboard },
@@ -291,29 +282,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </div>
               )}
             </div>
-
-            <div className="hidden sm:flex items-center space-x-2 bg-purple-100/80 border border-purple-300 px-3 py-1 rounded-full text-[10px] font-mono font-bold text-purple-950 shadow-xs">
-              <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse" />
-              <span>SENTINEL ONLINE</span>
-            </div>
-
-            <button
-              onClick={copyWorkspace}
-              title="Copy active Workspace ID"
-              className="hidden md:flex items-center space-x-1.5 text-[11px] font-mono text-neutral-600 hover:text-purple-700 border border-neutral-200 hover:border-purple-300 bg-white px-2.5 py-1.5 rounded-xl transition"
-            >
-              {copiedWs ? (
-                <>
-                  <Check className="w-3 h-3 text-purple-600" />
-                  <span className="text-purple-600 font-bold">Copied</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-3 h-3 text-neutral-400" />
-                  <span>WS: {workspaceId.slice(0, 8)}...</span>
-                </>
-              )}
-            </button>
 
             <button
               onClick={() => setShowScanCopy(true)}
