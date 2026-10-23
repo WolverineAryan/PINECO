@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   ShieldCheck,
   Sparkles,
@@ -332,8 +333,23 @@ const RBAC_ROLES = [
 ];
 
 export default function LandingPage() {
-  const { openAuthModal } = useRole();
+  const router = useRouter();
+  const { openAuthModal, loginWithCredentials, setActiveProduct } = useRole();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
+
+  const handleDemoAccess = async () => {
+    try {
+      setIsDemoLoading(true);
+      await loginWithCredentials('reviewer@pineco.internal', 'pineco2026!');
+      setActiveProduct(null);
+      router.push('/dashboard');
+    } catch {
+      router.push('/dashboard');
+    } finally {
+      setIsDemoLoading(false);
+    }
+  };
 
   // Live Interactive Hero Sandbox State
   const scenarios = [
@@ -533,19 +549,20 @@ export default function LandingPage() {
           <div className="flex items-center space-x-3">
             <button
               onClick={() => openAuthModal('signin')}
-              className="text-xs font-bold text-black hover:text-purple-700 hover:bg-purple-50 border border-neutral-300 hover:border-purple-300 px-4 py-2 rounded-xl transition shadow-xs flex items-center space-x-1.5"
+              className="text-xs font-bold text-black hover:text-purple-700 hover:bg-purple-50 border border-neutral-300 hover:border-purple-300 px-3.5 py-2 rounded-xl transition shadow-xs flex items-center space-x-1.5"
             >
               <Lock className="w-3.5 h-3.5 text-neutral-500" />
               <span>Sign In</span>
             </button>
-            <Link
-              href="/dashboard"
+            <button
+              onClick={handleDemoAccess}
+              disabled={isDemoLoading}
               className="flex items-center space-x-1.5 bg-black hover:bg-neutral-900 text-white text-xs font-bold px-4 sm:px-5 py-2.5 rounded-xl shadow-xs transition active:scale-95 hover:shadow-[0_0_25px_-3px_rgba(124,58,237,0.4)] border border-purple-500/20"
             >
-              <Zap className="w-3.5 h-3.5 text-purple-400" />
-              <span>Launch Platform</span>
+              <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+              <span>{isDemoLoading ? 'Opening Demo...' : 'Live Demo (20 Entries)'}</span>
               <ArrowRight className="w-3.5 h-3.5 text-purple-400 hidden sm:inline" />
-            </Link>
+            </button>
           </div>
         </div>
       </nav>
@@ -583,21 +600,25 @@ export default function LandingPage() {
 
             {/* Hero CTAs (TopperCode signature pill style) */}
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                href="/dashboard"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 text-sm font-semibold text-white bg-black hover:bg-neutral-900 active:bg-neutral-800 rounded-full shadow-lg shadow-black/20 hover:shadow-purple-500/25 transition-all group active:scale-95"
+              <button
+                onClick={handleDemoAccess}
+                disabled={isDemoLoading}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 text-sm font-bold text-white bg-black hover:bg-neutral-900 active:bg-neutral-800 rounded-full shadow-lg shadow-black/20 hover:shadow-purple-500/25 transition-all group active:scale-95 border border-purple-500/30"
               >
-                <span className="leading-none">Launch Command Center</span>
+                <Sparkles className="w-4 h-4 text-purple-400" />
+                <span className="leading-none">
+                  {isDemoLoading ? 'Opening Demo...' : 'Explore Demo Account (20 Entries)'}
+                </span>
                 <span className="w-5 h-5 rounded-full bg-white/20 inline-flex items-center justify-center group-hover:translate-x-0.5 transition-transform shrink-0">
                   <ArrowRight className="w-3 h-3 text-white" />
                 </span>
-              </Link>
+              </button>
               <button
-                onClick={() => openAuthModal('signup')}
+                onClick={() => openAuthModal('signin')}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 text-sm font-semibold text-neutral-700 hover:text-black bg-white hover:bg-neutral-50 active:bg-neutral-100 border border-neutral-200 rounded-full shadow-sm transition-all active:scale-95"
               >
                 <Lock className="w-3.5 h-3.5 text-purple-600 shrink-0" />
-                <span className="leading-none">Create Account (JWT)</span>
+                <span className="leading-none">Sign In / Switch Role</span>
               </button>
             </div>
 
@@ -2431,12 +2452,15 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
-            <Link
-              href="/dashboard"
-              className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-8 py-3.5 rounded-xl shadow-md transition active:scale-95 hover:shadow-[0_0_25px_rgba(124,58,237,0.5)] border border-purple-400/40"
+            <button
+              onClick={handleDemoAccess}
+              disabled={isDemoLoading}
+              className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-8 py-3.5 rounded-xl shadow-md transition active:scale-95 hover:shadow-[0_0_25px_rgba(124,58,237,0.5)] border border-purple-400/40 inline-flex items-center justify-center gap-2"
             >
-              Open Command Center &rarr;
-            </Link>
+              <Sparkles className="w-4 h-4 text-white" />
+              <span>{isDemoLoading ? 'Loading Demo Workspace...' : 'Explore Demo Account (20 Entries)'}</span>
+              <ArrowRight className="w-3.5 h-3.5 text-white" />
+            </button>
             <button
               onClick={() => openAuthModal('signin')}
               className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-semibold text-xs px-6 py-3.5 rounded-xl transition border border-white/20"

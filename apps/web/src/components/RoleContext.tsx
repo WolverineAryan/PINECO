@@ -153,9 +153,9 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       if (list.length > 0) {
         setActiveProduct((prev) => {
           if (prev && list.some((p) => p.id === prev.id)) {
-            return list.find((p) => p.id === prev.id) || list[0];
+            return list.find((p) => p.id === prev.id) || null;
           }
-          return list[0];
+          return null;
         });
       } else {
         setActiveProduct(null);

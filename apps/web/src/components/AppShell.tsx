@@ -106,34 +106,33 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           <div className="relative">
             <select
-              value={activeProduct?.id || ''}
+              value={activeProduct?.id || 'all'}
               onChange={(e) => {
-                const found = products.find((p) => p.id === e.target.value);
-                if (found) setActiveProduct(found);
+                if (e.target.value === 'all' || !e.target.value) {
+                  setActiveProduct(null);
+                } else {
+                  const found = products.find((p) => p.id === e.target.value);
+                  if (found) setActiveProduct(found);
+                }
               }}
               className="w-full text-xs font-bold text-black bg-white border border-neutral-300 hover:border-black rounded-xl px-2.5 py-2 appearance-none focus:outline-none focus:ring-1 focus:ring-purple-600 focus:border-purple-600 cursor-pointer shadow-xs pr-7 truncate transition"
             >
-              {products.length === 0 ? (
-                <option value="">(No product workspaces)</option>
-              ) : (
-                products.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))
-              )}
+              <option value="all">All Products (16 Portfolios)</option>
+              {products.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
             </select>
             <ChevronDown className="w-3.5 h-3.5 text-neutral-400 absolute right-2.5 top-3 pointer-events-none" />
           </div>
 
-          {activeProduct && (
-            <div className="text-[10px] text-neutral-500 font-mono truncate px-1 flex items-center justify-between">
-              <span>{activeProduct.category}</span>
-              <span className="text-[10px] bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.2 rounded-full font-bold">
-                Active Scope
-              </span>
-            </div>
-          )}
+          <div className="text-[10px] text-neutral-500 font-mono truncate px-1 flex items-center justify-between">
+            <span>{activeProduct ? activeProduct.category : 'All 16 Enterprise Portfolios'}</span>
+            <span className="text-[10px] bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.2 rounded-full font-bold">
+              {activeProduct ? 'Active Scope' : '20 Entries'}
+            </span>
+          </div>
         </div>
 
         {/* Navigation Items */}
@@ -299,14 +298,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="pb-2 border-b border-neutral-100">
               <span className="text-[10px] font-mono text-neutral-400 block mb-1">Active Product:</span>
               <select
-                value={activeProduct?.id || ''}
+                value={activeProduct?.id || 'all'}
                 onChange={(e) => {
-                  const found = products.find((p) => p.id === e.target.value);
-                  if (found) setActiveProduct(found);
+                  if (e.target.value === 'all' || !e.target.value) {
+                    setActiveProduct(null);
+                  } else {
+                    const found = products.find((p) => p.id === e.target.value);
+                    if (found) setActiveProduct(found);
+                  }
                   setMobileMenuOpen(false);
                 }}
                 className="w-full text-xs font-bold p-2 border border-neutral-300 rounded-lg text-black bg-white"
               >
+                <option value="all">All Products (16 Portfolios)</option>
                 {products.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}

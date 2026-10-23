@@ -78,11 +78,11 @@ def get_dashboard_summary(
         else:
             findings_by_category[c] = count
 
-    # Recent submissions
+    # Recent submissions (supports 20+ entries for rich demo and volume tracking)
     recent_subs_q = db.query(Submission).filter(Submission.workspace_id == ws_id)
     if product_id:
         recent_subs_q = recent_subs_q.filter(Submission.product_id == product_id)
-    recent_subs = recent_subs_q.order_by(Submission.updated_at.desc()).limit(5).all()
+    recent_subs = recent_subs_q.order_by(Submission.updated_at.desc()).limit(25).all()
 
     # Recent audit events
     recent_audits = (

@@ -97,15 +97,15 @@ export default function ProductComplianceDashboard() {
               Active Compliance Folder:
             </span>
             <span className="text-[10px] font-mono bg-purple-50 border border-purple-200 text-purple-700 font-bold px-2.5 py-0.5 rounded-full">
-              {activeProduct?.category || 'General'}
+              {activeProduct ? activeProduct.category : 'All 16 Enterprise Portfolios'}
             </span>
           </div>
           <h1 className="text-xl sm:text-2xl font-black text-black tracking-tight flex items-center space-x-2">
             <Folder className="w-5 h-5 text-neutral-700" />
-            <span>{activeProduct?.name || 'All Workspace Assets'}</span>
+            <span>{activeProduct?.name || 'All Products (20 Compliance Entries)'}</span>
           </h1>
           <p className="text-xs text-neutral-500 max-w-xl">
-            {activeProduct?.description || 'Brand compliance guidelines, approved facts, and content review history.'}
+            {activeProduct?.description || 'Unified governance overview tracking 20 pre-seeded compliance entries, 12 statutory brand guardrails, and 9 approved evidence facts across 16 enterprise products.'}
           </p>
         </div>
 

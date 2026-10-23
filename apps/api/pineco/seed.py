@@ -719,6 +719,204 @@ def seed_database(db: Session) -> None:
             "rationale": "NYDFS compliance checklist passed. Qualified custody segregation clause confirmed.",
             "reviewer": settings.DEFAULT_USER_REVIEWER,
         },
+        # 11. ClaimGuard Actuarial Underwriting Platform Brief (Approved)
+        {
+            "id": "sub-insur-approved",
+            "product_id": "prod-insur-claim",
+            "title": "ClaimGuard Commercial Property Underwriting Overview",
+            "channel": "website",
+            "created_by": settings.DEFAULT_USER_CREATOR,
+            "status": "approved",
+            "created_offset": timedelta(days=2, hours=4),
+            "updated_offset": timedelta(days=1, hours=1),
+            "text": (
+                "ClaimGuard underwrites commercial property risks using real-time catastrophe models verified against certified actuarial loss records. "
+                "All policies subject to underwriting eligibility and statutory state insurance filing approval."
+            ),
+            "decision": "approved",
+            "rationale": "State statutory insurance filing disclosures confirmed. Actuarial modeling statements verified against certified loss records.",
+            "reviewer": settings.DEFAULT_USER_REVIEWER,
+        },
+        # 12. CognitiveTutor University AI Curriculum Guide (In Review)
+        {
+            "id": "sub-edu-inreview",
+            "product_id": "prod-edu-tutor",
+            "title": "CognitiveTutor Higher-Ed Adaptive Pedagogy Guide",
+            "channel": "blog",
+            "created_by": settings.DEFAULT_USER_CREATOR,
+            "status": "in_review",
+            "created_offset": timedelta(hours=5),
+            "updated_offset": timedelta(hours=2),
+            "text": (
+                "CognitiveTutor provides adaptive Socratic dialogue support for university STEM faculty. "
+                "The platform complies fully with FERPA student privacy regulations and does not use student submissions for model retraining."
+            ),
+            "decision": None,
+            "reviewer": None,
+        },
+        # 13. Horizon5G Carrier Private Cellular Release (Changes Requested)
+        {
+            "id": "sub-telecom-changes",
+            "product_id": "prod-telecom-5g",
+            "title": "Horizon5G Industrial Private Cellular Deployment PR",
+            "channel": "press_release",
+            "created_by": settings.DEFAULT_USER_CREATOR,
+            "status": "changes_requested",
+            "created_offset": timedelta(hours=7),
+            "updated_offset": timedelta(hours=3),
+            "text": (
+                "Horizon5G delivers infinite wireless bandwidth with absolute 100% zero packet loss for industrial robotics facilities! "
+                "Guaranteed to eliminate all network downtime forever across enterprise factory floors."
+            ),
+            "decision": "changes_requested",
+            "rationale": "Prohibited absolute terms 'infinite wireless bandwidth', '100% zero packet loss', and 'eliminate all network downtime forever'. Replace with certified SLA benchmarks.",
+            "reviewer": settings.DEFAULT_USER_REVIEWER,
+            "findings": [
+                {
+                    "category": "terminology",
+                    "severity": "high",
+                    "excerpt": "infinite wireless bandwidth with absolute 100% zero packet loss",
+                    "explanation": "Absolute reliability and bandwidth claims violate brand governance standards.",
+                    "rule_id": "rule-demo-001",
+                    "suggested_correction": "Specify verified 99.999% packet delivery SLA benchmark.",
+                }
+            ],
+        },
+        # 14. OrbitLink Inter-Satellite Optical Cross-Link Whitepaper (Approved)
+        {
+            "id": "sub-space-approved",
+            "product_id": "prod-space-orbit",
+            "title": "OrbitLink Optical Cross-Link Technical Specifications",
+            "channel": "website",
+            "created_by": settings.DEFAULT_USER_CREATOR,
+            "status": "approved",
+            "created_offset": timedelta(days=3, hours=8),
+            "updated_offset": timedelta(days=2, hours=12),
+            "text": (
+                "OrbitLink inter-satellite cross-links achieve 100 Gbps optical transmission in sun-synchronous polar orbits. "
+                "Compliant with ITU spectrum allocations and orbital debris mitigation guidelines."
+            ),
+            "decision": "approved",
+            "rationale": "ITU spectrum and orbital compliance references verified by aerospace engineering.",
+            "reviewer": settings.DEFAULT_USER_REVIEWER,
+        },
+        # 15. LexisTrust Privileged Document Review Technical Memo (Approved)
+        {
+            "id": "sub-legal-approved",
+            "product_id": "prod-legal-lexis",
+            "title": "LexisTrust Statutory Privilege Classification Memo",
+            "channel": "internal",
+            "created_by": settings.DEFAULT_USER_CREATOR,
+            "status": "approved",
+            "created_offset": timedelta(days=1, hours=6),
+            "updated_offset": timedelta(hours=14),
+            "text": (
+                "LexisTrust accelerates regulatory compliance document discovery with deterministic privilege classification and end-to-end cryptographic audit trails. "
+                "This technical brief does not constitute formal legal counsel or create an attorney-client relationship."
+            ),
+            "decision": "approved",
+            "rationale": "Non-legal counsel disclaimer attached. Privilege classification metrics confirmed.",
+            "reviewer": settings.DEFAULT_USER_REVIEWER,
+        },
+        # 16. VoltSync Distributed Battery Grid Dispatch Report (In Review)
+        {
+            "id": "sub-energy-inreview",
+            "product_id": "prod-energy-grid",
+            "title": "VoltSync Commercial Battery Grid Dispatch Performance",
+            "channel": "blog",
+            "created_by": settings.DEFAULT_USER_CREATOR,
+            "status": "in_review",
+            "created_offset": timedelta(hours=8),
+            "updated_offset": timedelta(hours=4),
+            "text": (
+                "VoltSync aggregates 45 MW of commercial battery storage assets for automated regional grid frequency stabilization. "
+                "Interconnection agreements executed with certified regional transmission operators."
+            ),
+            "decision": None,
+            "reviewer": None,
+        },
+        # 17. Pineco Core Disclaimers Feature Announcement (Changes Requested)
+        {
+            "id": "sub-core-revisions",
+            "product_id": "prod-pineco-core",
+            "title": "Pineco Automated Regulatory Disclaimer Engine Social Blast",
+            "channel": "social",
+            "created_by": settings.DEFAULT_USER_CREATOR,
+            "status": "changes_requested",
+            "created_offset": timedelta(hours=9),
+            "updated_offset": timedelta(hours=2),
+            "text": (
+                "Never worry about compliance again! Pineco guarantees you will never be fined by any regulatory agency in the world with our magic AI software. "
+                "Eliminate all human lawyers today."
+            ),
+            "decision": "changes_requested",
+            "rationale": "Extreme brand violation: absolute promise 'guarantees you will never be fined' and disparaging language 'eliminate all human lawyers'.",
+            "reviewer": settings.DEFAULT_USER_REVIEWER,
+            "findings": [
+                {
+                    "category": "terminology",
+                    "severity": "high",
+                    "excerpt": "guarantees you will never be fined by any regulatory agency in the world",
+                    "explanation": "Absolute liability exclusion promise prohibited under enterprise risk guidelines.",
+                    "rule_id": "rule-demo-001",
+                    "suggested_correction": "Replace with 'Pineco helps mitigate regulatory compliance risk across marketing workflows'.",
+                }
+            ],
+        },
+        # 18. AlphaVault Treasury Cash Management Compliance Note (Approved)
+        {
+            "id": "sub-fintech-approved",
+            "product_id": "prod-fintech-alpha",
+            "title": "AlphaVault Treasury Repo Collateralization Compliance Brief",
+            "channel": "email",
+            "created_by": settings.DEFAULT_USER_CREATOR,
+            "status": "approved",
+            "created_offset": timedelta(days=2),
+            "updated_offset": timedelta(hours=16),
+            "text": (
+                "AlphaVault institutional liquidity accounts provide overnight repo collateralization backed by short-dated Tier-1 US Treasuries. "
+                "Past performance is not indicative of future results. Yields are variable and subject to capital market fluctuations."
+            ),
+            "decision": "approved",
+            "rationale": "SEC Rule 206(4)-1 disclaimer included. Tier-1 Treasury collateralization matches independent BDO attestation.",
+            "reviewer": settings.DEFAULT_USER_REVIEWER,
+        },
+        # 19. CardioPulse FDA 510(k) Clearance Regulatory Press Release (Approved)
+        {
+            "id": "sub-health-approved",
+            "product_id": "prod-health-cardio",
+            "title": "CardioPulse FDA 510(k) Regulatory Clearance Announcement",
+            "channel": "press_release",
+            "created_by": settings.DEFAULT_USER_CREATOR,
+            "status": "approved",
+            "created_offset": timedelta(days=1, hours=12),
+            "updated_offset": timedelta(hours=8),
+            "text": (
+                "CardioPulse BioMonitor receives FDA 510(k) clearance (K240981) for continuous hospital remote cardiac telemetry tracking. "
+                "Caution: Device is intended for remote monitoring under clinical physician supervision."
+            ),
+            "decision": "approved",
+            "rationale": "FDA 510(k) clearance number K240981 verified. Statutory clinical supervision disclaimer present.",
+            "reviewer": settings.DEFAULT_USER_REVIEWER,
+        },
+        # 20. VerdePack Circular Polymers Packaging Case Study (Approved)
+        {
+            "id": "sub-retail-approved",
+            "product_id": "prod-retail-green",
+            "title": "VerdePack Certified 34% Decarbonized Packaging Case Study",
+            "channel": "website",
+            "created_by": settings.DEFAULT_USER_CREATOR,
+            "status": "approved",
+            "created_offset": timedelta(days=2, hours=18),
+            "updated_offset": timedelta(hours=20),
+            "text": (
+                "VerdePack Circular Polymers reduce lifecycle carbon emissions by 34% compared to virgin petrochemical resin. "
+                "Verified according to ISO 14044 third-party life cycle assessment report LCA-SGS-2026-88."
+            ),
+            "decision": "approved",
+            "rationale": "FTC Green Guides compliant. References third-party ISO 14044 certified LCA report.",
+            "reviewer": settings.DEFAULT_USER_REVIEWER,
+        },
     ]
 
     for sub_item in demo_submissions:
