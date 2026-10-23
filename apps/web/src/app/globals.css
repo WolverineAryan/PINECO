@@ -317,3 +317,36 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: #7C3AED;
 }
+
+/* Continuous Infinite Marquee Ticker (inspired by toppercode.online) */
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 32s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* TopperCode signature card hover system */
+.topper-card-hover {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.25s ease;
+}
+
+.topper-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -15px rgba(124, 58, 237, 0.16), 0 0 20px rgba(124, 58, 237, 0.12);
+  border-color: rgba(124, 58, 237, 0.45);
+}
+

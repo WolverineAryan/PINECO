@@ -50,6 +50,7 @@ import {
 import { useRole } from '@/components/RoleContext';
 import { ScrollProgressBar } from '@/components/ScrollProgressBar';
 import { ScrollReveal } from '@/components/ScrollReveal';
+import { InteractiveFluidCanvas } from '@/components/InteractiveFluidCanvas';
 
 const SECTORS_DATA = [
   {
@@ -197,6 +198,19 @@ const SECTORS_DATA = [
     statutoryDisclosure: 'Lifecycle assessment audited in accordance with ISO 14044 protocols. Full carbon verification on file.',
     evidenceDoc: 'Verified against ISO 14044 Third-Party LCA Verification #LCA-8812',
   },
+];
+
+const MARQUEE_ITEMS = [
+  { title: 'SEC Rule 206(4)-1', category: 'Investment Marketing' },
+  { title: 'FDA 21 CFR Part 11', category: 'Electronic Records' },
+  { title: 'FINRA Rule 2210', category: 'Communications with Public' },
+  { title: 'SOC 2 Type II', category: 'Security & Confidentiality' },
+  { title: 'FTC 16 CFR Part 255', category: 'Endorsement & Claims' },
+  { title: 'ISO/IEC 27001:2022', category: 'ISMS Certified' },
+  { title: 'Zero-Retention Enclave', category: 'Contractual DPA' },
+  { title: 'SHA-256 Merkle Chain', category: 'Cryptographic Ledger' },
+  { title: 'Deterministic Intercept <0.04s', category: 'Zero Latency' },
+  { title: 'Role-Scoped JWT Sessions', category: 'Multi-Tenant RBAC' },
 ];
 
 const RBAC_ROLES = [
@@ -537,64 +551,94 @@ export default function LandingPage() {
       </nav>
 
       {/* ======================================================== */}
-      {/* 3. Hero Section with 3D Console & Fluid Aura */}
+      {/* 3. Hero Section with TopperCode-Inspired Physics Fluid Canvas */}
       {/* ======================================================== */}
-      <section className="relative pt-12 pb-20 px-4 sm:px-8 max-w-7xl mx-auto text-center space-y-8 overflow-hidden">
-       
-        {/* Primary Hero Typography with Purple Gradient Text */}
-        <div className="space-y-4 max-w-4xl mx-auto">
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-black leading-[1.08]">
-            Before You Publish Marketing Copy,{' '}
-            <span className="relative inline-block">
-              <span className="relative z-10 bg-gradient-to-r from-purple-700 via-purple-600 to-indigo-600 bg-clip-text text-transparent underline decoration-purple-500/40 underline-offset-8">
+      <section className="pt-6 sm:pt-12 pb-10 sm:pb-16 px-2.5 sm:px-6 bg-white">
+        <div className="max-w-7xl mx-auto rounded-3xl sm:rounded-[2.5rem] border border-neutral-200 bg-white px-3.5 sm:px-10 pt-10 sm:pt-20 pb-10 sm:pb-16 relative overflow-hidden shadow-xl">
+          {/* Interactive Physics Fluid Water Flow Canvas (Inspired by toppercode.online) */}
+          <InteractiveFluidCanvas className="opacity-75" />
+
+          {/* Foreground Hero Content */}
+          <div className="max-w-4xl mx-auto text-center relative z-10 space-y-6">
+            {/* Pill Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/95 border border-neutral-200 text-[11px] sm:text-xs font-semibold text-neutral-900 tracking-wider uppercase shadow-xs backdrop-blur-sm">
+              <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse shrink-0" />
+              <span className="leading-none">Next-Gen Enterprise Governance Platform</span>
+            </div>
+
+            {/* Primary Hero Typography with Elegant Serif Gradient Highlight */}
+            <h1 className="text-3xl xs:text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-black leading-[1.12] sm:leading-[1.08] text-balance">
+              Autonomous AI Copy Governance.<br className="hidden sm:inline" />
+              Before You Publish Copy,<br />
+              <span className="bg-gradient-to-r from-neutral-950 via-purple-600 to-neutral-950 bg-clip-text text-transparent font-serif italic font-normal">
                 Prove Every Claim.
               </span>
-            </span>
-          </h1>
+            </h1>
 
-          <p className="text-base sm:text-lg text-neutral-600 max-w-2xl mx-auto leading-relaxed">
-            Pineco intercepts marketing, PR, and social copy before publication. It couples{' '}
-            <strong className="text-black font-bold">deterministic policy guardrails</strong> and mandatory legal disclaimers with{' '}
-            <strong className="text-purple-700 font-bold">conservative AI fact verification</strong> grounded in corporate truth.
-          </p>
-        </div>
+            <p className="mt-4 sm:mt-6 text-sm sm:text-lg lg:text-xl text-neutral-600 max-w-2xl mx-auto leading-relaxed text-balance px-1">
+              Pineco intercepts marketing, PR, and social copy before publication. It couples{' '}
+              <strong className="text-black font-bold">deterministic policy guardrails</strong> and mandatory legal disclaimers with{' '}
+              <strong className="text-purple-700 font-bold">conservative AI fact verification</strong> grounded in corporate truth.
+            </p>
 
-        {/* Hero CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
-          <Link
-            href="/dashboard"
-            className="w-full sm:w-auto flex items-center justify-center space-x-2.5 bg-black hover:bg-neutral-900 text-white font-bold text-sm px-8 py-3.5 rounded-xl shadow-md transition-all duration-200 active:scale-95 group hover:shadow-[0_0_35px_-5px_rgba(124,58,237,0.55)] border border-purple-500/30"
-          >
-            <Zap className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />
-            <span>Launch Command Center</span>
-            <ArrowRight className="w-4 h-4 text-purple-400 group-hover:translate-x-1 transition-transform" />
-          </Link>
-          <button
-            onClick={() => openAuthModal('signup')}
-            className="w-full sm:w-auto flex items-center justify-center space-x-2 glass-pill hover:bg-purple-50 hover:border-purple-400 text-black font-bold text-sm px-7 py-3.5 rounded-xl transition shadow-xs hover:shadow-[0_0_20px_rgba(124,58,237,0.2)]"
-          >
-            <Lock className="w-4 h-4 text-purple-600" />
-            <span>Create Account (JWT)</span>
-          </button>
-        </div>
-
-        {/* Live Sentinel Audit Activity Ticker */}
-        <div className="max-w-2xl mx-auto pt-1">
-          <div className="glass-panel px-4 py-2 rounded-xl border border-purple-200/80 shadow-xs flex items-center justify-between text-xs font-mono">
-            <div className="flex items-center space-x-2 min-w-0">
-              <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse shrink-0" />
-              <span className="bg-purple-100 text-purple-800 font-bold px-1.5 py-0.5 rounded text-[10px] shrink-0">
-                {tickerEvents[tickerIndex].tag}
-              </span>
-              <span className="text-neutral-700 truncate text-[11px]">
-                {tickerEvents[tickerIndex].text}
-              </span>
+            {/* Hero CTAs (TopperCode signature pill style) */}
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link
+                href="/dashboard"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 text-sm font-semibold text-white bg-black hover:bg-neutral-900 active:bg-neutral-800 rounded-full shadow-lg shadow-black/20 hover:shadow-purple-500/25 transition-all group active:scale-95"
+              >
+                <span className="leading-none">Launch Command Center</span>
+                <span className="w-5 h-5 rounded-full bg-white/20 inline-flex items-center justify-center group-hover:translate-x-0.5 transition-transform shrink-0">
+                  <ArrowRight className="w-3 h-3 text-white" />
+                </span>
+              </Link>
+              <button
+                onClick={() => openAuthModal('signup')}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 text-sm font-semibold text-neutral-700 hover:text-black bg-white hover:bg-neutral-50 active:bg-neutral-100 border border-neutral-200 rounded-full shadow-sm transition-all active:scale-95"
+              >
+                <Lock className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                <span className="leading-none">Create Account (JWT)</span>
+              </button>
             </div>
-            <span className="text-neutral-400 text-[10px] shrink-0 ml-2">
-              {tickerEvents[tickerIndex].time}
-            </span>
+
+            {/* Hero Trust Strip under CTAs (toppercode.online pattern) */}
+            <div className="mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-neutral-200/80 max-w-3xl mx-auto flex flex-wrap items-center justify-center gap-x-6 sm:gap-x-8 gap-y-3 text-xs sm:text-sm text-neutral-800">
+              <div className="inline-flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                <span className="font-medium leading-none">Deterministic Guardrails (&lt;0.04s)</span>
+              </div>
+              <div className="inline-flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                <span className="font-medium leading-none">Grounded Fact Vault Proof</span>
+              </div>
+              <div className="inline-flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                <span className="font-medium leading-none">SHA-256 Merkle Ledger</span>
+              </div>
+              <div className="inline-flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                <span className="font-medium leading-none">Zero Retention for Training</span>
+              </div>
+            </div>
+
+            {/* Live Sentinel Audit Activity Ticker */}
+            <div className="max-w-2xl mx-auto pt-2">
+              <div className="glass-panel px-4 py-2 rounded-xl border border-purple-200/80 shadow-xs flex items-center justify-between text-xs font-mono">
+                <div className="flex items-center space-x-2 min-w-0">
+                  <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse shrink-0" />
+                  <span className="bg-purple-100 text-purple-800 font-bold px-1.5 py-0.5 rounded text-[10px] shrink-0">
+                    {tickerEvents[tickerIndex].tag}
+                  </span>
+                  <span className="text-neutral-700 truncate text-[11px]">
+                    {tickerEvents[tickerIndex].text}
+                  </span>
+                </div>
+                <span className="text-neutral-400 text-[10px] shrink-0 ml-2">
+                  {tickerEvents[tickerIndex].time}
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
 
         {/* ======================================================== */}
         {/* 4. 3D Glassmorphic Interactive Live Console Showcase */}
@@ -951,6 +995,32 @@ export default function LandingPage() {
             </div>
           </div>
         </ScrollReveal>
+        </div>
+      </section>
+
+      {/* ======================================================== */}
+      {/* Real-time Enterprise Compliance Marquee Ticker (toppercode.online design) */}
+      {/* ======================================================== */}
+      <section className="py-6 sm:py-8 border-y border-neutral-200 relative overflow-hidden bg-white">
+        <div className="max-w-7xl mx-auto px-4 relative overflow-hidden">
+          {/* Gradient edge masks */}
+          <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-white via-white/80 to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-white via-white/80 to-transparent z-10 pointer-events-none" />
+
+          <div className="animate-marquee flex items-center gap-4 sm:gap-6 text-xs font-mono text-neutral-700">
+            {/* Duplicated for seamless infinite loop */}
+            {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, idx) => (
+              <div
+                key={idx}
+                className="inline-flex items-center gap-2 whitespace-nowrap bg-white border border-neutral-200 px-4 py-2 rounded-full shadow-xs hover:border-purple-400 hover:shadow-sm transition-all"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                <span className="text-black font-bold text-xs">{item.title}</span>
+                <span className="text-[10px] text-neutral-500 font-sans font-medium">({item.category})</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* ======================================================== */}
@@ -971,55 +1041,95 @@ export default function LandingPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="glass-panel p-6 rounded-3xl border border-neutral-200 hover:border-purple-400 shadow-sm card-3d-hover space-y-3 group">
-            <div className="w-10 h-10 rounded-2xl bg-black text-white font-mono font-extrabold text-sm flex items-center justify-center group-hover:bg-purple-600 transition-colors shadow-xs border border-purple-500/30">
-              01
+          <div className="rounded-[2rem] bg-white border border-neutral-200 hover:border-purple-500/50 p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-xl topper-card-hover space-y-4 group">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-200/80 text-purple-700 font-mono font-extrabold text-sm flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors shadow-sm">
+                01
+              </div>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200 font-bold">
+                STAGE_INGEST
+              </span>
             </div>
-            <h3 className="text-sm font-bold text-black">Cryptographic Ingestion</h3>
-            <p className="text-xs text-neutral-600 leading-relaxed">
-              Creator submits marketing, PR, or social copy. Pineco computes a SHA-256 hash, creating an immutable Version 1 record.
-            </p>
-            <div className="pt-2 text-[10px] font-mono text-purple-700 font-bold">
-              + Immutable Version Seed
+            <div className="space-y-1.5">
+              <h3 className="text-base font-bold text-black tracking-tight group-hover:text-purple-600 transition-colors">
+                Cryptographic Ingestion
+              </h3>
+              <p className="text-xs text-neutral-600 leading-relaxed">
+                Creator submits marketing, PR, or social copy. Pineco computes a SHA-256 hash, creating an immutable Version 1 record.
+              </p>
             </div>
-          </div>
-
-          <div className="glass-panel p-6 rounded-3xl border border-neutral-200 hover:border-purple-400 shadow-sm card-3d-hover space-y-3 group">
-            <div className="w-10 h-10 rounded-2xl bg-black text-white font-mono font-extrabold text-sm flex items-center justify-center group-hover:bg-purple-600 transition-colors shadow-xs border border-purple-500/30">
-              02
-            </div>
-            <h3 className="text-sm font-bold text-black">Deterministic Guardrails</h3>
-            <p className="text-xs text-neutral-600 leading-relaxed">
-              Rules engine checks prohibited terms, suggested phrasing, and required disclaimers with exact character offsets.
-            </p>
-            <div className="pt-2 text-[10px] font-mono text-purple-700 font-bold">
-              + 0.04s Regex Intercept
+            <div className="pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] font-mono text-purple-700 font-bold">
+              <span>+ Immutable Version Seed</span>
+              <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" />
             </div>
           </div>
 
-          <div className="glass-panel p-6 rounded-3xl border border-neutral-200 hover:border-purple-400 shadow-sm card-3d-hover space-y-3 group">
-            <div className="w-10 h-10 rounded-2xl bg-black text-white font-mono font-extrabold text-sm flex items-center justify-center group-hover:bg-purple-600 transition-colors shadow-xs border border-purple-500/30">
-              03
+          <div className="rounded-[2rem] bg-white border border-neutral-200 hover:border-purple-500/50 p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-xl topper-card-hover space-y-4 group">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-200/80 text-purple-700 font-mono font-extrabold text-sm flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors shadow-sm">
+                02
+              </div>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200 font-bold">
+                STAGE_DETERM
+              </span>
             </div>
-            <h3 className="text-sm font-bold text-black">Conservative Fact Proof</h3>
-            <p className="text-xs text-neutral-600 leading-relaxed">
-              Claims are classified as Supported, Contradicted, or Unverified. Hallucinated IDs are discarded at the database boundary.
-            </p>
-            <div className="pt-2 text-[10px] font-mono text-purple-700 font-bold">
-              + Zero Public Hallucinations
+            <div className="space-y-1.5">
+              <h3 className="text-base font-bold text-black tracking-tight group-hover:text-purple-600 transition-colors">
+                Deterministic Guardrails
+              </h3>
+              <p className="text-xs text-neutral-600 leading-relaxed">
+                Rules engine checks prohibited terms, suggested phrasing, and required disclaimers with exact character offsets.
+              </p>
+            </div>
+            <div className="pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] font-mono text-purple-700 font-bold">
+              <span>+ 0.04s Regex Intercept</span>
+              <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" />
             </div>
           </div>
 
-          <div className="glass-panel p-6 rounded-3xl border border-neutral-200 hover:border-purple-400 shadow-sm card-3d-hover space-y-3 group">
-            <div className="w-10 h-10 rounded-2xl bg-black text-white font-mono font-extrabold text-sm flex items-center justify-center group-hover:bg-purple-600 transition-colors shadow-xs border border-purple-500/30">
-              04
+          <div className="rounded-[2rem] bg-white border border-neutral-200 hover:border-purple-500/50 p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-xl topper-card-hover space-y-4 group">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-200/80 text-purple-700 font-mono font-extrabold text-sm flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors shadow-sm">
+                03
+              </div>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200 font-bold">
+                STAGE_VERIFY
+              </span>
             </div>
-            <h3 className="text-sm font-bold text-black">Human Decision & Ledger</h3>
-            <p className="text-xs text-neutral-600 leading-relaxed">
-              Reviewer approves or requests revisions. Overrides strictly require written rationales logged in an append-only audit trail.
-            </p>
-            <div className="pt-2 text-[10px] font-mono text-purple-700 font-bold">
-              + Audit Trail Bound
+            <div className="space-y-1.5">
+              <h3 className="text-base font-bold text-black tracking-tight group-hover:text-purple-600 transition-colors">
+                Conservative Fact Proof
+              </h3>
+              <p className="text-xs text-neutral-600 leading-relaxed">
+                Claims are classified as Supported, Contradicted, or Unverified. Hallucinated IDs are discarded at the database boundary.
+              </p>
+            </div>
+            <div className="pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] font-mono text-purple-700 font-bold">
+              <span>+ Grounded Truth Anchors</span>
+              <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" />
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] bg-white border border-neutral-200 hover:border-purple-500/50 p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-xl topper-card-hover space-y-4 group">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-200/80 text-purple-700 font-mono font-extrabold text-sm flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors shadow-sm">
+                04
+              </div>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200 font-bold">
+                STAGE_LEDGER
+              </span>
+            </div>
+            <div className="space-y-1.5">
+              <h3 className="text-base font-bold text-black tracking-tight group-hover:text-purple-600 transition-colors">
+                Human Review & Ledger
+              </h3>
+              <p className="text-xs text-neutral-600 leading-relaxed">
+                Reviewer approves or requests revisions. Overrides strictly require written rationales logged in an append-only audit trail.
+              </p>
+            </div>
+            <div className="pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] font-mono text-purple-700 font-bold">
+              <span>+ Signed WORM Trail</span>
+              <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" />
             </div>
           </div>
         </div>
