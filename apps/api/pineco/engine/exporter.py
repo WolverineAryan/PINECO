@@ -478,6 +478,8 @@ def generate_pptx_report(
     cstf.margin_right = PptxInches(0.4)
     csp = cstf.paragraphs[0]
     copy_str = getattr(current_version, "content_text", "No content provided.") if current_version else "No content provided."
+    if len(copy_str) > 1200:
+        copy_str = copy_str[:1200] + "\n\n[... Remaining content truncated for slide presentation. Full text available in audit archive.]"
     csp.text = copy_str
     csp.font.size = PptxPt(12)
     csp.font.name = "Calibri"
@@ -712,8 +714,12 @@ def generate_pdf_report(
     )
 
     copy_text = getattr(current_version, "content_text", "No content provided.") if current_version else "No content provided."
+    if len(copy_text) > 1800:
+        display_copy = copy_text[:1800] + "\n\n[... Truncated for executive report summary. Full copy available in immutable Version store.]"
+    else:
+        display_copy = copy_text
     # Wrap in single-cell table for neat border
-    copy_table = Table([[Paragraph(copy_text.replace("\n", "<br/>"), code_style)]], colWidths=[540])
+    copy_table = Table([[Paragraph(display_copy.replace("\n", "<br/>"), code_style)]], colWidths=[540])
     copy_table.setStyle(
         TableStyle([
             ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F9FAFB")),

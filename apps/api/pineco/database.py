@@ -12,12 +12,15 @@ engine = create_engine(
     pool_pre_ping=True,
 )
 
-# Enable foreign key constraint enforcement in SQLite
+# Enable foreign key constraint enforcement and WAL mode for high volume & concurrency
 if settings.DATABASE_URL.startswith("sqlite"):
     @event.listens_for(engine, "connect")
     def set_sqlite_pragma(dbapi_connection, connection_record):
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.execute("PRAGMA busy_timeout=10000")
+        cursor.execute("PRAGMA synchronous=NORMAL")
         cursor.close()
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

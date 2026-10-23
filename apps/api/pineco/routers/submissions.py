@@ -32,6 +32,8 @@ def list_submissions(
     workspace_id: Optional[str] = Query(default=None),
     product_id: Optional[str] = Query(default=None),
     status: Optional[str] = Query(default=None),
+    limit: Optional[int] = Query(default=None, ge=1, le=5000),
+    offset: int = Query(default=0, ge=0),
     db: Session = Depends(get_db),
 ):
     ws_id = workspace_id or settings.DEFAULT_WORKSPACE_ID
@@ -40,7 +42,10 @@ def list_submissions(
         query = query.filter(Submission.product_id == product_id)
     if status:
         query = query.filter(Submission.status == status)
-    return query.order_by(Submission.updated_at.desc()).all()
+    query = query.order_by(Submission.updated_at.desc()).offset(offset)
+    if limit is not None:
+        query = query.limit(limit)
+    return query.all()
 
 
 @router.post("", response_model=SubmissionDetailResponse, status_code=201)
