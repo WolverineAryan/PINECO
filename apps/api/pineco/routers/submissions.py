@@ -2,7 +2,7 @@ import hashlib
 import json
 import os
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form, Response
 from sqlalchemy.orm import Session, joinedload
 
 from pineco.database import get_db
@@ -10,6 +10,7 @@ from pineco.config import settings
 from pineco.models import Submission, ContentVersion, Review, Finding, AuditEvent, get_utc_now
 from pineco.engine.parser import parse_uploaded_file
 from pineco.engine.pipeline import execute_review_pipeline
+from pineco.engine.exporter import generate_docx_report, generate_pptx_report, generate_pdf_report
 from pineco.schemas import (
     SubmissionCreate,
     SubmissionResponse,
@@ -343,4 +344,68 @@ async def upload_and_scan_endpoint(
         "filename": file.filename,
         "extracted_text": final_text,
     }
+
+
+@router.get("/{submission_id}/export")
+def export_submission_report(
+    submission_id: str,
+    format: str = Query(default="pdf", pattern="^(pdf|docx|pptx)$"),
+    db: Session = Depends(get_db),
+):
+    sub = (
+        db.query(Submission)
+        .options(
+            joinedload(Submission.versions),
+            joinedload(Submission.reviews).joinedload(Review.findings).joinedload(Finding.rule),
+            joinedload(Submission.reviews).joinedload(Review.findings).joinedload(Finding.fact),
+        )
+        .filter(Submission.id == submission_id)
+        .first()
+    )
+    if not sub:
+        raise HTTPException(status_code=404, detail="Submission not found")
+
+    versions_sorted = sorted(sub.versions, key=lambda v: v.version_number)
+    current_ver = next((v for v in versions_sorted if v.id == sub.current_version_id), None)
+    if not current_ver and versions_sorted:
+        current_ver = versions_sorted[-1]
+
+    latest_review = None
+    if sub.reviews:
+        sorted_reviews = sorted(sub.reviews, key=lambda r: r.started_at, reverse=True)
+        latest_review = sorted_reviews[0]
+
+    # Get audit events for submission
+    audit_events = (
+        db.query(AuditEvent)
+        .filter(AuditEvent.entity_id == submission_id)
+        .order_by(AuditEvent.created_at.asc())
+        .all()
+    )
+
+    fmt = format.lower()
+    clean_title = "".join(c for c in sub.title if c.isalnum() or c in ("-", "_")).strip() or "submission"
+
+    if fmt == "docx":
+        data = generate_docx_report(sub, current_ver, latest_review, audit_events)
+        media_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        filename = f"pineco-report-{clean_title}.docx"
+    elif fmt == "pptx":
+        data = generate_pptx_report(sub, current_ver, latest_review, audit_events)
+        media_type = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        filename = f"pineco-report-{clean_title}.pptx"
+    else:  # pdf
+        data = generate_pdf_report(sub, current_ver, latest_review, audit_events)
+        media_type = "application/pdf"
+        filename = f"pineco-report-{clean_title}.pdf"
+
+    return Response(
+        content=data,
+        media_type=media_type,
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Access-Control-Expose-Headers": "Content-Disposition",
+        },
+    )
+
 

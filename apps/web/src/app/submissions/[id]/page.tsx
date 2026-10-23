@@ -26,6 +26,7 @@ import { SubmissionDetail, Finding, Review, ContentVersion, AuditEvent } from '@
 import { useRole } from '@/components/RoleContext';
 import { useToast } from '@/components/Toast';
 import { SubmissionDetailSkeleton } from '@/components/Skeleton';
+import { ExportReportDropdown } from '@/components/ExportReportDropdown';
 
 export default function SubmissionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -210,6 +211,10 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
           <span>Back to Product Compliance Hub</span>
         </Link>
         <div className="flex items-center space-x-2 shrink-0">
+          <ExportReportDropdown
+            submissionId={submission.id}
+            submissionTitle={submission.title}
+          />
           <button
             onClick={handleRerunReview}
             disabled={rerunning}

@@ -327,4 +327,39 @@ export const api = {
       body: formData,
     });
   },
+
+  // Export Compliance & Audit Reports (PDF, DOCX, PPTX)
+  exportSubmissionReport: async (submissionId: string, format: 'pdf' | 'docx' | 'pptx', filenamePrefix?: string) => {
+    const token = getStoredToken();
+    const headers: Record<string, string> = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(`${API_BASE_URL}/submissions/${submissionId}/export?format=${format}`, {
+      headers,
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to export ${format.toUpperCase()} report: ${res.statusText}`);
+    }
+
+    // Try extracting filename from Content-Disposition header
+    let filename = `${filenamePrefix || 'pineco-compliance-report'}-${submissionId.slice(0, 8)}.${format}`;
+    const disposition = res.headers.get('content-disposition');
+    if (disposition && disposition.includes('filename=')) {
+      const match = disposition.match(/filename="?([^";]+)"?/);
+      if (match && match[1]) {
+        filename = match[1];
+      }
+    }
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+    return filename;
+  },
 };

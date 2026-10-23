@@ -31,6 +31,7 @@ import { ScanCopyModal } from '@/components/ScanCopyModal';
 import { CreateProductModal } from '@/components/CreateProductModal';
 import { DashboardSkeleton } from '@/components/Skeleton';
 import { ScrollReveal } from '@/components/ScrollReveal';
+import { ExportReportDropdown } from '@/components/ExportReportDropdown';
 
 export default function ProductComplianceDashboard() {
   const { workspaceId, currentUser, activeProduct, products, reloadProducts } = useRole();
@@ -378,13 +379,19 @@ export default function ProductComplianceDashboard() {
                     </div>
                   </div>
 
-                  <Link
-                    href={`/submissions/${sub.id}`}
-                    className="flex items-center space-x-1.5 text-xs font-bold bg-black hover:bg-neutral-900 text-white px-3.5 py-2 rounded-xl transition shadow-xs shrink-0 hover:shadow-[0_0_15px_-2px_rgba(124,58,237,0.35)]"
-                  >
-                    <span>Inspect Evidence</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-purple-400" />
-                  </Link>
+                  <div className="flex items-center space-x-2 shrink-0">
+                    <ExportReportDropdown
+                      submissionId={sub.id}
+                      submissionTitle={sub.title}
+                    />
+                    <Link
+                      href={`/submissions/${sub.id}`}
+                      className="flex items-center space-x-1.5 text-xs font-bold bg-black hover:bg-neutral-900 text-white px-3.5 py-2 rounded-xl transition shadow-xs shrink-0 hover:shadow-[0_0_15px_-2px_rgba(124,58,237,0.35)]"
+                    >
+                      <span>Inspect Evidence</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-purple-400" />
+                    </Link>
+                  </div>
                 </div>
               );
             })}
