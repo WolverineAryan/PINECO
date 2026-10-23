@@ -31,6 +31,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const {
     role,
+    setRole,
     currentUser,
     workspaceId,
     openAuthModal,
@@ -43,6 +44,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [copiedWs, setCopiedWs] = useState(false);
   const [showCreateProduct, setShowCreateProduct] = useState(false);
   const [showScanCopy, setShowScanCopy] = useState(false);
+  const [roleMenuOpen, setRoleMenuOpen] = useState(false);
 
   // If on public landing page at '/', render directly without app sidebar
   const isLanding = pathname === '/';
@@ -97,11 +99,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Product Folder Selection Card */}
         <div className="p-3 border-b border-neutral-200 bg-neutral-50/70 space-y-2">
-          <div className="flex items-center space-x-1.5 text-[11px]">
-            <Folder className="w-3.5 h-3.5 text-neutral-500" />
-            <span className="font-mono text-[9px] uppercase font-bold tracking-wider text-neutral-500">
-              Product Workspace
-            </span>
+          <div className="flex items-center justify-between text-[11px]">
+            <div className="flex items-center space-x-1.5">
+              <Folder className="w-3.5 h-3.5 text-purple-600" />
+              <span className="font-mono text-[9px] uppercase font-bold tracking-wider text-neutral-500">
+                Product Workspace
+              </span>
+            </div>
+            {products.length > 0 && (
+              <span className="text-[10px] font-mono text-purple-700 bg-purple-100/80 px-2 py-0.2 rounded-full font-bold">
+                {products.length} Products
+              </span>
+            )}
           </div>
 
           <div className="relative">
@@ -234,6 +243,55 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center space-x-3">
+            {/* Quick RBAC Role Simulator Dropdown */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setRoleMenuOpen(!roleMenuOpen)}
+                className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl border border-neutral-200 hover:border-purple-300 bg-neutral-50/90 hover:bg-purple-50/50 transition-all text-xs font-semibold shadow-xs"
+              >
+                <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse" />
+                <span className="font-mono text-[9px] uppercase font-bold text-neutral-400">Role:</span>
+                <span className="text-black capitalize font-bold text-xs">{role.replace('_', ' ')}</span>
+                <ChevronDown className="w-3 h-3 text-neutral-400" />
+              </button>
+
+              {roleMenuOpen && (
+                <div className="absolute right-0 mt-1.5 w-60 bg-white border border-neutral-200 rounded-2xl shadow-xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-wider text-neutral-400 font-bold border-b border-neutral-100 mb-1">
+                    Simulate Access Role (RBAC)
+                  </div>
+                  {(['reviewer', 'brand_manager', 'creator', 'admin'] as const).map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      onClick={() => {
+                        setRole(r);
+                        setRoleMenuOpen(false);
+                        success('Role Switched', `Active governance scope: ${r.replace('_', ' ')}.`);
+                      }}
+                      className={`w-full text-left px-2.5 py-2 rounded-xl text-xs transition flex items-center justify-between ${
+                        role === r
+                          ? 'bg-purple-50 text-purple-900 font-bold'
+                          : 'text-neutral-700 hover:bg-neutral-100'
+                      }`}
+                    >
+                      <div>
+                        <div className="capitalize">{r.replace('_', ' ')}</div>
+                        <div className="text-[10px] text-neutral-400 font-normal">
+                          {r === 'reviewer' && 'Reviews & override justifications'}
+                          {r === 'brand_manager' && 'Policy & ground truth rules'}
+                          {r === 'creator' && 'Drafter & pre-publication checks'}
+                          {r === 'admin' && 'Sovereign root governance'}
+                        </div>
+                      </div>
+                      {role === r && <Check className="w-3.5 h-3.5 text-purple-600 shrink-0" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <div className="hidden sm:flex items-center space-x-2 bg-purple-100/80 border border-purple-300 px-3 py-1 rounded-full text-[10px] font-mono font-bold text-purple-950 shadow-xs">
               <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse" />
               <span>SENTINEL ONLINE</span>

@@ -43,10 +43,66 @@ const DEFAULT_PROFILES: Record<UserRole, UserProfile> = {
   },
 };
 
+export interface RolePermissions {
+  canEditRules: boolean;
+  canEditFacts: boolean;
+  canApproveSubmissions: boolean;
+  canOverrideWithRationale: boolean;
+  canCreateSubmissions: boolean;
+  canInspectAuditTrail: boolean;
+  canManageWorkspace: boolean;
+  canExportPackets: boolean;
+}
+
+export const ROLE_PERMISSIONS: Record<UserRole, RolePermissions> = {
+  admin: {
+    canEditRules: true,
+    canEditFacts: true,
+    canApproveSubmissions: true,
+    canOverrideWithRationale: true,
+    canCreateSubmissions: true,
+    canInspectAuditTrail: true,
+    canManageWorkspace: true,
+    canExportPackets: true,
+  },
+  brand_manager: {
+    canEditRules: true,
+    canEditFacts: true,
+    canApproveSubmissions: true,
+    canOverrideWithRationale: true,
+    canCreateSubmissions: true,
+    canInspectAuditTrail: true,
+    canManageWorkspace: false,
+    canExportPackets: true,
+  },
+  reviewer: {
+    canEditRules: false,
+    canEditFacts: false,
+    canApproveSubmissions: true,
+    canOverrideWithRationale: true,
+    canCreateSubmissions: false,
+    canInspectAuditTrail: true,
+    canManageWorkspace: false,
+    canExportPackets: true,
+  },
+  creator: {
+    canEditRules: false,
+    canEditFacts: false,
+    canApproveSubmissions: false,
+    canOverrideWithRationale: false,
+    canCreateSubmissions: true,
+    canInspectAuditTrail: false,
+    canManageWorkspace: false,
+    canExportPackets: false,
+  },
+};
+
 interface RoleContextType {
   role: UserRole;
   setRole: (role: UserRole) => void;
   currentUser: UserProfile;
+  permissions: RolePermissions;
+  hasPermission: (perm: keyof RolePermissions) => boolean;
   isAuthenticated: boolean;
   workspaceId: string;
   setWorkspaceId: (id: string) => void;
@@ -217,12 +273,19 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     setIsAuthModalOpen(true);
   };
 
+  const permissions = ROLE_PERMISSIONS[role] || ROLE_PERMISSIONS['reviewer'];
+  const hasPermission = (perm: keyof RolePermissions): boolean => {
+    return !!permissions[perm];
+  };
+
   return (
     <RoleContext.Provider
       value={{
         role,
         setRole,
         currentUser,
+        permissions,
+        hasPermission,
         isAuthenticated,
         workspaceId,
         setWorkspaceId,

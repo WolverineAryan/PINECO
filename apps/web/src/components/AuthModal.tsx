@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   X,
   Key,
@@ -19,6 +20,7 @@ import { useToast } from './Toast';
 import { UserRole } from '@/lib/types';
 
 export function AuthModal() {
+  const router = useRouter();
   const {
     isAuthModalOpen,
     closeAuthModal,
@@ -53,6 +55,23 @@ export function AuthModal() {
 
   if (!isAuthModalOpen) return null;
 
+  const handleQuickDemoLogin = async (demoEmail: string, roleTitle: string) => {
+    try {
+      setLoading(true);
+      setErrorMessage(null);
+      await login(demoEmail, 'pineco2026!');
+      success('Demo Session Initialized', `Signed in as ${roleTitle}. Redirecting to Command Center...`);
+      closeAuthModal();
+      router.push('/dashboard');
+    } catch (err: any) {
+      const msg = err.message || 'Demo authentication failed.';
+      setErrorMessage(msg);
+      toastError('Sign In Failed', msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
@@ -72,6 +91,7 @@ export function AuthModal() {
       closeAuthModal();
       setEmail('');
       setPassword('');
+      router.push('/dashboard');
     } catch (err: any) {
       const msg = err.message || 'Authentication failed. Please verify your email and password.';
       setErrorMessage(msg);
@@ -111,6 +131,7 @@ export function AuthModal() {
       setName('');
       setEmail('');
       setPassword('');
+      router.push('/dashboard');
     } catch (err: any) {
       const msg = err.message || 'Registration failed. An account with this email may already exist.';
       setErrorMessage(msg);
@@ -135,7 +156,7 @@ export function AuthModal() {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-neutral-200 animate-in zoom-in-95 duration-200 relative">
+      <div className="bg-white rounded-2xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-neutral-200 animate-in zoom-in-95 duration-200 relative max-h-[92vh] overflow-y-auto">
         {/* Modal Header */}
         <div className="flex items-center justify-between pb-4 border-b border-neutral-100">
           <div className="flex items-center space-x-3">
@@ -160,9 +181,76 @@ export function AuthModal() {
           </button>
         </div>
 
+        {/* 1-Click Demo Account Quick Access Bar */}
+        <div className="mt-4 p-3.5 rounded-2xl bg-purple-50/70 border border-purple-200/90 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-purple-900 flex items-center space-x-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-purple-600 animate-pulse" />
+              <span>1-Click Demo Account Access</span>
+            </span>
+            <span className="text-[10px] font-mono text-purple-700 bg-white px-2 py-0.5 rounded-full border border-purple-200 font-semibold shadow-xs">
+              PW: pineco2026!
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => handleQuickDemoLogin('reviewer@pineco.internal', 'Elena Rostova (Compliance Reviewer)')}
+              className="p-2.5 rounded-xl bg-white border border-neutral-200 hover:border-purple-500 hover:bg-purple-50/50 text-left transition-all duration-200 hover:-translate-y-0.5 shadow-xs active:scale-95 group"
+            >
+              <div className="text-xs font-bold text-black group-hover:text-purple-700 transition-colors flex items-center justify-between">
+                <span>Reviewer</span>
+                <ArrowRight className="w-3 h-3 text-neutral-400 group-hover:text-purple-600 transition-transform group-hover:translate-x-0.5" />
+              </div>
+              <div className="text-[10px] text-neutral-500 truncate">Elena Rostova</div>
+            </button>
+
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => handleQuickDemoLogin('manager@pineco.internal', 'Marcus Vance (Head of Brand)')}
+              className="p-2.5 rounded-xl bg-white border border-neutral-200 hover:border-purple-500 hover:bg-purple-50/50 text-left transition-all duration-200 hover:-translate-y-0.5 shadow-xs active:scale-95 group"
+            >
+              <div className="text-xs font-bold text-black group-hover:text-purple-700 transition-colors flex items-center justify-between">
+                <span>Brand Manager</span>
+                <ArrowRight className="w-3 h-3 text-neutral-400 group-hover:text-purple-600 transition-transform group-hover:translate-x-0.5" />
+              </div>
+              <div className="text-[10px] text-neutral-500 truncate">Marcus Vance</div>
+            </button>
+
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => handleQuickDemoLogin('creator@pineco.internal', 'Sarah Chen (Content Creator)')}
+              className="p-2.5 rounded-xl bg-white border border-neutral-200 hover:border-purple-500 hover:bg-purple-50/50 text-left transition-all duration-200 hover:-translate-y-0.5 shadow-xs active:scale-95 group"
+            >
+              <div className="text-xs font-bold text-black group-hover:text-purple-700 transition-colors flex items-center justify-between">
+                <span>Content Creator</span>
+                <ArrowRight className="w-3 h-3 text-neutral-400 group-hover:text-purple-600 transition-transform group-hover:translate-x-0.5" />
+              </div>
+              <div className="text-[10px] text-neutral-500 truncate">Sarah Chen</div>
+            </button>
+
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => handleQuickDemoLogin('admin@pineco.internal', 'Alex Thorne (Platform Admin)')}
+              className="p-2.5 rounded-xl bg-white border border-neutral-200 hover:border-purple-500 hover:bg-purple-50/50 text-left transition-all duration-200 hover:-translate-y-0.5 shadow-xs active:scale-95 group"
+            >
+              <div className="text-xs font-bold text-black group-hover:text-purple-700 transition-colors flex items-center justify-between">
+                <span>Enterprise Admin</span>
+                <ArrowRight className="w-3 h-3 text-neutral-400 group-hover:text-purple-600 transition-transform group-hover:translate-x-0.5" />
+              </div>
+              <div className="text-[10px] text-neutral-500 truncate">Alex Thorne</div>
+            </button>
+          </div>
+        </div>
+
         {/* Currently Logged In Banner if Authenticated */}
         {isAuthenticated && token && (
-          <div className="mt-4 p-3 bg-neutral-50 rounded-xl border border-neutral-200 flex items-center justify-between">
+          <div className="mt-3.5 p-3 bg-neutral-50 rounded-xl border border-neutral-200 flex items-center justify-between">
             <div className="flex items-center space-x-2.5 min-w-0">
               <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center text-xs font-bold font-mono shrink-0">
                 {currentUser.avatar || 'PI'}
@@ -172,18 +260,32 @@ export function AuthModal() {
                 <span className="text-[10px] text-neutral-500 block truncate">{currentUser.email}</span>
               </div>
             </div>
-            <button
-              onClick={handleLogoutClick}
-              className="px-2.5 py-1 text-[11px] font-medium text-rose-600 hover:text-white hover:bg-rose-600 rounded-lg border border-rose-200 hover:border-rose-600 transition flex items-center space-x-1 shrink-0"
-            >
-              <LogOut className="w-3 h-3" />
-              <span>Sign Out</span>
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                type="button"
+                onClick={() => {
+                  closeAuthModal();
+                  router.push('/dashboard');
+                }}
+                className="px-2.5 py-1 text-[11px] font-bold text-white bg-black hover:bg-neutral-800 rounded-lg transition shadow-xs flex items-center space-x-1"
+              >
+                <span>Dashboard</span>
+                <ArrowRight className="w-3 h-3 text-purple-400" />
+              </button>
+              <button
+                type="button"
+                onClick={handleLogoutClick}
+                className="px-2 py-1 text-[11px] font-medium text-rose-600 hover:text-white hover:bg-rose-600 rounded-lg border border-rose-200 hover:border-rose-600 transition flex items-center space-x-1 shrink-0"
+              >
+                <LogOut className="w-3 h-3" />
+                <span>Out</span>
+              </button>
+            </div>
           </div>
         )}
 
         {/* Tab Toggle: Sign In vs Create Account */}
-        <div className="flex p-1 bg-neutral-100 rounded-xl mt-4 mb-4">
+        <div className="flex p-1 bg-neutral-100 rounded-xl mt-3.5 mb-3.5">
           <button
             type="button"
             onClick={() => {
@@ -192,11 +294,11 @@ export function AuthModal() {
             }}
             className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition ${
               tab === 'signin'
-                ? 'bg-white text-black shadow-xs'
+                ? 'bg-white text-black shadow-xs font-bold'
                 : 'text-neutral-500 hover:text-black'
             }`}
           >
-            Sign In
+            Manual Sign In
           </button>
           <button
             type="button"
@@ -206,7 +308,7 @@ export function AuthModal() {
             }}
             className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition ${
               tab === 'signup'
-                ? 'bg-white text-black shadow-xs'
+                ? 'bg-white text-black shadow-xs font-bold'
                 : 'text-neutral-500 hover:text-black'
             }`}
           >
@@ -224,7 +326,7 @@ export function AuthModal() {
 
         {/* Sign In Form */}
         {tab === 'signin' ? (
-          <form onSubmit={handleSignIn} className="space-y-3.5">
+          <form onSubmit={handleSignIn} className="space-y-3">
             <div>
               <label className="block text-[11px] font-semibold text-neutral-700 uppercase tracking-wider mb-1">
                 Work Email Address
@@ -237,7 +339,7 @@ export function AuthModal() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@company.com"
-                  className="w-full pl-9 pr-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:bg-white transition"
+                  className="w-full pl-9 pr-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-purple-600/30 focus:border-purple-600 focus:bg-white transition"
                 />
               </div>
             </div>
@@ -256,7 +358,7 @@ export function AuthModal() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full pl-9 pr-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:bg-white transition"
+                  className="w-full pl-9 pr-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-purple-600/30 focus:border-purple-600 focus:bg-white transition"
                 />
               </div>
             </div>
@@ -264,14 +366,14 @@ export function AuthModal() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold py-2.5 rounded-xl shadow-xs transition text-xs flex items-center justify-center space-x-2 mt-2 disabled:opacity-50"
+              className="w-full bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold py-2.5 rounded-xl shadow-xs transition-all duration-200 active:scale-95 text-xs flex items-center justify-center space-x-2 mt-2 disabled:opacity-50 hover:shadow-[0_0_20px_rgba(124,58,237,0.3)]"
             >
               {loading ? (
-                <span className="animate-pulse">Authenticating...</span>
+                <span className="animate-pulse">Authenticating & Redirecting...</span>
               ) : (
                 <>
-                  <span>Sign In with JWT</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <span>Sign In & Open Dashboard</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-purple-400" />
                 </>
               )}
             </button>
@@ -291,7 +393,7 @@ export function AuthModal() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Thor Aryan"
-                  className="w-full pl-9 pr-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:bg-white transition"
+                  className="w-full pl-9 pr-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-purple-600/30 focus:border-purple-600 focus:bg-white transition"
                 />
               </div>
             </div>
@@ -308,7 +410,7 @@ export function AuthModal() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="36thoraryan@gmail.com"
-                  className="w-full pl-9 pr-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:bg-white transition"
+                  className="w-full pl-9 pr-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-purple-600/30 focus:border-purple-600 focus:bg-white transition"
                 />
               </div>
             </div>
@@ -326,7 +428,7 @@ export function AuthModal() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full pl-9 pr-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:bg-white transition"
+                  className="w-full pl-9 pr-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-purple-600/30 focus:border-purple-600 focus:bg-white transition"
                 />
               </div>
             </div>
@@ -338,7 +440,7 @@ export function AuthModal() {
               <select
                 value={selectedRole}
                 onChange={(e) => setSelectedRole(e.target.value as UserRole)}
-                className="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-black focus:outline-none focus:ring-2 focus:ring-primary-600 focus:bg-white transition"
+                className="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-black focus:outline-none focus:ring-2 focus:ring-purple-600/30 focus:border-purple-600 focus:bg-white transition"
               >
                 <option value="reviewer">Compliance & Legal Reviewer</option>
                 <option value="brand_manager">Head of Brand Governance</option>
@@ -350,13 +452,13 @@ export function AuthModal() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white font-semibold py-2.5 rounded-xl shadow-xs transition text-xs flex items-center justify-center space-x-2 mt-2 disabled:opacity-50"
+              className="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-semibold py-2.5 rounded-xl shadow-xs transition-all duration-200 active:scale-95 text-xs flex items-center justify-center space-x-2 mt-2 disabled:opacity-50 hover:shadow-[0_0_20px_rgba(124,58,237,0.4)]"
             >
               {loading ? (
-                <span className="animate-pulse">Creating Account...</span>
+                <span className="animate-pulse">Creating Account & Redirecting...</span>
               ) : (
                 <>
-                  <span>Create Account & Issue JWT</span>
+                  <span>Create Account & Open Dashboard</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </>
               )}
@@ -369,7 +471,7 @@ export function AuthModal() {
           <div className="mt-4 pt-3.5 border-t border-neutral-100">
             <div className="flex items-center justify-between text-[11px]">
               <div className="flex items-center space-x-1.5 text-neutral-600">
-                <ShieldCheck className="w-3.5 h-3.5 text-primary-600" />
+                <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
                 <span className="font-semibold text-black">Active JWT Bearer Session</span>
               </div>
               <button
@@ -399,3 +501,4 @@ export function AuthModal() {
     </div>
   );
 }
+
