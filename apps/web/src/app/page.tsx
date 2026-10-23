@@ -358,15 +358,11 @@ export default function LandingPage() {
       <nav className="h-20 border-b border-neutral-200/80 bg-white/85 backdrop-blur-md sticky top-0 z-50 px-4 sm:px-8 transition-colors">
         <div className="max-w-7xl mx-auto h-full flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3 group">
-            <div className="relative">
-              <img
-                src="/logo-navbar.png"
-                alt="Pineco"
-                className="h-10 sm:h-11 w-auto object-contain transition duration-200 group-hover:scale-[1.02]"
-              />
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-purple-600 animate-ping opacity-75" />
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-purple-600" />
-            </div>
+            <img
+              src="/logo-navbar.png"
+              alt="Pineco"
+              className="h-10 sm:h-11 w-auto object-contain transition duration-200 group-hover:scale-[1.02]"
+            />
           </Link>
 
           <div className="hidden lg:flex items-center space-x-7 text-xs font-semibold text-neutral-600">
