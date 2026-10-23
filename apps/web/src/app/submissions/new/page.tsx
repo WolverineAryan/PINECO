@@ -8,25 +8,42 @@ import {
   RefreshCw,
   AlertTriangle,
   Lightbulb,
-  CheckCircle2,
   Folder,
+  UploadCloud,
+  Edit3,
+  CheckCircle2,
+  FileCheck,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useRole } from '@/components/RoleContext';
 import { useToast } from '@/components/Toast';
+import { FileIngestionDropzone, ExtractedMeta } from '@/components/FileIngestionDropzone';
 
 export default function NewSubmissionPage() {
   const router = useRouter();
   const { workspaceId, currentUser, activeProduct } = useRole();
   const { success, error: toastError } = useToast();
 
+  const [activeTab, setActiveTab] = useState<'upload' | 'manual'>('upload');
   const [title, setTitle] = useState('');
   const [channel, setChannel] = useState('social');
   const [content, setContent] = useState('');
+  const [attachedMeta, setAttachedMeta] = useState<ExtractedMeta | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const handleExtracted = (text: string, meta: ExtractedMeta) => {
+    setContent(text);
+    setAttachedMeta(meta);
+    if (!title.trim()) {
+      const cleanName = meta.filename.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+      setTitle(cleanName.charAt(0).toUpperCase() + cleanName.slice(1));
+    }
+    success('Text Extracted', `Successfully parsed ${meta.wordCount} words from ${meta.filename}.`);
+  };
+
   const loadCompliantSample = () => {
+    setAttachedMeta(null);
     setTitle('Enterprise Governance Launch Announcement');
     setChannel('press_release');
     setContent(
@@ -38,6 +55,7 @@ export default function NewSubmissionPage() {
   };
 
   const loadViolationSample = () => {
+    setAttachedMeta(null);
     setTitle('Q4 High-Growth Campaign Draft (Violations Sample)');
     setChannel('social');
     setContent(
@@ -89,37 +107,37 @@ export default function NewSubmissionPage() {
       <div>
         <div className="flex items-center space-x-2">
           <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-black">Scan Content</h1>
-          <span className="text-[10px] font-mono bg-neutral-100 border border-neutral-300 text-black font-bold px-2 py-0.5 rounded-full flex items-center space-x-1">
-            <Folder className="w-3 h-3 text-neutral-600" />
+          <span className="text-[10px] font-mono bg-purple-50 border border-purple-200 text-purple-700 font-bold px-2 py-0.5 rounded-full flex items-center space-x-1">
+            <Folder className="w-3 h-3 text-purple-600" />
             <span>{activeProduct?.name || 'All Assets'}</span>
           </span>
         </div>
-        <p className="text-xs text-slate-500 mt-1">
-          Submit draft copy to execute deterministic policy checks, disclaimer verification, and factual claim analysis for this product.
+        <p className="text-xs text-neutral-600 mt-1">
+          Submit copy via document upload (PDF, Word), image OCR recognition, or direct text to execute deterministic policy checks and fact verification.
         </p>
       </div>
 
       {/* Quick Judge Sample Preloaders */}
-      <div className="bg-slate-950 text-slate-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs border border-slate-800 shadow-sm">
+      <div className="bg-neutral-900 text-neutral-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs border border-neutral-800 shadow-sm">
         <div className="flex items-center space-x-2.5">
-          <Lightbulb className="w-4 h-4 text-emerald-400 shrink-0" />
+          <Lightbulb className="w-4 h-4 text-purple-400 shrink-0" />
           <div>
             <span className="font-semibold text-white block">Evaluator Quick Tests</span>
-            <span className="text-[11px] text-slate-400">Preload baseline copy to inspect deterministic & AI findings:</span>
+            <span className="text-[11px] text-neutral-400">Preload baseline copy to inspect deterministic & AI findings:</span>
           </div>
         </div>
         <div className="flex items-center space-x-2 shrink-0">
           <button
             type="button"
             onClick={loadViolationSample}
-            className="bg-slate-900 hover:bg-slate-800 text-rose-300 border border-slate-700/80 px-3 py-1.5 rounded-lg transition font-medium text-[11px]"
+            className="bg-neutral-800 hover:bg-neutral-700 text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-lg transition font-medium text-[11px]"
           >
             Load Violations Sample
           </button>
           <button
             type="button"
             onClick={loadCompliantSample}
-            className="bg-slate-900 hover:bg-slate-800 text-emerald-300 border border-slate-700/80 px-3 py-1.5 rounded-lg transition font-medium text-[11px]"
+            className="bg-neutral-800 hover:bg-neutral-700 text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-lg transition font-medium text-[11px]"
           >
             Load Compliant Sample
           </button>
@@ -127,32 +145,60 @@ export default function NewSubmissionPage() {
       </div>
 
       {error && (
-        <div className="bg-rose-50/70 border border-rose-200 text-rose-900 text-xs p-4 rounded-xl flex items-center space-x-2.5 shadow-sm">
+        <div className="bg-rose-50 border border-rose-200 text-rose-900 text-xs p-4 rounded-xl flex items-center space-x-2.5 shadow-sm">
           <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
           <span className="font-mono">{error}</span>
         </div>
       )}
 
+      {/* Mode Selector Tabs */}
+      <div className="flex items-center space-x-1 p-1 bg-neutral-100 rounded-xl">
+        <button
+          type="button"
+          onClick={() => setActiveTab('upload')}
+          className={`flex-1 flex items-center justify-center space-x-1.5 py-2.5 text-xs font-semibold rounded-lg transition ${
+            activeTab === 'upload'
+              ? 'bg-white text-purple-700 shadow-xs'
+              : 'text-neutral-600 hover:text-black'
+          }`}
+        >
+          <UploadCloud className="w-4 h-4 text-purple-600" />
+          <span>Upload Document / Image (OCR)</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('manual')}
+          className={`flex-1 flex items-center justify-center space-x-1.5 py-2.5 text-xs font-semibold rounded-lg transition ${
+            activeTab === 'manual'
+              ? 'bg-white text-purple-700 shadow-xs'
+              : 'text-neutral-600 hover:text-black'
+          }`}
+        >
+          <Edit3 className="w-4 h-4 text-purple-600" />
+          <span>Direct Text Entry</span>
+        </button>
+      </div>
+
       {/* Form */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-4 text-xs">
+      <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-neutral-200 p-6 shadow-sm space-y-4 text-xs">
         <div>
-          <label className="block font-semibold text-slate-800 mb-1">Submission Title *</label>
+          <label className="block font-semibold text-black mb-1">Submission Title *</label>
           <input
             type="text"
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Q4 Enterprise Growth Announcement"
-            className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-slate-900 transition"
+            className="w-full px-3.5 py-2.5 text-xs bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 transition"
           />
         </div>
 
         <div>
-          <label className="block font-semibold text-slate-800 mb-1">Target Channel *</label>
+          <label className="block font-semibold text-black mb-1">Target Channel *</label>
           <select
             value={channel}
             onChange={(e) => setChannel(e.target.value)}
-            className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-slate-900 transition font-medium"
+            className="w-full px-3.5 py-2.5 text-xs bg-white border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 transition font-medium"
           >
             <option value="social">Social Media (LinkedIn, Twitter/X)</option>
             <option value="press_release">Press Release / Corporate Communications</option>
@@ -162,12 +208,34 @@ export default function NewSubmissionPage() {
           </select>
         </div>
 
+        {/* Upload Dropzone */}
+        {activeTab === 'upload' && (
+          <div className="space-y-1">
+            <label className="block font-semibold text-black">Source File Ingestion</label>
+            <FileIngestionDropzone
+              onExtracted={handleExtracted}
+              onError={(err) => setError(err)}
+              currentFilename={attachedMeta?.filename}
+              onClear={() => {
+                setAttachedMeta(null);
+                setContent('');
+              }}
+            />
+          </div>
+        )}
+
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="font-semibold text-slate-800">
-              Content Copy * <span className="font-normal text-slate-400">(Immutable Version 1)</span>
+            <label className="font-semibold text-black flex items-center space-x-1.5">
+              <span>{attachedMeta ? 'Extracted Content (Editable) *' : 'Content Copy *'}</span>
+              <span className="font-normal text-neutral-400">(Immutable Version 1)</span>
+              {attachedMeta && (
+                <span className="text-[10px] text-purple-700 bg-purple-50 px-2 py-0.5 rounded font-mono font-medium">
+                  {attachedMeta.fileType}
+                </span>
+              )}
             </label>
-            <span className="text-[10px] font-mono text-slate-400">
+            <span className="text-[10px] font-mono text-neutral-500">
               {wordCount} words • {charCount} chars
             </span>
           </div>
@@ -176,29 +244,33 @@ export default function NewSubmissionPage() {
             rows={8}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="Paste or write draft copy here to be audited against brand guidelines and verified facts..."
-            className="w-full px-3.5 py-2.5 text-xs font-mono bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-slate-900 transition leading-relaxed"
+            placeholder={
+              activeTab === 'upload'
+                ? 'Extracted text from document or OCR will appear here for review and editing...'
+                : 'Paste or write draft copy here to be audited against brand guidelines and verified facts...'
+            }
+            className="w-full px-3.5 py-2.5 text-xs font-mono bg-neutral-50 border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 transition leading-relaxed"
           />
         </div>
 
-        <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-          <div className="text-[11px] text-slate-400">
-            Author: <span className="font-mono text-slate-700 font-semibold">{currentUser.name}</span>
+        <div className="pt-4 border-t border-neutral-100 flex items-center justify-between">
+          <div className="text-[11px] text-neutral-500">
+            Author: <span className="font-mono text-black font-semibold">{currentUser.name}</span>
           </div>
 
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || !title.trim() || !content.trim()}
             className="flex items-center space-x-2 bg-black hover:bg-neutral-800 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-xs transition disabled:opacity-50 active:scale-95"
           >
             {submitting ? (
               <>
-                <RefreshCw className="w-4 h-4 animate-spin text-white" />
+                <RefreshCw className="w-4 h-4 animate-spin text-purple-400" />
                 <span>Running Governance Pipeline...</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 text-white" />
+                <Sparkles className="w-4 h-4 text-purple-400" />
                 <span>Submit & Run Review &rarr;</span>
               </>
             )}
