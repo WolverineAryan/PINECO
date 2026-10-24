@@ -1,0 +1,40 @@
+services:
+  # Backend API Service
+  - type: web
+    name: pineco-api
+    runtime: python
+    buildCommand: pip install -r apps/api/requirements.txt
+    startCommand: uvicorn pineco.main:app --host 0.0.0.0 --port $PORT
+    rootDir: apps/api
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: PYTHONPATH
+        value: .
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pineco-db
+          property: connectionString
+
+  # Frontend Web Service
+  - type: web
+    name: pineco-web
+    runtime: node
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    rootDir: apps/web
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_BASE_URL
+        fromService:
+          type: web
+          name: pineco-api
+          property: host
+          path: /api/v1
+
+databases:
+  - name: pineco-db
+    plan: free
