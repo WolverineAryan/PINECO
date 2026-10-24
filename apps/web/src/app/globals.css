@@ -350,3 +350,14 @@ html {
   border-color: rgba(124, 58, 237, 0.45);
 }
 
+/* Suppress Next.js dev server indicator / floating badge in bottom corner */
+nextjs-portal,
+[data-nextjs-toast],
+[data-nextjs-dev-indicator],
+[data-nextjs-dialog-overlay] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
