@@ -7,7 +7,7 @@ from fastapi import HTTPException, Security, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pineco.config import settings
 
-JWT_SECRET = getattr(settings, "AUTH_SECRET", "pineco-codeaxis-jwt-auth-secret-key-2026")
+JWT_SECRET = getattr(settings, "AUTH_SECRET", "pineco-ai-governance-jwt-secret-key-2026")
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 24
 

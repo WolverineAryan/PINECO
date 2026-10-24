@@ -944,10 +944,10 @@ class NumberedCanvas(canvas.Canvas):
 
     def draw_page_decorations(self, page_count):
         self.saveState()
-        # Top Running Header (every page, exactly like the sample proposal)
+        # Top Running Header (every page)
         self.setFont("Helvetica-Bold", 8)
         self.setFillColor(colors.HexColor("#475569"))
-        self.drawString(36, 814, "PINECO | CODEAXIS HACKATHON")
+        self.drawString(36, 814, "PINECO | AI GOVERNANCE PLATFORM")
         self.drawRightString(559, 814, f"Page {self._pageNumber} of {page_count}")
         
         self.setStrokeColor(colors.HexColor("#E2E8F0"))
@@ -1126,16 +1126,19 @@ def generate_pdf_report(
     story.append(Paragraph("Intelligent Brand Governance Platform", brand_subtitle_style))
     story.append(HRFlowable(width="100%", thickness=2.5, color=colors.HexColor("#7C3AED"), spaceAfter=10))
 
-    story.append(Paragraph("<font color='#7C3AED'><b>CODEAXIS HACKATHON • COMPLIANCE AUDIT DOSSIER</b></font>", h2_style))
+    story.append(Paragraph("<font color='#7C3AED'><b>AI GOVERNANCE PLATFORM • COMPLIANCE AUDIT DOSSIER</b></font>", h2_style))
     story.append(Paragraph(f"<b>Submission Compliance Audit & Technical Verification Dossier | {submission.title}</b>", h1_style))
-    story.append(Paragraph("Product category: AI-enabled content governance and brand compliance", meta_val_style))
+    prod_name = getattr(product, "name", "Enterprise Scope") if product else "Enterprise Product Scope"
+    prod_cat = getattr(product, "category", "Commercial Portfolio") if product else "Multi-Channel Dissemination"
+    channel_name = getattr(submission, "channel", "social").upper()
+    story.append(Paragraph(f"Product Scope: {prod_name} &nbsp;|&nbsp; Category: {prod_cat} &nbsp;|&nbsp; Channel: {channel_name}", meta_val_style))
     story.append(Spacer(1, 10))
 
-    # Executive Blockquote (Exact text from proposal)
+    # Executive Blockquote (Dynamic attestation quote)
     exec_quote_text = (
-        "Pineco reviews content before publication against an organisation's approved brand guidelines, "
-        "verified facts, terminology and creative assets. It produces evidence-linked findings, suggests "
-        "corrections and supports a human-controlled approval workflow."
+        f"Automated pre-publication brand governance and statutory compliance verification for '{submission.title}'. "
+        f"Evaluates promotional copy against deterministic brand policies, approved corporate ground truth, and "
+        f"regulatory truth-in-advertising standards with cryptographic auditability."
     )
     quote_table = Table([[Paragraph(f"<i>{exec_quote_text}</i>", body_italic_quote)]], colWidths=[523])
     quote_table.setStyle(
@@ -1201,37 +1204,58 @@ def generate_pdf_report(
     story.append(meta_table)
     story.append(Spacer(1, 14))
 
-    story.append(Paragraph("<b>Prepared for CodeAxis Hackathon | Round 1 - The Plan & Verification Dossier</b>", meta_val_style))
+    story.append(Paragraph("<b>Pineco AI Governance Platform | Enterprise Compliance & Technical Verification Dossier</b>", meta_val_style))
     story.append(PageBreak())
 
     # =========================================================================
     # PAGE 2: 1. EXECUTIVE SUMMARY & SCORECARD + 2. PROBLEM & STATUTORY RISK
     # =========================================================================
-    story.append(Paragraph("1. Executive Summary & Compliance Scorecard", h1_style))
-    story.append(
-        Paragraph(
-            "Organisations publish content through employees, agencies, freelancers and AI-assisted tools. "
-            "This distributed process can lead to inconsistent tone, outdated product information, unsupported promotional "
-            "claims, incorrect terminology, off-brand visuals and accessibility problems. These issues may reach customers "
-            "before a reviewer notices them.",
-            body_style,
-        )
-    )
-    story.append(
-        Paragraph(
-            "Pineco proposes a central brand-governance layer that reviews content before publication. Users configure "
-            "approved guidelines, factual sources, terminology and brand assets. Submitted content is assessed through "
-            "deterministic rules and AI-assisted analysis. Each finding includes the relevant content, severity, confidence, "
-            "applicable rule or source, explanation and suggested correction. Creators retain control of edits while "
-            "authorised reviewers manage approvals and exceptions.",
-            body_style,
-        )
-    )
-
     findings = getattr(review, "findings", []) or []
     high_count = sum(1 for f in findings if getattr(f, "severity", "") == "high")
     med_count = sum(1 for f in findings if getattr(f, "severity", "") == "medium")
     low_count = sum(1 for f in findings if getattr(f, "severity", "") == "low")
+    sub_title = getattr(submission, "title", "Content Submission")
+
+    if high_count == 0 and med_count == 0 and low_count == 0:
+        p1_text = (
+            f"This pre-publication compliance dossier certifies that marketing content entitled <b>'{sub_title}'</b>, "
+            f"scoped under the <b>{prod_name}</b> ({prod_cat}) portfolio, has cleared automated compliance screening. "
+            f"Evaluated against corporate brand guidelines and regulatory matrices for the <b>{channel_name}</b> channel, "
+            f"the draft contains zero detected policy violations, prohibited terminology, or ungrounded factual claims."
+        )
+        p2_text = (
+            f"The Pineco AI Governance Platform executed multi-stage deterministic regex scans, evidence cross-referencing, "
+            f"and semantic ground-truth validation against approved corporate source repositories. All assertions within "
+            f"this copy are substantiated by verified product documentation. The submission is designated as compliant "
+            f"and cleared for dual-custody human sign-off and publication."
+        )
+    else:
+        violation_types = []
+        if high_count > 0:
+            violation_types.append(f"<b>{high_count} critical/high-severity</b> statutory violations")
+        if med_count > 0:
+            violation_types.append(f"<b>{med_count} medium-severity</b> brand policy discrepancies")
+        if low_count > 0:
+            violation_types.append(f"<b>{low_count} low-severity</b> advisory notices")
+        violation_summary = ", ".join(violation_types)
+
+        p1_text = (
+            f"This pre-publication compliance dossier provides an automated technical verification audit of the marketing copy "
+            f"entitled <b>'{sub_title}'</b>, governed under the <b>{prod_name}</b> ({prod_cat}) asset registry. "
+            f"Prior to public dissemination across the <b>{channel_name}</b> channel, the content was evaluated against corporate "
+            f"brand guidelines, statutory truth-in-advertising mandates, and verified corporate facts, intercepting "
+            f"{violation_summary} that require corrective remediation."
+        )
+        p2_text = (
+            f"The Pineco AI Governance Platform intercepted flagged language to mitigate regulatory non-compliance exposure, "
+            f"prohibited absolute performance assertions, and corporate messaging drift. Every finding is linked to an authoritative "
+            f"rule, statutory citation, and recommended replacement text. In accordance with dual-custody governance, creators "
+            f"retain editing custody while authorized compliance personnel adjudicate approvals or record rationale-backed overrides."
+        )
+
+    story.append(Paragraph("1. Executive Summary & Compliance Scorecard", h1_style))
+    story.append(Paragraph(p1_text, body_style))
+    story.append(Paragraph(p2_text, body_style))
 
     scorecard_data = [
         [
@@ -1264,14 +1288,14 @@ def generate_pdf_report(
     story.append(scorecard_table)
     story.append(Spacer(1, 10))
 
-    story.append(Paragraph("2. Problem Definition & Statutory Frameworks", h1_style))
+    story.append(Paragraph("2. Statutory Governance & Regulatory Risk Framework", h1_style))
     story.append(
         Paragraph(
-            "Brand governance is difficult when content is created by multiple teams and tools but reviewed against "
-            "fragmented, outdated or ambiguous guidelines. Conventional proofreading focuses on language quality, while "
-            "general-purpose AI writing tools focus on content generation or rewriting. Organisations need a consistent, "
-            "explainable and traceable pre-publication process that checks brand compliance across formats while preserving "
-            "human accountability.",
+            f"Marketing and promotional materials disseminated via <b>{channel_name}</b> distribution channels are subject to "
+            f"strict consumer protection and truth-in-advertising standards. Unsubstantiated performance guarantees, missing "
+            f"statutory risk disclosures, and unqualified promotional assertions create substantial liability under regulatory enforcement frameworks. "
+            f"The Pineco AI Governance Platform provides deterministic pre-publication interception to ensure corporate copy strictly aligns "
+            f"with the multi-agency statutory requirements detailed below.",
             body_style,
         )
     )
