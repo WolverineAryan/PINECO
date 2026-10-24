@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   PlusCircle,
@@ -38,6 +38,7 @@ import {
 } from './Skeleton';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const pathname = usePathname();
   const {
     role,
@@ -63,13 +64,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [profileModalTab, setProfileModalTab] = useState<'profile' | 'settings' | 'help'>('profile');
 
-  // If on public landing page at '/' or '/landing', render directly without app sidebar
+  // If on public landing page or dedicated auth pages, render directly without app sidebar
+  const isAuthPage = pathname === '/login' || pathname === '/signup';
   const isLanding = pathname === '/' || pathname === '/landing';
 
-  if (isLanding) {
+  if (isLanding || isAuthPage) {
     return (
       <div className="min-h-screen bg-white text-black">
-        <AuthModal />
         {children}
       </div>
     );
@@ -84,7 +85,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-white text-black flex">
-      <AuthModal />
       <ProfileSettingsModal
         isOpen={profileModalOpen}
         initialTab={profileModalTab}
@@ -277,23 +277,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </div>
 
                 <div className="border-t border-neutral-100 pt-1 space-y-0.5">
-                  <button
-                    onClick={() => {
-                      setProfileMenuOpen(false);
-                      openAuthModal('signin');
-                    }}
+                  <Link
+                    href="/login"
+                    onClick={() => setProfileMenuOpen(false)}
                     className="w-full flex items-center space-x-2.5 px-2.5 py-1.5 rounded-lg text-neutral-600 hover:text-black hover:bg-neutral-100 text-[11px] transition text-left font-medium"
                   >
                     <Key className="w-3.5 h-3.5 text-neutral-400" />
-                    <span>Switch Account / JWT</span>
-                  </button>
+                    <span>Switch Account / Sign In</span>
+                  </Link>
 
                   <button
                     onClick={() => {
                       setProfileMenuOpen(false);
                       logout();
+                      router.push('/login');
                     }}
-                    className="w-full flex items-center space-x-2 px-2.5 py-1.5 rounded-lg text-rose-600 hover:bg-rose-50 font-bold transition text-left"
+                    className="w-full flex items-center space-x-2 px-2.5 py-1.5 rounded-lg text-rose-600 hover:bg-rose-50 font-bold transition text-left text-xs"
                   >
                     <LogOut className="w-3.5 h-3.5 text-rose-500" />
                     <span>Log out</span>

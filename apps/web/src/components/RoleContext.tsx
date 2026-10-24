@@ -373,7 +373,9 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
 
   const openAuthModal = (mode?: any) => {
     setAuthModalMode(mode === 'signup' ? 'signup' : 'signin');
-    setIsAuthModalOpen(true);
+    if (typeof window !== 'undefined') {
+      window.location.href = mode === 'signup' ? '/signup' : '/login';
+    }
   };
 
   const permissions = ROLE_PERMISSIONS[role] || ROLE_PERMISSIONS['reviewer'];

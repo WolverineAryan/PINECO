@@ -21,16 +21,12 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { useRole } from '@/components/RoleContext';
-import { AuthModal } from '@/components/AuthModal';
-
 export default function LandingPage() {
-  const { openAuthModal, loginWithRole } = useRole();
+  const { loginWithRole } = useRole();
   const [activeTab, setActiveTab] = useState<'violations' | 'compliant'>('violations');
 
   return (
     <div className="space-y-24 py-6">
-      <AuthModal />
-
       {/* Hero Section */}
       <section className="text-center max-w-4xl mx-auto space-y-6 pt-6 sm:pt-10">
         <div className="inline-flex items-center space-x-2 bg-slate-100 border border-slate-200/80 px-3.5 py-1.5 rounded-full text-xs font-mono text-slate-800 shadow-sm animate-in fade-in duration-300">
@@ -60,13 +56,13 @@ export default function LandingPage() {
             <span>Launch CRM Workspace</span>
             <ArrowRight className="w-4 h-4 text-emerald-400" />
           </Link>
-          <button
-            onClick={() => openAuthModal('signin')}
+          <Link
+            href="/login"
             className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-900 font-semibold text-xs px-5 py-3 rounded-xl shadow-sm transition"
           >
             <UserCheck className="w-4 h-4 text-slate-500" />
-            <span>Sign In / Register (JWT)</span>
-          </button>
+            <span>Sign In / Register</span>
+          </Link>
         </div>
 
         {/* Live Interactive Scan Demo Card */}
@@ -319,12 +315,12 @@ export default function LandingPage() {
           >
             Enter Main Dashboard &rarr;
           </Link>
-          <button
-            onClick={openAuthModal}
-            className="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-semibold text-xs px-5 py-3 rounded-xl transition"
+          <Link
+            href="/login"
+            className="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-semibold text-xs px-5 py-3 rounded-xl transition inline-block"
           >
-            Select Persona (JWT)
-          </button>
+            Sign In / Switch Role
+          </Link>
         </div>
       </section>
     </div>
