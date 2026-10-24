@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useRole } from '@/components/RoleContext';
 import { useToast } from '@/components/Toast';
+import { AuthBackgroundAnimation } from '@/components/AuthBackgroundAnimation';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -58,9 +59,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex flex-col justify-between text-neutral-900 selection:bg-purple-100 selection:text-purple-900 relative">
-      {/* Background Grid Pattern */}
-      <div className="absolute inset-0 bg-grid-monochrome opacity-40 pointer-events-none [mask-image:radial-gradient(ellipse_at_50%_35%,black_45%,transparent_85%)]" />
+    <div className="min-h-screen bg-neutral-50 flex flex-col justify-between text-neutral-900 selection:bg-purple-100 selection:text-purple-900 relative overflow-hidden">
+      {/* Dynamic Animated Ambient Background */}
+      <AuthBackgroundAnimation />
 
       {/* Top Header / Back Nav */}
       <header className="relative z-10 px-6 py-6 max-w-7xl mx-auto w-full flex items-center justify-between">

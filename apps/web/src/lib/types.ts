@@ -8,6 +8,7 @@ export type UserRole = 'creator' | 'brand_manager' | 'reviewer' | 'admin';
 
 export interface UserProfile {
   id: string;
+  workspace_id?: string;
   email: string;
   name: string;
   role: UserRole;

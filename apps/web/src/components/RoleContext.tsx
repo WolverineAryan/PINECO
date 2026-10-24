@@ -227,6 +227,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     // Check if token exists in localStorage
     const savedToken = localStorage.getItem('pineco_jwt_token');
     const savedUser = localStorage.getItem('pineco_jwt_user');
+    const savedWs = localStorage.getItem('pineco_workspace_id');
 
     if (savedToken && savedUser) {
       try {
@@ -235,6 +236,9 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
         setCurrentUser(parsed);
         setRoleState(parsed.role);
         setIsAuthenticated(true);
+        if (savedWs || parsed.workspace_id) {
+          setWorkspaceId(savedWs || parsed.workspace_id!);
+        }
 
         // Verify token with backend /me in background
         api
@@ -242,12 +246,17 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
           .then((verifiedProfile) => {
             setCurrentUser(verifiedProfile);
             setRoleState(verifiedProfile.role);
+            if (verifiedProfile.workspace_id) {
+              setWorkspaceId(verifiedProfile.workspace_id);
+              localStorage.setItem('pineco_workspace_id', verifiedProfile.workspace_id);
+            }
             localStorage.setItem('pineco_jwt_user', JSON.stringify(verifiedProfile));
           })
           .catch(() => {
             // Token expired or invalid
             localStorage.removeItem('pineco_jwt_token');
             localStorage.removeItem('pineco_jwt_user');
+            localStorage.removeItem('pineco_workspace_id');
             setToken(null);
             setIsAuthenticated(false);
           });
@@ -257,18 +266,28 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    // Default: initialize with demo reviewer credentials
-    loginWithCredentials('reviewer@pineco.internal', 'pineco2026!').catch(() => {});
+    // Default: initialize with demo reviewer credentials if not navigating to auth routes
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname;
+      if (path !== '/login' && path !== '/signup') {
+        loginWithCredentials('reviewer@pineco.internal', 'pineco2026!').catch(() => {});
+      }
+    }
   }, []);
 
   const login = async (email: string, password?: string) => {
     const res = await api.login({ email, password });
     localStorage.setItem('pineco_jwt_token', res.access_token);
     localStorage.setItem('pineco_jwt_user', JSON.stringify(res.user));
+    if (res.user.workspace_id) {
+      localStorage.setItem('pineco_workspace_id', res.user.workspace_id);
+      setWorkspaceId(res.user.workspace_id);
+    }
     setToken(res.access_token);
     setCurrentUser(res.user);
     setRoleState(res.user.role);
     setIsAuthenticated(true);
+    setActiveProduct(null);
   };
 
   const register = async (data: {
@@ -282,10 +301,15 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     const res = await api.register(data);
     localStorage.setItem('pineco_jwt_token', res.access_token);
     localStorage.setItem('pineco_jwt_user', JSON.stringify(res.user));
+    if (res.user.workspace_id) {
+      localStorage.setItem('pineco_workspace_id', res.user.workspace_id);
+      setWorkspaceId(res.user.workspace_id);
+    }
     setToken(res.access_token);
     setCurrentUser(res.user);
     setRoleState(res.user.role);
     setIsAuthenticated(true);
+    setActiveProduct(null);
   };
 
   const loginWithRole = async (targetRole: UserRole) => {
@@ -311,8 +335,11 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     localStorage.removeItem('pineco_jwt_token');
     localStorage.removeItem('pineco_jwt_user');
+    localStorage.removeItem('pineco_workspace_id');
     setToken(null);
     setIsAuthenticated(false);
+    setWorkspaceId('ws-demo-enterprise-001');
+    setActiveProduct(null);
     const fallback = DEFAULT_PROFILES['creator'];
     setCurrentUser(fallback);
     setRoleState(fallback.role);

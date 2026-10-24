@@ -45,6 +45,7 @@ class LoginRequest(BaseModel):
 
 class UserProfileResponse(BaseModel):
     id: str
+    workspace_id: str
     email: str
     name: str
     role: str
@@ -63,8 +64,10 @@ def format_user_profile(user_dict_or_model: Any) -> UserProfileResponse:
     if hasattr(user_dict_or_model, "email"):
         name = user_dict_or_model.name or "User"
         initials = "".join([p[0] for p in name.split()[:2]]).upper() or "PI"
+        ws_id = getattr(user_dict_or_model, "workspace_id", None) or settings.DEFAULT_WORKSPACE_ID
         return UserProfileResponse(
             id=user_dict_or_model.id,
+            workspace_id=ws_id,
             email=user_dict_or_model.email,
             name=name,
             role=user_dict_or_model.role or "reviewer",
@@ -75,8 +78,10 @@ def format_user_profile(user_dict_or_model: Any) -> UserProfileResponse:
     else:
         name = user_dict_or_model.get("name", "User")
         initials = "".join([p[0] for p in name.split()[:2]]).upper() or "PI"
+        ws_id = user_dict_or_model.get("workspace_id") or settings.DEFAULT_WORKSPACE_ID
         return UserProfileResponse(
             id=user_dict_or_model.get("id", ""),
+            workspace_id=ws_id,
             email=user_dict_or_model.get("email", ""),
             name=name,
             role=user_dict_or_model.get("role", "reviewer"),
@@ -90,6 +95,7 @@ def format_user_profile(user_dict_or_model: Any) -> UserProfileResponse:
 def register(payload: RegisterRequest, db: Session = Depends(get_db)):
     """
     Registers a new user account with secure password hashing and returns a signed JWT token.
+    Assigns a fresh, isolated workspace with zero mock data.
     """
     clean_email = payload.email.strip().lower()
     
@@ -113,9 +119,12 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
         "admin": "Enterprise Workspace Administrator",
     }.get(role_clean, "Brand Governance Specialist")
 
+    # Generate a fresh, isolated workspace for this newly registered enterprise account
+    new_workspace_id = f"ws-{uuid.uuid4().hex[:12]}"
+
     new_user = User(
         id=f"usr-{uuid.uuid4().hex[:12]}",
-        workspace_id=settings.DEFAULT_WORKSPACE_ID,
+        workspace_id=new_workspace_id,
         email=clean_email,
         password_hash=hash_password(payload.password),
         name=payload.name.strip(),
