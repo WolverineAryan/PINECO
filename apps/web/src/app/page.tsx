@@ -38,6 +38,7 @@ import {
   Play,
   RotateCcw,
   Sliders,
+  UserPlus,
   SlidersHorizontal,
   Workflow,
   ShieldAlert,
@@ -579,22 +580,27 @@ export default function LandingPage() {
             <a href="#faq" className="hover:text-purple-600 transition">FAQ</a>
           </div>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             <Link
               href="/login"
-              className="text-xs font-bold text-black hover:text-purple-700 hover:bg-purple-50 border border-neutral-300 hover:border-purple-300 px-3.5 py-2 rounded-xl transition shadow-xs flex items-center space-x-1.5"
+              className="text-xs font-semibold text-neutral-700 hover:text-black hover:bg-neutral-100 px-3 py-2 rounded-xl transition"
             >
-              <Lock className="w-3.5 h-3.5 text-neutral-500" />
-              <span>Sign In</span>
+              Sign In
+            </Link>
+            <Link
+              href="/signup"
+              className="text-xs font-bold text-white bg-purple-700 hover:bg-purple-800 px-3.5 py-2 rounded-xl transition shadow-xs flex items-center space-x-1.5 border border-purple-600"
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>Create Account</span>
             </Link>
             <button
               onClick={handleDemoAccess}
               disabled={isDemoLoading}
-              className="flex items-center space-x-1.5 bg-black hover:bg-neutral-900 text-white text-xs font-bold px-4 sm:px-5 py-2.5 rounded-xl shadow-xs transition active:scale-95 hover:shadow-[0_0_25px_-3px_rgba(124,58,237,0.4)] border border-purple-500/20"
+              className="hidden sm:flex items-center space-x-1.5 bg-black hover:bg-neutral-900 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-xs transition active:scale-95 border border-neutral-800"
             >
               <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-              <span>{isDemoLoading ? 'Opening Demo...' : 'Live Demo (20 Entries)'}</span>
-              <ArrowRight className="w-3.5 h-3.5 text-purple-400 hidden sm:inline" />
+              <span>{isDemoLoading ? 'Opening...' : 'Live Demo'}</span>
             </button>
           </div>
         </div>
@@ -627,27 +633,34 @@ export default function LandingPage() {
               <strong className="text-purple-700 font-bold">conservative AI fact verification</strong> grounded in corporate truth.
             </p>
 
-            {/* Hero CTAs (TopperCode signature pill style) */}
+            {/* Hero CTAs */}
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link
+                href="/signup"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 text-sm font-bold text-white bg-purple-700 hover:bg-purple-800 rounded-full shadow-lg shadow-purple-900/20 hover:shadow-purple-500/30 transition-all group active:scale-95 border border-purple-500/40"
+              >
+                <UserPlus className="w-4 h-4 text-purple-200" />
+                <span className="leading-none">Create Free Account</span>
+                <span className="w-5 h-5 rounded-full bg-white/20 inline-flex items-center justify-center group-hover:translate-x-0.5 transition-transform shrink-0">
+                  <ArrowRight className="w-3 h-3 text-white" />
+                </span>
+              </Link>
               <button
                 onClick={handleDemoAccess}
                 disabled={isDemoLoading}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 text-sm font-bold text-white bg-black hover:bg-neutral-900 active:bg-neutral-800 rounded-full shadow-lg shadow-black/20 hover:shadow-purple-500/25 transition-all group active:scale-95 border border-purple-500/30"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-4 text-sm font-bold text-white bg-black hover:bg-neutral-900 active:bg-neutral-800 rounded-full shadow-md transition-all group active:scale-95 border border-neutral-700"
               >
                 <Sparkles className="w-4 h-4 text-purple-400" />
                 <span className="leading-none">
-                  {isDemoLoading ? 'Opening Demo...' : 'Explore Demo Account (20 Entries)'}
-                </span>
-                <span className="w-5 h-5 rounded-full bg-white/20 inline-flex items-center justify-center group-hover:translate-x-0.5 transition-transform shrink-0">
-                  <ArrowRight className="w-3 h-3 text-white" />
+                  {isDemoLoading ? 'Opening Demo...' : 'Live Demo (20 Entries)'}
                 </span>
               </button>
               <Link
                 href="/login"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 text-sm font-semibold text-neutral-700 hover:text-black bg-white hover:bg-neutral-50 active:bg-neutral-100 border border-neutral-200 rounded-full shadow-sm transition-all active:scale-95"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 text-sm font-semibold text-neutral-700 hover:text-black bg-white hover:bg-neutral-50 active:bg-neutral-100 border border-neutral-200 rounded-full shadow-sm transition-all active:scale-95"
               >
-                <Lock className="w-3.5 h-3.5 text-purple-600 shrink-0" />
-                <span className="leading-none">Sign In / Switch Role</span>
+                <Lock className="w-3.5 h-3.5 text-neutral-500 shrink-0" />
+                <span className="leading-none">Sign In</span>
               </Link>
             </div>
 
@@ -2440,14 +2453,21 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
+            <Link
+              href="/signup"
+              className="w-full sm:w-auto bg-white hover:bg-neutral-100 text-black font-bold text-xs px-8 py-3.5 rounded-xl shadow-md transition active:scale-95 inline-flex items-center justify-center gap-2"
+            >
+              <UserPlus className="w-4 h-4 text-purple-700" />
+              <span>Create Free Account</span>
+              <ArrowRight className="w-3.5 h-3.5 text-black" />
+            </Link>
             <button
               onClick={handleDemoAccess}
               disabled={isDemoLoading}
-              className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-8 py-3.5 rounded-xl shadow-md transition active:scale-95 hover:shadow-[0_0_25px_rgba(124,58,237,0.5)] border border-purple-400/40 inline-flex items-center justify-center gap-2"
+              className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-7 py-3.5 rounded-xl shadow-md transition active:scale-95 border border-purple-400/40 inline-flex items-center justify-center gap-2"
             >
               <Sparkles className="w-4 h-4 text-white" />
-              <span>{isDemoLoading ? 'Loading Demo Workspace...' : 'Explore Demo Account (20 Entries)'}</span>
-              <ArrowRight className="w-3.5 h-3.5 text-white" />
+              <span>{isDemoLoading ? 'Loading Demo Workspace...' : 'Explore Demo Account'}</span>
             </button>
             <Link
               href="/login"

@@ -50,10 +50,10 @@ export default function LandingPage() {
         {/* Hero CTAs */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
           <Link
-            href="/"
+            href="/signup"
             className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-slate-950 hover:bg-slate-800 text-white font-semibold text-xs px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition duration-150"
           >
-            <span>Launch CRM Workspace</span>
+            <span>Create Account</span>
             <ArrowRight className="w-4 h-4 text-emerald-400" />
           </Link>
           <Link
@@ -61,7 +61,7 @@ export default function LandingPage() {
             className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-900 font-semibold text-xs px-5 py-3 rounded-xl shadow-sm transition"
           >
             <UserCheck className="w-4 h-4 text-slate-500" />
-            <span>Sign In / Register</span>
+            <span>Sign In</span>
           </Link>
         </div>
 

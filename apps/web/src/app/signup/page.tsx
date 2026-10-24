@@ -15,6 +15,7 @@ import {
   AlertCircle,
   Building2,
   CheckCircle2,
+  LogIn,
 } from 'lucide-react';
 import { useRole } from '@/components/RoleContext';
 import { useToast } from '@/components/Toast';
@@ -101,13 +102,14 @@ export default function SignupPage() {
           <span>Back to Home</span>
         </Link>
 
-        <div className="flex items-center space-x-2 text-xs font-medium text-neutral-500">
-          <span>Already registered?</span>
+        <div className="flex items-center space-x-3 text-xs font-medium">
+          <span className="text-neutral-500 hidden sm:inline">Already registered?</span>
           <Link
             href="/login"
-            className="text-purple-700 font-bold hover:underline"
+            className="border border-neutral-300 hover:border-purple-300 text-black hover:text-purple-700 font-bold px-3.5 py-1.5 rounded-xl transition shadow-xs flex items-center space-x-1.5 bg-white"
           >
-            Sign in
+            <LogIn className="w-3.5 h-3.5" />
+            <span>Sign In</span>
           </Link>
         </div>
       </header>
@@ -116,7 +118,7 @@ export default function SignupPage() {
       <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-8 sm:px-6">
         <div className="w-full max-w-lg bg-white border border-neutral-200/90 rounded-2xl shadow-xl p-8 space-y-6">
           {/* Logo & Headline */}
-          <div className="text-center space-y-2">
+          <div className="text-center space-y-3">
             <Link href="/" className="inline-block group">
               <img
                 src="/logo-text.png"
@@ -124,7 +126,21 @@ export default function SignupPage() {
                 className="h-10 w-auto object-contain mx-auto transition duration-200 group-hover:scale-[1.02]"
               />
             </Link>
-            <h1 className="text-2xl font-bold tracking-tight text-black pt-2">
+
+            {/* Segmented Mode Selector */}
+            <div className="flex p-1 bg-neutral-100 rounded-xl max-w-xs mx-auto text-xs font-semibold">
+              <Link
+                href="/login"
+                className="flex-1 py-1.5 px-3 text-neutral-500 hover:text-black rounded-lg text-center transition font-semibold"
+              >
+                Sign In
+              </Link>
+              <span className="flex-1 py-1.5 px-3 bg-white text-black font-bold rounded-lg shadow-2xs text-center">
+                Create Account
+              </span>
+            </div>
+
+            <h1 className="text-xl font-bold tracking-tight text-black pt-1">
               Create an enterprise account
             </h1>
             <p className="text-xs text-neutral-500">
@@ -309,6 +325,18 @@ export default function SignupPage() {
                 </>
               )}
             </button>
+
+            {/* Prominent Sign In Link inside card */}
+            <div className="pt-3 border-t border-neutral-100 flex items-center justify-between text-xs">
+              <span className="text-neutral-500">Already have an enterprise account?</span>
+              <Link
+                href="/login"
+                className="text-purple-700 font-bold hover:underline inline-flex items-center space-x-1"
+              >
+                <span>Sign in</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
           </form>
 
           {/* Security Footnote */}

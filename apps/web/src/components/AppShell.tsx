@@ -19,6 +19,7 @@ import {
   Sparkles,
   Key,
   User,
+  UserPlus,
   Settings as SettingsIcon,
   HelpCircle,
   LogOut,
@@ -277,6 +278,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </div>
 
                 <div className="border-t border-neutral-100 pt-1 space-y-0.5">
+                  <Link
+                    href="/signup"
+                    onClick={() => setProfileMenuOpen(false)}
+                    className="w-full flex items-center space-x-2.5 px-2.5 py-1.5 rounded-lg text-purple-700 hover:text-purple-900 hover:bg-purple-50 text-[11px] transition text-left font-semibold"
+                  >
+                    <UserPlus className="w-3.5 h-3.5 text-purple-600" />
+                    <span>Create New Account</span>
+                  </Link>
+
                   <Link
                     href="/login"
                     onClick={() => setProfileMenuOpen(false)}

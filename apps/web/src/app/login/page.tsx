@@ -12,8 +12,7 @@ import {
   EyeOff,
   ShieldCheck,
   AlertCircle,
-  Sparkles,
-  CheckCircle2,
+  UserPlus,
 } from 'lucide-react';
 import { useRole } from '@/components/RoleContext';
 import { useToast } from '@/components/Toast';
@@ -96,13 +95,14 @@ export default function LoginPage() {
           <span>Back to Home</span>
         </Link>
 
-        <div className="flex items-center space-x-2 text-xs font-medium text-neutral-500">
-          <span>Need an account?</span>
+        <div className="flex items-center space-x-3 text-xs font-medium">
+          <span className="text-neutral-500 hidden sm:inline">Don't have an account?</span>
           <Link
             href="/signup"
-            className="text-purple-700 font-bold hover:underline"
+            className="bg-purple-700 hover:bg-purple-800 text-white font-bold px-3.5 py-1.5 rounded-xl transition shadow-xs flex items-center space-x-1.5 border border-purple-600"
           >
-            Create account
+            <UserPlus className="w-3.5 h-3.5" />
+            <span>Create New Account</span>
           </Link>
         </div>
       </header>
@@ -110,8 +110,8 @@ export default function LoginPage() {
       {/* Main Container */}
       <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-8 sm:px-6">
         <div className="w-full max-w-md bg-white border border-neutral-200/90 rounded-2xl shadow-xl p-8 space-y-6">
-          {/* Logo & Headline */}
-          <div className="text-center space-y-2">
+          {/* Logo */}
+          <div className="text-center space-y-3">
             <Link href="/" className="inline-block group">
               <img
                 src="/logo-text.png"
@@ -119,7 +119,21 @@ export default function LoginPage() {
                 className="h-10 w-auto object-contain mx-auto transition duration-200 group-hover:scale-[1.02]"
               />
             </Link>
-            <h1 className="text-2xl font-bold tracking-tight text-black pt-2">
+
+            {/* Segmented Mode Selector */}
+            <div className="flex p-1 bg-neutral-100 rounded-xl max-w-xs mx-auto text-xs font-semibold">
+              <span className="flex-1 py-1.5 px-3 bg-white text-black font-bold rounded-lg shadow-2xs text-center">
+                Sign In
+              </span>
+              <Link
+                href="/signup"
+                className="flex-1 py-1.5 px-3 text-neutral-500 hover:text-black rounded-lg text-center transition font-semibold"
+              >
+                Create Account
+              </Link>
+            </div>
+
+            <h1 className="text-xl font-bold tracking-tight text-black pt-1">
               Sign in to your account
             </h1>
             <p className="text-xs text-neutral-500">
@@ -224,6 +238,18 @@ export default function LoginPage() {
                 </>
               )}
             </button>
+
+            {/* Prominent Create Account Link inside card */}
+            <div className="pt-3 border-t border-neutral-100 flex items-center justify-between text-xs">
+              <span className="text-neutral-500">Don't have an enterprise account?</span>
+              <Link
+                href="/signup"
+                className="text-purple-700 font-bold hover:underline inline-flex items-center space-x-1"
+              >
+                <span>Create account</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
           </form>
 
           {/* Quick Demo Role Selector */}
