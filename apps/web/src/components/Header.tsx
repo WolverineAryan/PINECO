@@ -52,7 +52,7 @@ export function Header() {
       <div className="bg-slate-950 text-slate-300 text-xs px-4 sm:px-6 lg:px-8 py-1.5 flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80">
         <div className="flex items-center space-x-3">
           <span className="bg-slate-800 text-slate-300 border border-slate-700/80 text-[10px] uppercase tracking-wider px-2 py-0.5 rounded font-mono font-medium">
-            CodeAxis Round 2
+            AI Governance Platform
           </span>
           <button
             onClick={copyWorkspace}

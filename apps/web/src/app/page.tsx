@@ -2515,10 +2515,10 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Main Footer 5-Column Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 text-xs">
-            {/* Column 1: Brand & Sovereign Trust (Span 2 cols on desktop) */}
-            <div className="col-span-2 space-y-4">
+          {/* Main Clean & Professional Footer */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 text-xs py-4">
+            {/* Column 1: Brand & Overview (6 cols) */}
+            <div className="md:col-span-6 space-y-3.5">
               <div className="flex items-center space-x-2.5">
                 <img
                   src="/logo-navbar.png"
@@ -2526,134 +2526,76 @@ export default function LandingPage() {
                   className="h-8 w-auto object-contain"
                 />
               </div>
-              <p className="text-xs text-neutral-500 leading-relaxed max-w-sm">
-                Pineco delivers pre-publication content governance, deterministic regulatory rule verification, and cryptographic chain-of-custody audit logging for distributed enterprise organizations.
+              <p className="text-xs text-neutral-500 leading-relaxed max-w-md">
+                Intelligent pre-publication brand governance, deterministic regulatory rule verification, and cryptographic chain-of-custody audit logging for distributed enterprise marketing teams.
               </p>
-
-              {/* Real-time System Operational Pill */}
-              <div className="inline-flex items-center space-x-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-xl text-[11px] font-mono shadow-xs">
+              <div className="inline-flex items-center space-x-2 bg-neutral-50 border border-neutral-200 px-3 py-1.5 rounded-xl text-[11px] font-mono">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-neutral-700 font-semibold">Systems Operational</span>
                 <span className="text-neutral-300">|</span>
                 <span className="text-purple-700 font-bold">Latency &lt;0.04s</span>
-              </div>
-
-              {/* Enterprise Security Badges */}
-              <div className="pt-2 flex flex-wrap gap-2 text-[10px] font-mono">
-                <span className="bg-white border border-neutral-200 text-neutral-700 px-2 py-1 rounded-md font-bold">
-                  SOC 2 Type II
-                </span>
-                <span className="bg-white border border-neutral-200 text-neutral-700 px-2 py-1 rounded-md font-bold">
-                  ISO/IEC 27001
-                </span>
-                <span className="bg-white border border-neutral-200 text-neutral-700 px-2 py-1 rounded-md font-bold">
-                  SHA-256 Merkle Chain
-                </span>
-                <span className="bg-white border border-neutral-200 text-neutral-700 px-2 py-1 rounded-md font-bold">
-                  Zero LLM Retention
-                </span>
+                <span className="text-neutral-300">|</span>
+                <span className="text-neutral-500">SOC 2 &bull; ISO 27001</span>
               </div>
             </div>
 
-            {/* Column 2: Governance Engine */}
-            <div className="space-y-3">
+            {/* Column 2: Governance Platform (3 cols) */}
+            <div className="md:col-span-3 space-y-2.5">
               <div className="font-mono text-[11px] font-bold uppercase tracking-wider text-black">
-                Platform Architecture
+                Platform
               </div>
               <ul className="space-y-2 text-neutral-500">
-                <li><a href="#live-sandbox" className="hover:text-purple-700 transition">Multi-Format Ingestion</a></li>
-                <li><a href="#how-it-works" className="hover:text-purple-700 transition">Deterministic Rule Matrix</a></li>
-                <li><a href="#how-it-works" className="hover:text-purple-700 transition">Ground Truth Evidence Vault</a></li>
-                <li><a href="#how-it-works" className="hover:text-purple-700 transition">Dual-Custody Sign-Off Gate</a></li>
-                <li><a href="#security" className="hover:text-purple-700 transition">Merkle Audit Ledger</a></li>
-                <li><Link href="/automation" className="hover:text-purple-700 transition">AI Policy Proposer</Link></li>
-                <li><Link href="/knowledge" className="hover:text-purple-700 transition">Knowledge Base Engine</Link></li>
+                <li><Link href="/dashboard" className="hover:text-purple-700 transition">Compliance Overview</Link></li>
+                <li><Link href="/knowledge" className="hover:text-purple-700 transition">Brand Guidelines &amp; Rules</Link></li>
+                <li><Link href="/audit" className="hover:text-purple-700 transition">Immutable Audit Ledger</Link></li>
+                <li><Link href="/automation" className="hover:text-purple-700 transition">AI Policy Architect</Link></li>
               </ul>
             </div>
 
-            {/* Column 3: Statutory Frameworks */}
-            <div className="space-y-3">
+            {/* Column 3: Trust & Regulatory (3 cols) */}
+            <div className="md:col-span-3 space-y-2.5">
               <div className="font-mono text-[11px] font-bold uppercase tracking-wider text-black">
-                Statutory Mandates
+                Compliance &amp; Trust
               </div>
               <ul className="space-y-2 text-neutral-500">
-                <li><a href="#regulations" className="hover:text-purple-700 transition">SEC Rule 206(4)-1</a></li>
-                <li><a href="#regulations" className="hover:text-purple-700 transition">FINRA Rule 2210</a></li>
-                <li><a href="#regulations" className="hover:text-purple-700 transition">FTC 16 CFR Part 260</a></li>
-                <li><a href="#regulations" className="hover:text-purple-700 transition">FDA 21 CFR §202.1</a></li>
-                <li><a href="#regulations" className="hover:text-purple-700 transition">EU AI Act Article 52</a></li>
-                <li><a href="#regulations" className="hover:text-purple-700 transition">AICPA SOC 2 Criteria</a></li>
-                <li><a href="#regulations" className="hover:text-purple-700 transition">NIST AI RMF 1.0</a></li>
-              </ul>
-            </div>
-
-            {/* Column 4: 16 Product Portfolios */}
-            <div className="space-y-3">
-              <div className="font-mono text-[11px] font-bold uppercase tracking-wider text-black">
-                Product Scopes
-              </div>
-              <ul className="space-y-2 text-neutral-500">
-                <li><Link href="/dashboard" className="hover:text-purple-700 transition">Apex Capital FinTech</Link></li>
-                <li><Link href="/dashboard" className="hover:text-purple-700 transition">BioPure HealthCare</Link></li>
-                <li><Link href="/dashboard" className="hover:text-purple-700 transition">NovaCloud B2B SaaS</Link></li>
-                <li><Link href="/dashboard" className="hover:text-purple-700 transition">EcoSmart Retail Goods</Link></li>
-                <li><Link href="/dashboard" className="hover:text-purple-700 transition">AuraGen GenAI Studio</Link></li>
-                <li><Link href="/dashboard" className="hover:text-purple-700 transition">QuantumSafe Defense</Link></li>
-                <li><Link href="/dashboard" className="hover:text-purple-700 transition">All 16 Scoped Products &rarr;</Link></li>
-              </ul>
-            </div>
-
-            {/* Column 5: Dossier & Resources */}
-            <div className="space-y-3">
-              <div className="font-mono text-[11px] font-bold uppercase tracking-wider text-black">
-                CodeAxis Hackathon
-              </div>
-              <ul className="space-y-2 text-neutral-500">
-                <li><a href="#live-sandbox" className="hover:text-purple-700 transition">Interactive Live Sandbox</a></li>
-                <li><a href="#roi-calculator" className="hover:text-purple-700 transition">ROI &amp; Cost Calculator</a></li>
-                <li><Link href="/audit" className="hover:text-purple-700 transition">Cryptographic Audit Trail</Link></li>
-                <li><Link href="/dashboard" className="hover:text-purple-700 transition">Instant Demo Account (20 Scans)</Link></li>
-                <li><a href="#security" className="hover:text-purple-700 transition">RBAC Sovereign Matrix</a></li>
-                <li><Link href="/dashboard" className="hover:text-purple-700 transition">Export PDF / PPTX Dossier</Link></li>
+                <li><a href="#regulations" className="hover:text-purple-700 transition">SEC &amp; FINRA Guidelines</a></li>
+                <li><a href="#regulations" className="hover:text-purple-700 transition">FTC Truth-in-Advertising</a></li>
+                <li><a href="#regulations" className="hover:text-purple-700 transition">FDA Fair-Balance Controls</a></li>
                 <li>
                   <a
                     href="https://github.com/WolverineAryan/PINECO"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-purple-700 font-bold hover:underline flex items-center space-x-1"
+                    className="text-purple-700 font-bold hover:underline inline-flex items-center space-x-1"
                   >
                     <span>GitHub Repository</span>
-                    <ExternalLink className="w-3 h-3" />
+                    <ExternalLink className="w-3 h-3 ml-0.5" />
                   </a>
                 </li>
               </ul>
             </div>
           </div>
 
-          {/* Bottom Legal & Non-Counsel Disclaimer */}
-          <div className="pt-8 border-t border-neutral-200/80 space-y-3">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-neutral-500">
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          {/* Bottom Legal & Copyright Bar */}
+          <div className="pt-6 border-t border-neutral-200/80 space-y-2.5">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-neutral-500">
+              <div>
                 <span>&copy; 2026 Pineco Technologies Inc. All rights reserved.</span>
-                <span className="hidden sm:inline text-neutral-300">|</span>
-                <span className="font-mono text-purple-700 font-bold">
-                  CodeAxis Hackathon • Technical Plan &amp; Verification Dossier
-                </span>
               </div>
 
               <div className="flex flex-wrap items-center space-x-4">
-                <a href="#security" className="hover:text-purple-700 transition">Privacy Architecture</a>
+                <a href="#security" className="hover:text-purple-700 transition">Privacy Policy</a>
                 <a href="#security" className="hover:text-purple-700 transition">Terms of Service</a>
-                <a href="#security" className="hover:text-purple-700 transition">Zero-Retention DPA</a>
-                <Link href="/dashboard" className="text-black font-bold hover:text-purple-700 transition flex items-center space-x-1">
-                  <span>Launch Dashboard</span>
-                  <ArrowRight className="w-3 h-3" />
+                <a href="#security" className="hover:text-purple-700 transition">Security Attestation</a>
+                <Link href="/dashboard" className="text-black font-bold hover:text-purple-700 transition inline-flex items-center space-x-1">
+                  <span>Open App</span>
+                  <ArrowRight className="w-3 h-3 ml-0.5" />
                 </Link>
               </div>
             </div>
 
             <p className="text-[10px] text-neutral-400 leading-relaxed text-center sm:text-left">
-              Disclaimer: Pineco is an automated brand governance and content pre-clearance platform designed to enforce organizational brand guidelines and published regulatory baselines. Automated verification supplements but does not constitute formal legal counsel. Enterprise release remains subject to authorized dual-custody human sign-off.
+              Disclaimer: Pineco provides pre-publication brand governance and compliance verification. Automated verification supplements internal review workflows under dual-custody human sign-off.
             </p>
           </div>
         </div>

@@ -35,7 +35,7 @@ export default function LandingPage() {
       <section className="text-center max-w-4xl mx-auto space-y-6 pt-6 sm:pt-10">
         <div className="inline-flex items-center space-x-2 bg-slate-100 border border-slate-200/80 px-3.5 py-1.5 rounded-full text-xs font-mono text-slate-800 shadow-sm animate-in fade-in duration-300">
           <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-          <span className="font-semibold">CodeAxis Hackathon Round 2 Build</span>
+          <span className="font-semibold">AI Governance Platform</span>
           <span className="text-slate-400">•</span>
           <span className="text-slate-600">Enterprise Brand Governance</span>
         </div>
