@@ -421,14 +421,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </div>
               )}
             </div>
-
-            <button
-              onClick={() => setShowScanCopy(true)}
-              className="flex items-center space-x-1.5 bg-black hover:bg-neutral-900 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl shadow-xs transition active:scale-95 hover:shadow-[0_0_15px_-2px_rgba(124,58,237,0.35)] border border-purple-500/20"
-            >
-              <PlusCircle className="w-3.5 h-3.5 text-purple-400" />
-              <span>Scan Copy</span>
-            </button>
           </div>
         </header>
 

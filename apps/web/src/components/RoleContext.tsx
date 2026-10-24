@@ -72,7 +72,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermissions> = {
     canOverrideWithRationale: true,
     canCreateSubmissions: true,
     canInspectAuditTrail: true,
-    canManageWorkspace: false,
+    canManageWorkspace: true,
     canExportPackets: true,
   },
   reviewer: {
@@ -80,9 +80,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermissions> = {
     canEditFacts: false,
     canApproveSubmissions: true,
     canOverrideWithRationale: true,
-    canCreateSubmissions: false,
+    canCreateSubmissions: true,
     canInspectAuditTrail: true,
-    canManageWorkspace: false,
+    canManageWorkspace: true,
     canExportPackets: true,
   },
   creator: {
@@ -91,8 +91,8 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermissions> = {
     canApproveSubmissions: false,
     canOverrideWithRationale: false,
     canCreateSubmissions: true,
-    canInspectAuditTrail: false,
-    canManageWorkspace: false,
+    canInspectAuditTrail: true,
+    canManageWorkspace: true,
     canExportPackets: false,
   },
 };

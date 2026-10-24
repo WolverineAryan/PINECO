@@ -1,3 +1,4 @@
+import json
 from typing import List, Optional
 from fastapi import APIRouter, Depends, Query, HTTPException, status
 from sqlalchemy.orm import Session
@@ -54,7 +55,7 @@ def create_product(
         entity_type="product",
         entity_id=product.id,
         event_type="created",
-        metadata_json=f'{{"name": "{product.name}", "category": "{product.category}"}}',
+        metadata_json=json.dumps({"name": product.name, "category": product.category}),
     )
     db.add(audit)
     db.commit()

@@ -50,3 +50,45 @@ def test_product_crud_and_scoping(client, db_session):
     # 5. Delete product
     del_resp = client.delete(f"/api/v1/products/{prod_id}")
     assert del_resp.status_code == 204
+
+
+def test_create_product_authenticated_new_user(client):
+    # Register a new user
+    reg_resp = client.post(
+        "/api/v1/auth/register",
+        json={
+            "name": "Jordan Brand Specialist",
+            "email": "jordan.brand@test.internal",
+            "password": "Password123!",
+            "role": "brand_manager",
+        },
+    )
+    assert reg_resp.status_code == 201
+    auth_data = reg_resp.json()
+    token = auth_data["access_token"]
+    user_ws = auth_data["user"]["workspace_id"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Verify newly registered user starts with 0 products
+    init_list = client.get("/api/v1/products", headers=headers).json()
+    assert len(init_list) == 0
+
+    # User creates their first product folder without specifying workspace_id
+    create_resp = client.post(
+        "/api/v1/products",
+        json={
+            "name": "Omni Brand Campaign",
+            "category": "Corporate Brand",
+            "description": "2026 Core Product Line",
+        },
+        headers=headers,
+    )
+    assert create_resp.status_code == 201
+    new_prod = create_resp.json()
+    assert new_prod["name"] == "Omni Brand Campaign"
+    assert new_prod["workspace_id"] == user_ws
+
+    # Verify list products now contains exactly 1 product
+    updated_list = client.get("/api/v1/products", headers=headers).json()
+    assert len(updated_list) == 1
+    assert updated_list[0]["id"] == new_prod["id"]

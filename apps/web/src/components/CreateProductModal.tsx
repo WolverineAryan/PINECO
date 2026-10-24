@@ -12,7 +12,7 @@ interface CreateProductModalProps {
 }
 
 export function CreateProductModal({ isOpen, onClose }: CreateProductModalProps) {
-  const { workspaceId, reloadProducts, setActiveProduct, hasPermission, role } = useRole();
+  const { workspaceId, setWorkspaceId, reloadProducts, setActiveProduct } = useRole();
   const { success, error: toastError } = useToast();
 
   const [name, setName] = useState('');
@@ -32,8 +32,15 @@ export function CreateProductModal({ isOpen, onClose }: CreateProductModalProps)
         name: name.trim(),
         category: category.trim(),
         description: description.trim() || undefined,
-        workspace_id: workspaceId,
+        workspace_id: workspaceId || undefined,
       });
+
+      if (!workspaceId && newProd.workspace_id) {
+        setWorkspaceId(newProd.workspace_id);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('pineco_workspace_id', newProd.workspace_id);
+        }
+      }
 
       success('Product Folder Created', `Governance space ready for ${newProd.name}`);
       await reloadProducts();
@@ -126,8 +133,8 @@ export function CreateProductModal({ isOpen, onClose }: CreateProductModalProps)
             </button>
             <button
               type="submit"
-              disabled={saving || !name.trim() || !hasPermission('canManageWorkspace')}
-              className="px-5 py-2.5 text-xs font-bold bg-black hover:bg-neutral-800 text-white rounded-xl shadow-xs transition disabled:opacity-50"
+              disabled={saving || !name.trim()}
+              className="px-5 py-2.5 text-xs font-bold bg-black hover:bg-neutral-800 text-white rounded-xl shadow-xs transition disabled:opacity-50 cursor-pointer"
             >
               {saving ? 'Creating Folder...' : 'Create Folder'}
             </button>
