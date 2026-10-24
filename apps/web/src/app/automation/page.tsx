@@ -575,61 +575,6 @@ export default function AutomationAgentPage() {
         )}
       </div>
 
-      {/* Top Telemetry & Status HUD */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-neutral-500 mb-1">
-            <span className="text-[10px] font-mono uppercase font-bold tracking-wider">Agent Model</span>
-            <Sparkles className="w-4 h-4 text-purple-600" />
-          </div>
-          <div className="text-lg font-bold text-black font-mono">
-            {agentStatus?.model || 'grok-2-latest'}
-          </div>
-          <div className="text-[11px] text-neutral-500">
-            {agentStatus?.llm_provider || 'xAI Grok-2 Autonomous Reasoner'}
-          </div>
-        </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-neutral-500 mb-1">
-            <span className="text-[10px] font-mono uppercase font-bold tracking-wider">Interception Speed</span>
-            <Zap className="w-4 h-4 text-purple-600" />
-          </div>
-          <div className="text-lg font-bold text-black font-mono">
-            {agentStatus?.latency_ms || 42.5} ms
-          </div>
-          <div className="text-[11px] text-neutral-500">
-            Sub-millisecond regex + parallel LLM
-          </div>
-        </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-neutral-500 mb-1">
-            <span className="text-[10px] font-mono uppercase font-bold tracking-wider">Warning Categories</span>
-            <AlertTriangle className="w-4 h-4 text-purple-600" />
-          </div>
-          <div className="text-lg font-bold text-black font-mono">
-            5 Granular Tiers
-          </div>
-          <div className="text-[11px] text-neutral-500">
-            Legal, regulatory, trademark, fact drift
-          </div>
-        </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-neutral-500 mb-1">
-            <span className="text-[10px] font-mono uppercase font-bold tracking-wider">Remediation Engine</span>
-            <CheckCircle2 className="w-4 h-4 text-purple-600" />
-          </div>
-          <div className="text-lg font-bold text-black font-mono">
-            Autonomous
-          </div>
-          <div className="text-[11px] text-neutral-500">
-            Auto-diff generation with zero hallucination
-          </div>
-        </div>
-      </div>
-
       {/* Autonomous Automation Pipelines Section */}
       <div className="bg-white rounded-2xl border border-neutral-200 p-6 space-y-5 shadow-xs">
         <div className="flex items-center justify-between">
