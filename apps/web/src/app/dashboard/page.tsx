@@ -267,8 +267,8 @@ export default function ProductComplianceDashboard() {
       </div>
 
       {/* Main Content Compliance Stream */}
-      <div className="bg-white rounded-2xl border border-neutral-200 shadow-xs overflow-hidden">
-        <div className="p-4 sm:p-5 border-b border-neutral-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div className="bg-white rounded-2xl border border-neutral-200 shadow-xs relative">
+        <div className="p-4 sm:p-5 border-b border-neutral-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-t-2xl bg-white">
           <div className="flex items-center space-x-3">
             <h2 className="text-sm font-bold text-black uppercase tracking-wide font-mono">
               Content Compliance Reviews
@@ -348,7 +348,7 @@ export default function ProductComplianceDashboard() {
               return (
                 <div
                   key={sub.id}
-                  className="p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-neutral-50/80 transition group"
+                  className="p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-neutral-50/80 transition group relative hover:z-20"
                 >
                   <div className="space-y-1 flex-1 min-w-0">
                     <div className="flex items-center space-x-2">

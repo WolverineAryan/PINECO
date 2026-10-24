@@ -25,6 +25,7 @@ export function ExportReportDropdown({
   className = '',
 }: ExportReportDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [openUpward, setOpenUpward] = useState(false);
   const [exportingFormat, setExportingFormat] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { success, error: toastError } = useToast();
@@ -38,6 +39,19 @@ export function ExportReportDropdown({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (isOpen && dropdownRef.current) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      // If there's less than 280px below, flip upward to prevent underlapping
+      if (spaceBelow < 280 && rect.top > 280) {
+        setOpenUpward(true);
+      } else {
+        setOpenUpward(false);
+      }
+    }
+  }, [isOpen]);
 
   const handleExport = async (format: 'pdf' | 'docx' | 'pptx') => {
     try {
@@ -56,7 +70,7 @@ export function ExportReportDropdown({
   };
 
   return (
-    <div className={`relative inline-block text-left ${className}`} ref={dropdownRef}>
+    <div className={`relative inline-block text-left ${isOpen ? 'z-50' : 'z-10'} ${className}`} ref={dropdownRef}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -73,7 +87,11 @@ export function ExportReportDropdown({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white border border-neutral-200 shadow-xl z-50 p-2 animate-in fade-in zoom-in-95 duration-150">
+        <div
+          className={`absolute right-0 w-72 rounded-2xl bg-white border border-neutral-200 shadow-2xl z-50 p-2 animate-in fade-in zoom-in-95 duration-150 ${
+            openUpward ? 'bottom-full mb-2 origin-bottom-right' : 'top-full mt-2 origin-top-right'
+          }`}
+        >
           <div className="px-3 py-2 border-b border-neutral-100 mb-1">
             <span className="text-[11px] font-bold text-black uppercase tracking-wider block">
               Export Compliance Audit
