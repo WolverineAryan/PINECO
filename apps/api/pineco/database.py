@@ -3,9 +3,22 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from pineco.config import settings
 
 db_url = settings.DATABASE_URL
-# Render and other PaaS providers provide postgres:// which SQLAlchemy 2.0 requires as postgresql+psycopg2://
+# Render and other PaaS providers provide postgres:// which SQLAlchemy 2.0 requires as postgresql+psycopg:// or postgresql+psycopg2://
 if db_url.startswith("postgres://"):
-    db_url = db_url.replace("postgres://", "postgresql+psycopg2://", 1)
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+if db_url.startswith("postgresql://") and not any(
+    driver in db_url for driver in ["+psycopg", "+asyncpg", "+pg8000"]
+):
+    try:
+        import psycopg  # psycopg v3
+        db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
+    except ImportError:
+        try:
+            import psycopg2  # psycopg2 fallback
+            db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+        except ImportError:
+            pass
 
 connect_args = {}
 if db_url.startswith("sqlite"):
