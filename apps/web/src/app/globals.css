@@ -25,7 +25,8 @@ html {
   * {
     border-color: var(--border);
   }
-  body {
+  html, body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     color: var(--foreground);
     background-color: var(--background);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
@@ -348,16 +349,5 @@ html {
   transform: translateY(-4px);
   box-shadow: 0 20px 40px -15px rgba(124, 58, 237, 0.16), 0 0 20px rgba(124, 58, 237, 0.12);
   border-color: rgba(124, 58, 237, 0.45);
-}
-
-/* Suppress Next.js dev server indicator / floating badge in bottom corner */
-nextjs-portal,
-[data-nextjs-toast],
-[data-nextjs-dev-indicator],
-[data-nextjs-dialog-overlay] {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
 }
 

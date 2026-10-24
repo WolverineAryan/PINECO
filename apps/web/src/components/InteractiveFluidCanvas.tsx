@@ -44,28 +44,28 @@ export function InteractiveFluidCanvas({ className = '' }: { className?: string 
     let time = 0;
     let lastTime = performance.now();
 
-    // 7 Signature Fluid Masses strictly aligned with Pineco's Purple & Black palette
+    // 7 Signature Fluid Masses directly aligned with the rainbow water flow spectrum (Cyan, Blue, Purple, Magenta, Rose, Amber, Emerald)
     const masses: FluidMass[] = [
       {
-        baseXRatio: 0.18,
-        baseYRatio: 0.28,
+        baseXRatio: 0.2,
+        baseYRatio: 0.3,
         x: 0,
         y: 0,
         vx: 0,
         vy: 0,
-        radiusRatio: 0.44,
-        radius: 290,
-        hue: 268, // Electric Royal Purple (#7C3AED)
-        sat: 88,
-        light: 58,
-        alpha: 0.38,
+        radiusRatio: 0.42,
+        radius: 280,
+        hue: 195, // Vivid Cyan / Blue
+        sat: 90,
+        light: 60,
+        alpha: 0.42,
         phaseX: 0,
         phaseY: 1.0,
         speedX: 0.35,
         speedY: 0.4,
       },
       {
-        baseXRatio: 0.48,
+        baseXRatio: 0.5,
         baseYRatio: 0.22,
         x: 0,
         y: 0,
@@ -73,71 +73,35 @@ export function InteractiveFluidCanvas({ className = '' }: { className?: string 
         vy: 0,
         radiusRatio: 0.46,
         radius: 320,
-        hue: 260, // Deep Obsidian Jet Black
-        sat: 30,
-        light: 8,
-        alpha: 0.4,
+        hue: 240, // Deep Royal Blue
+        sat: 88,
+        light: 62,
+        alpha: 0.38,
         phaseX: 1.8,
         phaseY: 0.6,
         speedX: 0.3,
         speedY: 0.35,
       },
       {
-        baseXRatio: 0.82,
-        baseYRatio: 0.32,
+        baseXRatio: 0.8,
+        baseYRatio: 0.35,
         x: 0,
         y: 0,
         vx: 0,
         vy: 0,
         radiusRatio: 0.45,
-        radius: 310,
-        hue: 274, // Luminous Violet Purple (#9333EA)
+        radius: 300,
+        hue: 275, // Electric Purple (Pineco Brand core)
         sat: 92,
-        light: 54,
-        alpha: 0.36,
+        light: 60,
+        alpha: 0.45,
         phaseX: 0.9,
         phaseY: 2.1,
         speedX: 0.38,
         speedY: 0.32,
       },
       {
-        baseXRatio: 0.76,
-        baseYRatio: 0.74,
-        x: 0,
-        y: 0,
-        vx: 0,
-        vy: 0,
-        radiusRatio: 0.42,
-        radius: 280,
-        hue: 265, // Midnight Plum / Deep Violet (#1C1033)
-        sat: 68,
-        light: 14,
-        alpha: 0.42,
-        phaseX: 2.5,
-        phaseY: 1.2,
-        speedX: 0.32,
-        speedY: 0.42,
-      },
-      {
-        baseXRatio: 0.5,
-        baseYRatio: 0.84,
-        x: 0,
-        y: 0,
-        vx: 0,
-        vy: 0,
-        radiusRatio: 0.44,
-        radius: 300,
-        hue: 262, // Soft Luminous Lavender Purple (#C4B5FD)
-        sat: 82,
-        light: 72,
-        alpha: 0.32,
-        phaseX: 0.4,
-        phaseY: 2.8,
-        speedX: 0.4,
-        speedY: 0.35,
-      },
-      {
-        baseXRatio: 0.24,
+        baseXRatio: 0.78,
         baseYRatio: 0.72,
         x: 0,
         y: 0,
@@ -145,9 +109,45 @@ export function InteractiveFluidCanvas({ className = '' }: { className?: string 
         vy: 0,
         radiusRatio: 0.4,
         radius: 270,
-        hue: 250, // Carbon Black (#09090C)
-        sat: 25,
-        light: 6,
+        hue: 305, // Rich Magenta / Violet
+        sat: 90,
+        light: 62,
+        alpha: 0.36,
+        phaseX: 2.5,
+        phaseY: 1.2,
+        speedX: 0.32,
+        speedY: 0.42,
+      },
+      {
+        baseXRatio: 0.52,
+        baseYRatio: 0.82,
+        x: 0,
+        y: 0,
+        vx: 0,
+        vy: 0,
+        radiusRatio: 0.42,
+        radius: 290,
+        hue: 345, // Soft Rose / Crimson
+        sat: 90,
+        light: 64,
+        alpha: 0.35,
+        phaseX: 0.4,
+        phaseY: 2.8,
+        speedX: 0.4,
+        speedY: 0.35,
+      },
+      {
+        baseXRatio: 0.25,
+        baseYRatio: 0.75,
+        x: 0,
+        y: 0,
+        vx: 0,
+        vy: 0,
+        radiusRatio: 0.38,
+        radius: 260,
+        hue: 38, // Warm Amber / Golden Sunlight
+        sat: 94,
+        light: 58,
         alpha: 0.36,
         phaseX: 2.2,
         phaseY: 0.3,
@@ -155,18 +155,18 @@ export function InteractiveFluidCanvas({ className = '' }: { className?: string 
         speedY: 0.3,
       },
       {
-        baseXRatio: 0.12,
+        baseXRatio: 0.14,
         baseYRatio: 0.52,
         x: 0,
         y: 0,
         vx: 0,
         vy: 0,
-        radiusRatio: 0.42,
-        radius: 280,
-        hue: 270, // Signature Royal Purple (#6D28D9)
+        radiusRatio: 0.4,
+        radius: 270,
+        hue: 165, // Fresh Emerald / Teal
         sat: 86,
-        light: 46,
-        alpha: 0.38,
+        light: 56,
+        alpha: 0.35,
         phaseX: 1.5,
         phaseY: 1.9,
         speedX: 0.36,
@@ -327,7 +327,7 @@ export function InteractiveFluidCanvas({ className = '' }: { className?: string 
       ctx.save();
       ctx.globalCompositeOperation = 'source-over';
 
-      // Draw all fluid masses strictly in Purple & Black theme
+      // Draw all 7 rainbow fluid masses with multi-stop radial gradients
       for (const d of masses) {
         const radius = d.radius;
         if (radius <= 1) continue;
@@ -335,8 +335,8 @@ export function InteractiveFluidCanvas({ className = '' }: { className?: string 
         const grad = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, radius);
         const y = d.alpha;
         const E = `hsla(${d.hue}, ${d.sat}%, ${d.light}%, ${y.toFixed(3)})`;
-        const N = `hsla(${d.hue}, ${Math.max(d.sat - 10, 20)}%, ${Math.max(d.light - 6, 6)}%, ${(y * 0.5).toFixed(3)})`;
-        const F = `hsla(${d.hue}, ${d.sat}%, ${d.light}%, 0)`;
+        const N = `hsla(${(d.hue + 15) % 360}, ${d.sat - 8}%, ${d.light + 4}%, ${(y * 0.55).toFixed(3)})`;
+        const F = `hsla(${(d.hue + 30) % 360}, ${d.sat - 12}%, ${d.light + 8}%, 0)`;
 
         grad.addColorStop(0, E);
         grad.addColorStop(0.5, N);
@@ -348,7 +348,7 @@ export function InteractiveFluidCanvas({ className = '' }: { className?: string 
         ctx.fill();
       }
 
-      // Dynamic Interactive Cursor Fluid Glow on Hover (strictly purple and black)
+      // Dynamic Interactive Cursor Fluid Glow on Hover (Enhancement for immediate cursor feedback)
       if (hoverStrength > 0.02 && smoothMouseX > 0 && smoothMouseY > 0) {
         const cursorRadius = Math.max(width * 0.28, 260);
         const cursorGrad = ctx.createRadialGradient(
@@ -359,11 +359,11 @@ export function InteractiveFluidCanvas({ className = '' }: { className?: string 
           smoothMouseY,
           cursorRadius
         );
-        const curAlpha = 0.42 * hoverStrength;
-        cursorGrad.addColorStop(0, `hsla(268, 92%, 58%, ${curAlpha.toFixed(3)})`);
-        cursorGrad.addColorStop(0.35, `hsla(265, 80%, 32%, ${(curAlpha * 0.55).toFixed(3)})`);
-        cursorGrad.addColorStop(0.7, `hsla(260, 30%, 10%, ${(curAlpha * 0.25).toFixed(3)})`);
-        cursorGrad.addColorStop(1, 'hsla(260, 30%, 10%, 0)');
+        const curAlpha = 0.45 * hoverStrength;
+        cursorGrad.addColorStop(0, `hsla(275, 95%, 65%, ${curAlpha.toFixed(3)})`);
+        cursorGrad.addColorStop(0.35, `hsla(295, 90%, 62%, ${(curAlpha * 0.6).toFixed(3)})`);
+        cursorGrad.addColorStop(0.65, `hsla(235, 85%, 65%, ${(curAlpha * 0.25).toFixed(3)})`);
+        cursorGrad.addColorStop(1, 'hsla(275, 90%, 60%, 0)');
 
         ctx.fillStyle = cursorGrad;
         ctx.beginPath();

@@ -44,8 +44,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [showScanCopy, setShowScanCopy] = useState(false);
   const [roleMenuOpen, setRoleMenuOpen] = useState(false);
 
-  // If on public landing page at '/', render directly without app sidebar
-  const isLanding = pathname === '/';
+  // If on public landing page at '/' or '/landing', render directly without app sidebar
+  const isLanding = pathname === '/' || pathname === '/landing';
 
   if (isLanding) {
     return (

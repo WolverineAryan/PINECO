@@ -15,8 +15,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full">
-      <body className="bg-white text-black antialiased min-h-screen flex flex-col font-sans selection:bg-black selection:text-white">
+    <html lang="en" className="h-full" suppressHydrationWarning>
+      <body
+        suppressHydrationWarning
+        className="bg-white text-black antialiased min-h-screen flex flex-col font-sans selection:bg-black selection:text-white"
+        style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}
+      >
         <RoleProvider>
           <ToastProvider>
             <AppShell>{children}</AppShell>

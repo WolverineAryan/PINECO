@@ -514,10 +514,10 @@ export default function LandingPage() {
         {/* Subtle grid */}
         <div className="absolute inset-0 bg-grid-monochrome opacity-50 [mask-image:radial-gradient(ellipse_at_50%_25%,black_45%,transparent_85%)]" />
 
-        {/* Fluid morphing blobs (Strictly Purple and Black) */}
-        <div className="absolute -top-32 left-1/4 w-[550px] h-[550px] rounded-full bg-gradient-to-tr from-purple-600/25 via-purple-800/20 to-neutral-950/15 blur-3xl animate-fluid-1" />
-        <div className="absolute -top-20 right-1/4 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-neutral-950/25 via-purple-600/20 to-purple-900/20 blur-3xl animate-fluid-2" />
-        <div className="absolute top-96 left-1/3 w-[650px] h-[450px] rounded-full bg-gradient-to-r from-purple-800/20 via-purple-600/15 to-neutral-950/20 blur-3xl animate-fluid-3" />
+        {/* Fluid morphing blobs */}
+        <div className="absolute -top-32 left-1/4 w-[550px] h-[550px] rounded-full bg-gradient-to-tr from-purple-600/25 via-violet-500/20 to-purple-400/15 blur-3xl animate-fluid-1" />
+        <div className="absolute -top-20 right-1/4 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-indigo-600/20 via-purple-600/25 to-fuchsia-500/15 blur-3xl animate-fluid-2" />
+        <div className="absolute top-96 left-1/3 w-[650px] h-[450px] rounded-full bg-gradient-to-r from-purple-700/15 via-violet-600/20 to-indigo-500/15 blur-3xl animate-fluid-3" />
         <div className="absolute top-48 inset-x-0 h-[600px] bg-radial-gradient from-purple-600/10 via-transparent to-transparent animate-purple-pulse" />
       </div>
 
@@ -609,12 +609,15 @@ export default function LandingPage() {
                 <span className="leading-none">
                   {isDemoLoading ? 'Opening Demo...' : 'Explore Demo Account (20 Entries)'}
                 </span>
-                <ArrowRight className="w-4 h-4 text-purple-300 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                <span className="w-5 h-5 rounded-full bg-white/20 inline-flex items-center justify-center group-hover:translate-x-0.5 transition-transform shrink-0">
+                  <ArrowRight className="w-3 h-3 text-white" />
+                </span>
               </button>
               <button
                 onClick={() => openAuthModal('signin')}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 text-sm font-semibold text-neutral-700 hover:text-black bg-white hover:bg-neutral-50 active:bg-neutral-100 border border-neutral-200 rounded-full shadow-sm transition-all active:scale-95"
               >
+                <Lock className="w-3.5 h-3.5 text-purple-600 shrink-0" />
                 <span className="leading-none">Sign In / Switch Role</span>
               </button>
             </div>
