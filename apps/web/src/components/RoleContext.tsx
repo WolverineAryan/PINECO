@@ -373,6 +373,28 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     logout();
   };
 
+  const switchRole = async (targetRole: UserRole) => {
+    try {
+      const res = await api.switchRole(targetRole);
+      localStorage.setItem('pineco_jwt_token', res.access_token);
+      localStorage.setItem('pineco_jwt_user', JSON.stringify(res.user));
+      if (res.user.workspace_id) {
+        localStorage.setItem('pineco_workspace_id', res.user.workspace_id);
+        setWorkspaceId(res.user.workspace_id);
+      }
+      setToken(res.access_token);
+      setCurrentUser(res.user);
+      setRoleState(res.user.role);
+      setIsAuthenticated(true);
+    } catch {
+      // Local fallback: update local role without changing workspace
+      setRoleState(targetRole);
+      const updated = { ...currentUser, role: targetRole };
+      setCurrentUser(updated);
+      localStorage.setItem('pineco_jwt_user', JSON.stringify(updated));
+    }
+  };
+
   const setRole = (newRole: UserRole) => {
     if (newRole === role) return;
     setIsRoleSwitching(true);
@@ -386,7 +408,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       timestamp: Date.now(),
     });
 
-    loginWithRole(newRole);
+    switchRole(newRole);
 
     // Provide a smooth skeleton shimmer feedback transition
     setTimeout(() => {

@@ -194,6 +194,57 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
     )
 
 
+class SwitchRoleRequest(BaseModel):
+    role: str
+
+
+@router.post("/switch-role", response_model=AuthTokenResponse)
+def switch_user_role(
+    payload: SwitchRoleRequest,
+    auth: Optional[HTTPAuthorizationCredentials] = Security(security_bearer),
+    db: Session = Depends(get_db),
+):
+    """
+    Switches active role while preserving the user's workspace isolation.
+    - If user is a real registered account: updates their role, retains their custom workspace_id.
+    - If user is in demo mode: switches to demo persona within DEFAULT_WORKSPACE_ID.
+    """
+    target_role = payload.role.strip().lower()
+    if target_role not in ["creator", "reviewer", "brand_manager", "admin"]:
+        target_role = "reviewer"
+
+    claims = None
+    if auth and auth.credentials:
+        try:
+            claims = decode_jwt_token(auth.credentials)
+        except HTTPException:
+            claims = None
+
+    if claims and claims.get("email"):
+        clean_email = claims["email"].strip().lower()
+        db_user = db.query(User).filter(User.email == clean_email).first()
+        if db_user:
+            db_user.role = target_role
+            db.commit()
+            db.refresh(db_user)
+            user_profile = format_user_profile(db_user)
+            token = create_jwt_token(user_profile.model_dump())
+            return AuthTokenResponse(access_token=token, token_type="bearer", user=user_profile)
+
+    # Demo fallback: only if unauthenticated or demo user
+    matched_demo = None
+    for u in DEMO_USERS.values():
+        if u["role"] == target_role:
+            matched_demo = u
+            break
+    if not matched_demo:
+        matched_demo = DEMO_USERS["reviewer@pineco.internal"]
+
+    user_profile = format_user_profile(matched_demo)
+    token = create_jwt_token(user_profile.model_dump())
+    return AuthTokenResponse(access_token=token, token_type="bearer", user=user_profile)
+
+
 @router.get("/demo-accounts", response_model=List[UserProfileResponse])
 def get_demo_accounts():
     """Returns benchmark accounts for automated test suites."""

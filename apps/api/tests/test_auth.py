@@ -102,3 +102,35 @@ def test_login_wrong_password_rejected(client):
     err_body = wrong_login.json()
     msg = err_body.get("error", {}).get("message") or err_body.get("detail", "")
     assert "Invalid email or password" in msg
+
+
+def test_switch_role_preserves_new_user_workspace(client):
+    # 1. Register new user
+    reg_resp = client.post(
+        "/api/v1/auth/register",
+        json={
+            "name": "Pranav User",
+            "email": "pranav.role@custom-enterprise.io",
+            "password": "Password123!",
+            "role": "reviewer",
+        },
+    )
+    assert reg_resp.status_code == 201
+    auth_data = reg_resp.json()
+    token = auth_data["access_token"]
+    user_ws = auth_data["user"]["workspace_id"]
+    assert user_ws != "ws-demo-enterprise-001"
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # 2. Switch role to brand_manager
+    switch_resp = client.post("/api/v1/auth/switch-role", json={"role": "brand_manager"}, headers=headers)
+    assert switch_resp.status_code == 200
+    switched_data = switch_resp.json()
+    assert switched_data["user"]["role"] == "brand_manager"
+    # Workspace must strictly remain the user's workspace, NEVER the demo workspace
+    assert switched_data["user"]["workspace_id"] == user_ws
+
+    # 3. Switch role to creator
+    switch_resp2 = client.post("/api/v1/auth/switch-role", json={"role": "creator"}, headers=headers)
+    assert switch_resp2.status_code == 200
+    assert switch_resp2.json()["user"]["workspace_id"] == user_ws

@@ -113,6 +113,12 @@ export const api = {
       body: JSON.stringify(credentials),
     }),
 
+  switchRole: (role: string) =>
+    fetchJson<LoginResponse>('/auth/switch-role', {
+      method: 'POST',
+      body: JSON.stringify({ role }),
+    }),
+
   getDemoAccounts: () => fetchJson<UserProfile[]>('/auth/demo-accounts'),
 
   getCurrentUser: () => fetchJson<UserProfile>('/auth/me'),
