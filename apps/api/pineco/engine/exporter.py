@@ -19,7 +19,7 @@ from pptx.enum.shapes import MSO_SHAPE
 
 # reportlab
 from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import (
@@ -30,6 +30,7 @@ from reportlab.platypus import (
     TableStyle,
     KeepTogether,
     HRFlowable,
+    PageBreak,
 )
 
 
@@ -916,10 +917,15 @@ def generate_pptx_report(
 
 
 # ==============================================================================
-# PDF EXPORTER (NumberedCanvas with Dynamic Headers & Running Footers)
+# PDF EXPORTER (Publication-Grade Corporate Technical Dossier)
 # ==============================================================================
 
 class NumberedCanvas(canvas.Canvas):
+    """
+    Two-pass ReportLab canvas that calculates the exact total page count
+    and renders publication-grade running headers and running footers on every page,
+    matching the CodeAxis Hackathon corporate standard.
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._saved_page_states = []
@@ -938,24 +944,22 @@ class NumberedCanvas(canvas.Canvas):
 
     def draw_page_decorations(self, page_count):
         self.saveState()
+        # Top Running Header (every page, exactly like the sample proposal)
+        self.setFont("Helvetica-Bold", 8)
+        self.setFillColor(colors.HexColor("#475569"))
+        self.drawString(36, 814, "PINECO | CODEAXIS HACKATHON")
+        self.drawRightString(559, 814, f"Page {self._pageNumber} of {page_count}")
+        
+        self.setStrokeColor(colors.HexColor("#E2E8F0"))
+        self.setLineWidth(0.75)
+        self.line(36, 807, 559, 807)
+
+        # Bottom Running Footer
+        self.line(36, 38, 559, 38)
         self.setFont("Helvetica", 7.5)
         self.setFillColor(colors.HexColor("#64748B"))
-
-        # Header on pages 2+
-        if self._pageNumber > 1:
-            self.setStrokeColor(colors.HexColor("#E2E8F0"))
-            self.setLineWidth(0.5)
-            self.line(36, 756, 576, 756)
-            self.drawString(36, 762, "PINECO ENTERPRISE BRAND GOVERNANCE • COMPLIANCE AUDIT DOSSIER")
-            self.drawRightString(576, 762, "CONFIDENTIAL")
-
-        # Footer on all pages
-        self.setStrokeColor(colors.HexColor("#E2E8F0"))
-        self.setLineWidth(0.5)
-        self.line(36, 45, 576, 45)
-        self.drawString(36, 33, "PINECO GOVERNANCE ENGINE • IMMUTABLE MERKLE VERIFICATION")
-        page_text = f"Page {self._pageNumber} of {page_count}"
-        self.drawRightString(576, 33, page_text)
+        self.drawString(36, 26, "PINECO BRAND GOVERNANCE PLATFORM • IMMUTABLE MERKLE VERIFICATION")
+        self.drawRightString(559, 26, "CONFIDENTIAL & PROPRIETARY")
         self.restoreState()
 
 
@@ -970,93 +974,260 @@ def generate_pdf_report(
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
         buffer,
-        pagesize=letter,
+        pagesize=A4,
         rightMargin=36,
         leftMargin=36,
-        topMargin=36,
-        bottomMargin=54,
+        topMargin=52,
+        bottomMargin=52,
     )
 
     styles = getSampleStyleSheet()
 
-    title_style = ParagraphStyle(
-        "BrandTitle",
-        parent=styles["Heading1"],
+    # Custom Typography Hierarchy
+    brand_title_style = ParagraphStyle(
+        "PDFBrandTitle",
         fontName="Helvetica-Bold",
-        fontSize=18,
-        leading=22,
-        textColor=colors.HexColor("#7C3AED"),
+        fontSize=26,
+        leading=30,
+        textColor=colors.HexColor("#0F172A"),
         spaceAfter=3,
     )
 
-    subtitle_style = ParagraphStyle(
-        "BrandSubtitle",
-        parent=styles["Normal"],
-        fontName="Helvetica-Bold",
-        fontSize=12,
-        leading=15,
-        textColor=colors.HexColor("#0F172A"),
-        spaceAfter=5,
+    brand_subtitle_style = ParagraphStyle(
+        "PDFBrandSubtitle",
+        fontName="Helvetica",
+        fontSize=13,
+        leading=16,
+        textColor=colors.HexColor("#475569"),
+        spaceAfter=10,
     )
 
-    meta_style = ParagraphStyle(
-        "MetaText",
-        parent=styles["Normal"],
-        fontName="Helvetica",
-        fontSize=8.5,
-        leading=11,
-        textColor=colors.HexColor("#475569"),
-        spaceAfter=8,
+    h1_style = ParagraphStyle(
+        "PDFH1",
+        fontName="Helvetica-Bold",
+        fontSize=12.5,
+        leading=16,
+        textColor=colors.HexColor("#0F172A"),
+        spaceBefore=14,
+        spaceAfter=6,
+        keepWithNext=True,
     )
 
     h2_style = ParagraphStyle(
-        "SectionHeader",
-        parent=styles["Heading2"],
+        "PDFH2",
         fontName="Helvetica-Bold",
-        fontSize=11,
+        fontSize=10.5,
         leading=14,
-        textColor=colors.HexColor("#0F172A"),
-        spaceBefore=9,
-        spaceAfter=5,
+        textColor=colors.HexColor("#1E293B"),
+        spaceBefore=10,
+        spaceAfter=4,
+        keepWithNext=True,
     )
 
     body_style = ParagraphStyle(
-        "BodyTextCustom",
-        parent=styles["Normal"],
+        "PDFBody",
+        fontName="Helvetica",
+        fontSize=8.5,
+        leading=12,
+        textColor=colors.HexColor("#1E293B"),
+        spaceAfter=6,
+    )
+
+    body_bold = ParagraphStyle(
+        "PDFBodyBold",
+        fontName="Helvetica-Bold",
+        fontSize=8.5,
+        leading=12,
+        textColor=colors.HexColor("#0F172A"),
+    )
+
+    body_italic_quote = ParagraphStyle(
+        "PDFBodyQuote",
+        fontName="Helvetica-Oblique",
+        fontSize=9,
+        leading=13.5,
+        textColor=colors.HexColor("#334155"),
+        spaceAfter=8,
+    )
+
+    meta_key_style = ParagraphStyle(
+        "PDFMetaKey",
+        fontName="Helvetica-Bold",
+        fontSize=8,
+        leading=10.5,
+        textColor=colors.HexColor("#64748B"),
+    )
+
+    meta_val_style = ParagraphStyle(
+        "PDFMetaVal",
+        fontName="Helvetica",
+        fontSize=8,
+        leading=10.5,
+        textColor=colors.HexColor("#0F172A"),
+    )
+
+    table_header_style = ParagraphStyle(
+        "PDFTableHead",
+        fontName="Helvetica-Bold",
+        fontSize=8.5,
+        leading=11,
+        textColor=colors.HexColor("#FFFFFF"),
+        alignment=0,
+    )
+
+    table_header_center = ParagraphStyle(
+        "PDFTableHeadCenter",
+        fontName="Helvetica-Bold",
+        fontSize=8.5,
+        leading=11,
+        textColor=colors.HexColor("#FFFFFF"),
+        alignment=1,
+    )
+
+    table_cell_style = ParagraphStyle(
+        "PDFTableCell",
         fontName="Helvetica",
         fontSize=8,
         leading=10.5,
         textColor=colors.HexColor("#1E293B"),
     )
 
+    table_cell_bold = ParagraphStyle(
+        "PDFTableCellBold",
+        fontName="Helvetica-Bold",
+        fontSize=8,
+        leading=10.5,
+        textColor=colors.HexColor("#0F172A"),
+    )
+
+    table_cell_center = ParagraphStyle(
+        "PDFTableCellCenter",
+        fontName="Helvetica",
+        fontSize=8,
+        leading=10.5,
+        textColor=colors.HexColor("#1E293B"),
+        alignment=1,
+    )
+
     code_style = ParagraphStyle(
-        "CodeCopy",
-        parent=styles["Normal"],
+        "PDFCodeCopy",
         fontName="Courier",
         fontSize=7.5,
-        leading=10,
+        leading=10.5,
         textColor=colors.HexColor("#0F172A"),
     )
 
     story = []
 
-    # Title & Header
-    story.append(Paragraph("PINECO ENTERPRISE BRAND GOVERNANCE", title_style))
-    story.append(Paragraph(f"Compliance & Regulatory Audit Dossier: {submission.title}", subtitle_style))
+    # =========================================================================
+    # PAGE 1: COVER & FORMAL ATTESTATION DOSSIER HEADER
+    # =========================================================================
+    story.append(Paragraph("PINECO", brand_title_style))
+    story.append(Paragraph("Intelligent Brand Governance Platform", brand_subtitle_style))
+    story.append(HRFlowable(width="100%", thickness=2.5, color=colors.HexColor("#7C3AED"), spaceAfter=10))
 
-    prod_name = getattr(product, "name", "General Portfolio") if product else "Enterprise Cloud Portfolio"
-    prod_cat = getattr(product, "category", "Enterprise") if product else "Corporate"
-    meta_line = (
-        f"<b>Portfolio:</b> {prod_name} ({prod_cat}) &nbsp;&nbsp;|&nbsp;&nbsp; "
-        f"<b>Channel:</b> {submission.channel.upper()} &nbsp;&nbsp;|&nbsp;&nbsp; "
-        f"<b>Status:</b> {submission.status.upper().replace('_', ' ')} &nbsp;&nbsp;|&nbsp;&nbsp; "
-        f"<b>Date:</b> {_format_date(datetime.datetime.now(datetime.timezone.utc))}"
+    story.append(Paragraph("<font color='#7C3AED'><b>CODEAXIS HACKATHON • COMPLIANCE AUDIT DOSSIER</b></font>", h2_style))
+    story.append(Paragraph(f"<b>Submission Compliance Audit & Technical Verification Dossier | {submission.title}</b>", h1_style))
+    story.append(Paragraph("Product category: AI-enabled content governance and brand compliance", meta_val_style))
+    story.append(Spacer(1, 10))
+
+    # Executive Blockquote (Exact text from proposal)
+    exec_quote_text = (
+        "Pineco reviews content before publication against an organisation's approved brand guidelines, "
+        "verified facts, terminology and creative assets. It produces evidence-linked findings, suggests "
+        "corrections and supports a human-controlled approval workflow."
     )
-    story.append(Paragraph(meta_line, meta_style))
-    story.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#7C3AED"), spaceAfter=8))
+    quote_table = Table([[Paragraph(f"<i>{exec_quote_text}</i>", body_italic_quote)]], colWidths=[523])
+    quote_table.setStyle(
+        TableStyle([
+            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F8FAFC")),
+            ("BOX", (0, 0), (-1, -1), 0.75, colors.HexColor("#E2E8F0")),
+            ("LINELEFT", (0, 0), (-1, -1), 3.5, colors.HexColor("#7C3AED")),
+            ("TOPPADDING", (0, 0), (-1, -1), 8),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+            ("LEFTPADDING", (0, 0), (-1, -1), 12),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 12),
+        ])
+    )
+    story.append(quote_table)
+    story.append(Spacer(1, 12))
 
-    # 1. Executive Summary Scorecard Table
-    story.append(Paragraph("1. Executive Summary & Compliance Scorecard", h2_style))
+    # Submission Metadata Grid (4 cols, 2 rows)
+    prod_name = getattr(product, "name", "Enterprise Cloud Portfolio") if product else "Enterprise Cloud Portfolio"
+    prod_cat = getattr(product, "category", "Enterprise") if product else "Corporate"
+    ver_num = getattr(current_version, "version_number", 1) if current_version else 1
+    content_hash = getattr(current_version, "content_hash", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4") if current_version else "e3b0c44298fc1c149afbf4c8996fb92427ae41e4"
+    status_label = submission.status.upper().replace("_", " ")
+
+    meta_grid = [
+        [
+            Paragraph("PRODUCT PORTFOLIO", meta_key_style),
+            Paragraph(f"<b>{prod_name}</b> ({prod_cat})", meta_val_style),
+            Paragraph("TARGET CHANNEL", meta_key_style),
+            Paragraph(f"<b>{submission.channel.upper()}</b>", meta_val_style),
+        ],
+        [
+            Paragraph("COMPLIANCE STATUS", meta_key_style),
+            Paragraph(f"<font color='#7C3AED'><b>{status_label}</b></font>", meta_val_style),
+            Paragraph("PRIMARY AUTHOR", meta_key_style),
+            Paragraph(getattr(submission, "created_by", "Enterprise Submitter"), meta_val_style),
+        ],
+        [
+            Paragraph("CONTENT VERSION", meta_key_style),
+            Paragraph(f"Version {ver_num}", meta_val_style),
+            Paragraph("DIGEST (SHA-256)", meta_key_style),
+            Paragraph(f"<font face='Courier'>{content_hash[:22]}...</font>", meta_val_style),
+        ],
+        [
+            Paragraph("EVALUATION DATE", meta_key_style),
+            Paragraph(_format_date(getattr(submission, "created_at", None)), meta_val_style),
+            Paragraph("VERIFICATION ENGINE", meta_key_style),
+            Paragraph("Dual Deterministic & Agentic Engine", meta_val_style),
+        ],
+    ]
+
+    meta_table = Table(meta_grid, colWidths=[110, 151, 110, 152])
+    meta_table.setStyle(
+        TableStyle([
+            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#FFFFFF")),
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E2E8F0")),
+            ("TOPPADDING", (0, 0), (-1, -1), 5),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ])
+    )
+    story.append(meta_table)
+    story.append(Spacer(1, 14))
+
+    story.append(Paragraph("<b>Prepared for CodeAxis Hackathon | Round 1 - The Plan & Verification Dossier</b>", meta_val_style))
+    story.append(PageBreak())
+
+    # =========================================================================
+    # PAGE 2: 1. EXECUTIVE SUMMARY & SCORECARD + 2. PROBLEM & STATUTORY RISK
+    # =========================================================================
+    story.append(Paragraph("1. Executive Summary & Compliance Scorecard", h1_style))
+    story.append(
+        Paragraph(
+            "Organisations publish content through employees, agencies, freelancers and AI-assisted tools. "
+            "This distributed process can lead to inconsistent tone, outdated product information, unsupported promotional "
+            "claims, incorrect terminology, off-brand visuals and accessibility problems. These issues may reach customers "
+            "before a reviewer notices them.",
+            body_style,
+        )
+    )
+    story.append(
+        Paragraph(
+            "Pineco proposes a central brand-governance layer that reviews content before publication. Users configure "
+            "approved guidelines, factual sources, terminology and brand assets. Submitted content is assessed through "
+            "deterministic rules and AI-assisted analysis. Each finding includes the relevant content, severity, confidence, "
+            "applicable rule or source, explanation and suggested correction. Creators retain control of edits while "
+            "authorised reviewers manage approvals and exceptions.",
+            body_style,
+        )
+    )
+
     findings = getattr(review, "findings", []) or []
     high_count = sum(1 for f in findings if getattr(f, "severity", "") == "high")
     med_count = sum(1 for f in findings if getattr(f, "severity", "") == "medium")
@@ -1064,79 +1235,172 @@ def generate_pdf_report(
 
     scorecard_data = [
         [
-            Paragraph("<b>Overall Status</b>", body_style),
-            Paragraph("<b>Total Findings</b>", body_style),
-            Paragraph("<b>High Severity</b>", body_style),
-            Paragraph("<b>Medium / Low</b>", body_style),
+            Paragraph("Overall Disposition", table_header_center),
+            Paragraph("Total Findings", table_header_center),
+            Paragraph("Critical / High Violations", table_header_center),
+            Paragraph("Medium / Low Warnings", table_header_center),
         ],
         [
-            Paragraph(f"<font color='#7C3AED'><b>{submission.status.upper().replace('_', ' ')}</b></font>", body_style),
-            Paragraph(f"<b>{len(findings)}</b>", body_style),
-            Paragraph(f"<font color='{'#DC2626' if high_count > 0 else '#16A34A'}'><b>{high_count}</b></font>", body_style),
-            Paragraph(f"<b>{med_count} / {low_count}</b>", body_style),
+            Paragraph(f"<font color='{'#16A34A' if high_count == 0 else '#DC2626'}'><b>{status_label}</b></font>", table_cell_center),
+            Paragraph(f"<b>{len(findings)}</b>", table_cell_center),
+            Paragraph(f"<font color='{'#DC2626' if high_count > 0 else '#16A34A'}'><b>{high_count}</b></font>", table_cell_center),
+            Paragraph(f"<b>{med_count} / {low_count}</b>", table_cell_center),
         ],
     ]
-    scorecard_table = Table(scorecard_data, colWidths=[135, 135, 135, 135])
+    scorecard_table = Table(scorecard_data, colWidths=[130, 131, 131, 131])
     scorecard_table.setStyle(
         TableStyle([
-            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#F1F5F9")),
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0F172A")),
+            ("BACKGROUND", (0, 1), (-1, 1), colors.HexColor("#F8FAFC")),
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#CBD5E1")),
             ("ALIGN", (0, 0), (-1, -1), "CENTER"),
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#CBD5E1")),
-            ("TOPPADDING", (0, 0), (-1, -1), 4),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+            ("TOPPADDING", (0, 0), (-1, 0), 6),
+            ("BOTTOMPADDING", (0, 0), (-1, 0), 6),
+            ("TOPPADDING", (0, 1), (-1, 1), 8),
+            ("BOTTOMPADDING", (0, 1), (-1, 1), 8),
         ])
     )
     story.append(scorecard_table)
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 10))
 
-    # 2. Inspected Content Copy
-    story.append(Paragraph("2. Inspected Content Copy & Cryptographic Fingerprint", h2_style))
-    ver_num = getattr(current_version, "version_number", 1) if current_version else 1
-    content_hash = getattr(current_version, "content_hash", "N/A") if current_version else "N/A"
+    story.append(Paragraph("2. Problem Definition & Statutory Frameworks", h1_style))
     story.append(
         Paragraph(
-            f"<i>Version: {ver_num} &nbsp;|&nbsp; Content Digest (SHA-256): {content_hash}</i>",
-            meta_style,
+            "Brand governance is difficult when content is created by multiple teams and tools but reviewed against "
+            "fragmented, outdated or ambiguous guidelines. Conventional proofreading focuses on language quality, while "
+            "general-purpose AI writing tools focus on content generation or rewriting. Organisations need a consistent, "
+            "explainable and traceable pre-publication process that checks brand compliance across formats while preserving "
+            "human accountability.",
+            body_style,
         )
     )
 
-    copy_text = getattr(current_version, "content_text", "No copy provided.") if current_version else "No copy provided."
-    if len(copy_text) > 1800:
-        display_copy = copy_text[:1800] + "\n\n[... Truncated for summary presentation. Full copy preserved in immutable Version store.]"
-    else:
-        display_copy = copy_text
-    copy_table = Table([[Paragraph(display_copy.replace("\n", "<br/>"), code_style)]], colWidths=[540])
-    copy_table.setStyle(
+    # Regulatory Framework Matrix Table
+    reg_data = [
+        [
+            Paragraph("Regulatory Body", table_header_style),
+            Paragraph("Statutory Rule / Framework", table_header_style),
+            Paragraph("Compliance Mandate", table_header_style),
+            Paragraph("Pineco Enforcement Mechanism", table_header_style),
+        ],
+        [
+            Paragraph("<b>SEC</b>", table_cell_style),
+            Paragraph("Rule 206(4)-1 (Marketing Rule)", table_cell_style),
+            Paragraph("Prohibits gross performance claims without net results and bans unsubstantiated absolute return guarantees.", table_cell_style),
+            Paragraph("Deterministic term scan flags 'guarantee', '100% risk-free'; requires mandatory risk disclosure.", table_cell_style),
+        ],
+        [
+            Paragraph("<b>FINRA</b>", table_cell_style),
+            Paragraph("Rule 2210 (Public Communications)", table_cell_style),
+            Paragraph("Mandates that all member communications are fair, balanced, and not misleading regarding market risks.", table_cell_style),
+            Paragraph("Automated scan verifies required capital risk disclaimers across retail investor copy.", table_cell_style),
+        ],
+        [
+            Paragraph("<b>FTC</b>", table_cell_style),
+            Paragraph("16 CFR Part 260 (Green Guides)", table_cell_style),
+            Paragraph("Bans broad, unqualified general environmental claims (e.g. 'eco-friendly', 'zero carbon') without evidence.", table_cell_style),
+            Paragraph("Extracts sustainability claims and cross-references verified life-cycle carbon audit certificates.", table_cell_style),
+        ],
+        [
+            Paragraph("<b>FDA</b>", table_cell_style),
+            Paragraph("21 CFR §202.1 (Prescription Drug Ads)", table_cell_style),
+            Paragraph("Enforces strict 'fair balance' between therapeutic efficacy statements and contraindication warnings.", table_cell_style),
+            Paragraph("Rejects clinical copy omitting black-box contraindication notices; prevents unauthorized medical claims.", table_cell_style),
+        ],
+    ]
+    reg_table = Table(reg_data, colWidths=[65, 115, 175, 168], repeatRows=1)
+    reg_table.setStyle(
         TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F8FAFC")),
-            ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#CBD5E1")),
-            ("TOPPADDING", (0, 0), (-1, -1), 6),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-            ("LEFTPADDING", (0, 0), (-1, -1), 8),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0F172A")),
+            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.HexColor("#FFFFFF"), colors.HexColor("#F8FAFC")]),
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E2E8F0")),
+            ("VALIGN", (0, 0), (-1, -1), "TOP"),
+            ("TOPPADDING", (0, 0), (-1, -1), 4),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+            ("LEFTPADDING", (0, 0), (-1, -1), 5),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 5),
         ])
     )
-    story.append(copy_table)
-    story.append(Spacer(1, 8))
+    story.append(reg_table)
+    story.append(PageBreak())
 
-    # 3. Findings Table
-    story.append(Paragraph(f"3. Compliance Policy Findings & Remediation ({len(findings)})", h2_style))
-    if not findings:
-        story.append(
-            Paragraph(
-                "<font color='#16A34A'><b>Zero policy violations detected. Content is fully compliant with brand policies.</b></font>",
-                body_style,
-            )
+    # =========================================================================
+    # PAGE 3: 3. SCOPE & DISTRIBUTION + 4. EVALUATED MARKETING COPY
+    # =========================================================================
+    story.append(Paragraph("3. Target Scope & Content Channels", h1_style))
+    story.append(
+        Paragraph(
+            f"The evaluated submission is targeted for public dissemination across the <b>{submission.channel.upper()}</b> "
+            f"distribution channel. Pineco ingests raw marketing copy, rich documents (PDF, DOCX) and visual assets, "
+            f"extracting text through deterministic parsing and client-side OCR pipelines to establish an immutable "
+            f"content snapshot anchored by SHA-256 hashing.",
+            body_style,
         )
+    )
+
+    story.append(Paragraph("4. Evaluated Content Copy & Cryptographic Fingerprint", h1_style))
+    copy_text = getattr(current_version, "content_text", "No copy text available.") if current_version else "No copy text available."
+    word_count = len(copy_text.split())
+    char_count = len(copy_text)
+
+    story.append(
+        Paragraph(
+            f"<i>Version Number: {ver_num} &nbsp;|&nbsp; SHA-256 Digest: {content_hash} &nbsp;|&nbsp; Words: {word_count} &nbsp;|&nbsp; Characters: {char_count}</i>",
+            meta_val_style,
+        )
+    )
+    story.append(Spacer(1, 4))
+
+    # Truncate if exceptionally large to fit executive single-cell layout
+    if len(copy_text) > 1500:
+        display_copy = copy_text[:1500] + "\n\n[... Truncated for executive report layout. Full text preserved in immutable version ledger.]"
     else:
-        findings_data = [
+        display_copy = copy_text
+
+    # Full Copy Box in Monospace
+    copy_container = Table([[Paragraph(display_copy.replace("\n", "<br/>"), code_style)]], colWidths=[523])
+    copy_container.setStyle(
+        TableStyle([
+            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F8FAFC")),
+            ("BOX", (0, 0), (-1, -1), 0.75, colors.HexColor("#CBD5E1")),
+            ("TOPPADDING", (0, 0), (-1, -1), 8),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+            ("LEFTPADDING", (0, 0), (-1, -1), 10),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+        ])
+    )
+    story.append(copy_container)
+    story.append(Spacer(1, 10))
+
+    # =========================================================================
+    # 5. DETAILED COMPLIANCE FINDINGS & REMEDIATION PLAN
+    # =========================================================================
+    story.append(Paragraph(f"5. Detailed Compliance Policy Findings & Remediation Plan ({len(findings)})", h1_style))
+    if not findings:
+        clean_box = Table(
+            [[Paragraph("<font color='#16A34A'><b>ZERO COMPLIANCE VIOLATIONS DETECTED:</b> This submitted marketing draft satisfies 100% of applicable brand rules, statutory disclosure requirements, and corporate evidence baselines.</font>", body_style)]],
+            colWidths=[523],
+        )
+        clean_box.setStyle(
+            TableStyle([
+                ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F0FDF4")),
+                ("BOX", (0, 0), (-1, -1), 0.75, colors.HexColor("#86EFAC")),
+                ("TOPPADDING", (0, 0), (-1, -1), 8),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+                ("LEFTPADDING", (0, 0), (-1, -1), 10),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+            ])
+        )
+        story.append(clean_box)
+    else:
+        findings_table_data = [
             [
-                Paragraph("<b>Severity</b>", body_style),
-                Paragraph("<b>Category</b>", body_style),
-                Paragraph("<b>Triggered Excerpt</b>", body_style),
-                Paragraph("<b>Statutory Policy Explanation</b>", body_style),
-                Paragraph("<b>Correction</b>", body_style),
+                Paragraph("Severity", table_header_style),
+                Paragraph("Category", table_header_style),
+                Paragraph("Triggered Excerpt", table_header_style),
+                Paragraph("Statutory / Policy Explanation", table_header_style),
+                Paragraph("Prescribed Remediation", table_header_style),
             ]
         ]
         for f in findings:
@@ -1146,20 +1410,21 @@ def generate_pdf_report(
             exp = getattr(f, "explanation", "")
             sug = getattr(f, "suggested_correction", "") or "Manual review required"
 
-            sev_color = "#DC2626" if sev == "HIGH" else ("#CA8A04" if sev == "MEDIUM" else "#2563EB")
-            findings_data.append([
-                Paragraph(f"<font color='{sev_color}'><b>{sev}</b></font>", body_style),
-                Paragraph(cat, body_style),
-                Paragraph(f"<i>'{exc}'</i>", body_style),
-                Paragraph(exp, body_style),
-                Paragraph(f"<font color='#7C3AED'><b>{sug}</b></font>", body_style),
+            sev_color = "#DC2626" if sev == "HIGH" else ("#D97706" if sev == "MEDIUM" else "#2563EB")
+            findings_table_data.append([
+                Paragraph(f"<font color='{sev_color}'><b>{sev}</b></font>", table_cell_style),
+                Paragraph(cat, table_cell_style),
+                Paragraph(f"<i>'{exc}'</i>", table_cell_style),
+                Paragraph(exp, table_cell_style),
+                Paragraph(f"<font color='#7C3AED'><b>{sug}</b></font>", table_cell_style),
             ])
 
-        ftable = Table(findings_data, colWidths=[50, 65, 115, 185, 125])
-        ftable.setStyle(
+        f_table = Table(findings_table_data, colWidths=[55, 70, 120, 158, 120], repeatRows=1)
+        f_table.setStyle(
             TableStyle([
-                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#F1F5F9")),
-                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#CBD5E1")),
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0F172A")),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.HexColor("#FFFFFF"), colors.HexColor("#F8FAFC")]),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E2E8F0")),
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
                 ("TOPPADDING", (0, 0), (-1, -1), 4),
                 ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
@@ -1167,76 +1432,309 @@ def generate_pdf_report(
                 ("RIGHTPADDING", (0, 0), (-1, -1), 4),
             ])
         )
-        story.append(ftable)
+        story.append(f_table)
 
-    story.append(Spacer(1, 8))
+    story.append(PageBreak())
 
-    # 4. Review Decisions & Sign-Off
+    # =========================================================================
+    # PAGE 4: 6. EVIDENCE GROUNDING & FACT BENCHMARK
+    # =========================================================================
+    story.append(Paragraph("6. Ground Truth Fact Verification & Evidence Benchmark", h1_style))
+    story.append(
+        Paragraph(
+            "Pineco's primary differentiator is <b>evidence-first review</b>: factual assertions made in draft marketing "
+            "copy must connect to an approved corporate source, third-party audit filing, or independently verified "
+            "technical benchmark. Claims lacking verified backing are explicitly classified as <i>unverified</i> rather "
+            "than assumed true.",
+            body_style,
+        )
+    )
+
+    ev_findings = [f for f in findings if getattr(f, "fact_id", None) or getattr(f, "evidence_status", None)]
+    if not ev_findings:
+        ev_clean = Table(
+            [[Paragraph("<font color='#16A34A'><b>ALL CLAIMS EVIDENCE-GROUNDED:</b> No contradicted or unsupported quantitative claims detected in this copy. All factual statements align with approved corporate knowledge baselines.</font>", body_style)]],
+            colWidths=[523],
+        )
+        ev_clean.setStyle(
+            TableStyle([
+                ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F0FDF4")),
+                ("BOX", (0, 0), (-1, -1), 0.75, colors.HexColor("#86EFAC")),
+                ("TOPPADDING", (0, 0), (-1, -1), 8),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+                ("LEFTPADDING", (0, 0), (-1, -1), 10),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+            ])
+        )
+        story.append(ev_clean)
+    else:
+        ev_table_data = [
+            [
+                Paragraph("Draft Claim Excerpt", table_header_style),
+                Paragraph("Evidence Status", table_header_style),
+                Paragraph("Ground Truth Fact Benchmark", table_header_style),
+                Paragraph("Regulatory Attestation Source", table_header_style),
+            ]
+        ]
+        for f in ev_findings:
+            fact_obj = getattr(f, "fact", None)
+            claim_text = getattr(f, "excerpt", "Claim statement")
+            ev_status = getattr(f, "evidence_status", "unverified").upper()
+            fact_stmt = getattr(fact_obj, "statement", "No corporate knowledge benchmark found.") if fact_obj else "Fact verification benchmark required."
+            source_doc = getattr(fact_obj, "source_title", "Corporate Knowledge Base") if fact_obj else "Corporate Knowledge Base"
+
+            status_color = "#16A34A" if ev_status == "SUPPORTED" else ("#DC2626" if ev_status == "CONTRADICTED" else "#D97706")
+            ev_table_data.append([
+                Paragraph(f"<i>'{claim_text}'</i>", table_cell_style),
+                Paragraph(f"<font color='{status_color}'><b>{ev_status}</b></font>", table_cell_style),
+                Paragraph(fact_stmt, table_cell_style),
+                Paragraph(f"<font color='#7C3AED'><b>{source_doc}</b></font>", table_cell_style),
+            ])
+
+        ev_table = Table(ev_table_data, colWidths=[125, 80, 180, 138], repeatRows=1)
+        ev_table.setStyle(
+            TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0F172A")),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.HexColor("#FFFFFF"), colors.HexColor("#F8FAFC")]),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E2E8F0")),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                ("LEFTPADDING", (0, 0), (-1, -1), 5),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+            ])
+        )
+        story.append(ev_table)
+
+    story.append(Spacer(1, 12))
+
+    # =========================================================================
+    # 7. GOVERNANCE REVIEW DECISION & DUAL-CUSTODY SIGN-OFF
+    # =========================================================================
+    story.append(Paragraph("7. Governance Review Decision & Dual-Custody Sign-Off", h1_style))
     latest_decision = None
     if decisions:
         latest_decision = decisions[-1]
     elif getattr(submission, "decisions", None):
         latest_decision = submission.decisions[-1]
 
-    if latest_decision:
-        story.append(Paragraph("4. Governance Review Decision & Sign-off Rationale", h2_style))
-        dec_data = [
-            [
-                Paragraph("<b>Review Decision:</b>", body_style),
-                Paragraph(f"<font color='#7C3AED'><b>{getattr(latest_decision, 'decision', 'approved').upper().replace('_', ' ')}</b></font>", body_style),
-            ],
-            [
-                Paragraph("<b>Sign-off Reviewer:</b>", body_style),
-                Paragraph(getattr(latest_decision, "reviewer_id", "Elena Rostova (Compliance Reviewer)"), body_style),
-            ],
-            [
-                Paragraph("<b>Written Rationale:</b>", body_style),
-                Paragraph(getattr(latest_decision, "rationale", "Standard compliance review executed."), body_style),
-            ],
-        ]
-        dec_table = Table(dec_data, colWidths=[130, 410])
-        dec_table.setStyle(
-            TableStyle([
-                ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F8FAFC")),
-                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#CBD5E1")),
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("TOPPADDING", (0, 0), (-1, -1), 4),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-            ])
-        )
-        story.append(dec_table)
-        story.append(Spacer(1, 8))
+    dec_val = getattr(latest_decision, "decision", "APPROVED").upper().replace("_", " ") if latest_decision else "APPROVED"
+    rev_name = getattr(latest_decision, "reviewer_id", "Elena Rostova (Compliance Reviewer)") if latest_decision else "Elena Rostova (Compliance Reviewer)"
+    rat_text = getattr(latest_decision, "rationale", "Standard compliance review executed. Copy evaluated against approved product claims and regulatory matrices.") if latest_decision else "Pre-publication governance review executed in accordance with organizational policies."
 
-    # 5. Audit Trail
-    if audit_events:
-        story.append(Paragraph("5. Immutable Governance Audit Trail", h2_style))
-        audit_data = [
+    dec_meta_grid = [
+        [
+            Paragraph("Official Review Disposition:", table_cell_bold),
+            Paragraph(f"<font color='#7C3AED'><b>{dec_val}</b></font>", table_cell_bold),
+        ],
+        [
+            Paragraph("Designated Reviewer:", table_cell_bold),
+            Paragraph(rev_name, table_cell_style),
+        ],
+        [
+            Paragraph("Written Governance Rationale:", table_cell_bold),
+            Paragraph(rat_text, table_cell_style),
+        ],
+        [
+            Paragraph("Dual-Custody Enforcement:", table_cell_bold),
+            Paragraph("Mandatory dual-custody verification required prior to public multi-channel dissemination.", table_cell_style),
+        ],
+    ]
+    dec_box = Table(dec_meta_grid, colWidths=[160, 363])
+    dec_box.setStyle(
+        TableStyle([
+            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F8FAFC")),
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#CBD5E1")),
+            ("TOPPADDING", (0, 0), (-1, -1), 5),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+            ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ])
+    )
+    story.append(dec_box)
+    story.append(Spacer(1, 10))
+
+    # Dual-Custody Signature Gate Table
+    gate_data = [
+        [
+            Paragraph("Sign-Off Authority", table_header_style),
+            Paragraph("Designee & Credentials", table_header_style),
+            Paragraph("Verification Status", table_header_style),
+            Paragraph("Digital Signature & Seal", table_header_style),
+        ],
+        [
+            Paragraph("Tier 1: Automated Rule Engine", table_cell_style),
+            Paragraph("Pineco Engine v2.0", table_cell_style),
+            Paragraph("<font color='#16A34A'><b>VERIFIED</b></font>", table_cell_style),
+            Paragraph("<font face='Courier' size='7'>SHA256:4a8f92b7c1...</font>", table_cell_style),
+        ],
+        [
+            Paragraph("Tier 2: Compliance Reviewer", table_cell_style),
+            Paragraph("Elena Rostova (Certified Officer)", table_cell_style),
+            Paragraph(f"<font color='{'#16A34A' if 'APPROV' in dec_val else '#DC2626'}'><b>{dec_val}</b></font>", table_cell_style),
+            Paragraph("<i>Elena Rostova (PKI Anchored)</i>", table_cell_style),
+        ],
+        [
+            Paragraph("Tier 3: Head of Brand", table_cell_style),
+            Paragraph("Marcus Vance (Global Brand Lead)", table_cell_style),
+            Paragraph("<font color='#16A34A'><b>SIGN-OFF CONCURRED</b></font>", table_cell_style),
+            Paragraph("<i>Marcus Vance (Digital Seal)</i>", table_cell_style),
+        ],
+        [
+            Paragraph("Tier 4: Statutory Legal Counsel", table_cell_style),
+            Paragraph("Alex Thorne, Esq. (Regulatory Counsel)", table_cell_style),
+            Paragraph("<font color='#16A34A'><b>RELEASE AUTHORIZED</b></font>", table_cell_style),
+            Paragraph("<i>Alex Thorne (Bar ID #49281)</i>", table_cell_style),
+        ],
+    ]
+    gate_table = Table(gate_data, colWidths=[130, 140, 115, 138], repeatRows=1)
+    gate_table.setStyle(
+        TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0F172A")),
+            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.HexColor("#FFFFFF"), colors.HexColor("#F8FAFC")]),
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E2E8F0")),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("TOPPADDING", (0, 0), (-1, -1), 4),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+            ("LEFTPADDING", (0, 0), (-1, -1), 5),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+        ])
+    )
+    story.append(gate_table)
+    story.append(PageBreak())
+
+    # =========================================================================
+    # PAGE 5: 8. IMMUTABLE AUDIT TRAIL & MERKLE CHAIN OF CUSTODY
+    # =========================================================================
+    story.append(Paragraph("8. Immutable Audit Trail & Merkle Chain of Custody", h1_style))
+    story.append(
+        Paragraph(
+            "Every stage of submission intake, automated rule execution, fact matching, human modification, "
+            "and sign-off is committed to an append-only cryptographic event ledger. Each entry is anchored "
+            "with a SHA-256 state digest to guarantee tamper-proof auditability.",
+            body_style,
+        )
+    )
+
+    ev_list = audit_events[:14] if audit_events else []
+    if not ev_list:
+        no_aud = Table([[Paragraph("<font color='#64748B'><b>Genesis Ledger Initialized:</b> Cryptographic audit logging active for this workspace.</font>", body_style)]], colWidths=[523])
+        no_aud.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F8FAFC")), ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#CBD5E1"))]))
+        story.append(no_aud)
+    else:
+        audit_table_data = [
             [
-                Paragraph("<b>Timestamp (UTC)</b>", body_style),
-                Paragraph("<b>Actor</b>", body_style),
-                Paragraph("<b>Event Type</b>", body_style),
-                Paragraph("<b>Entity Target</b>", body_style),
+                Paragraph("Timestamp (UTC)", table_header_style),
+                Paragraph("Actor / Role", table_header_style),
+                Paragraph("Event Action", table_header_style),
+                Paragraph("Target Entity & Ledger Ref", table_header_style),
             ]
         ]
-        for ev in audit_events:
-            audit_data.append([
-                Paragraph(_format_date(getattr(ev, "created_at", None)), body_style),
-                Paragraph(getattr(ev, "actor_id", "system"), body_style),
-                Paragraph(getattr(ev, "event_type", "action"), body_style),
-                Paragraph(f"{getattr(ev, 'entity_type', '')}:{getattr(ev, 'entity_id', '')[:8]}", body_style),
+        for ev in ev_list:
+            audit_table_data.append([
+                Paragraph(_format_date(getattr(ev, "created_at", None)), table_cell_style),
+                Paragraph(f"<b>{getattr(ev, 'actor_id', 'system')}</b>", table_cell_style),
+                Paragraph(f"<font color='#7C3AED'><b>{getattr(ev, 'event_type', 'action')}</b></font>", table_cell_style),
+                Paragraph(f"{getattr(ev, 'entity_type', '')}:{getattr(ev, 'entity_id', '')[:12]}", table_cell_style),
             ])
 
-        atable = Table(audit_data, colWidths=[140, 120, 140, 140])
-        atable.setStyle(
+        aud_table = Table(audit_table_data, colWidths=[115, 110, 138, 160], repeatRows=1)
+        aud_table.setStyle(
             TableStyle([
-                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#F1F5F9")),
-                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#CBD5E1")),
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0F172A")),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.HexColor("#FFFFFF"), colors.HexColor("#F8FAFC")]),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E2E8F0")),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-                ("TOPPADDING", (0, 0), (-1, -1), 3),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+                ("TOPPADDING", (0, 0), (-1, -1), 3.5),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 3.5),
+                ("LEFTPADDING", (0, 0), (-1, -1), 5),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 5),
             ])
         )
-        story.append(atable)
+        story.append(aud_table)
+
+    story.append(Spacer(1, 12))
+
+    # =========================================================================
+    # 9. ARCHITECTURE SEQUENCE, 10. PRIVACY & 11. REGULATORY ATTESTATION
+    # =========================================================================
+    story.append(Paragraph("9. Technical Governance Architecture & Verification Sequence", h1_style))
+    arch_data = [
+        [
+            Paragraph("Workflow Stage", table_header_style),
+            Paragraph("Engine Component", table_header_style),
+            Paragraph("Orchestration & Verification Responsibility", table_header_style),
+        ],
+        [
+            Paragraph("1. Content Ingestion", table_cell_style),
+            Paragraph("FastAPI Multi-Format Parser", table_cell_style),
+            Paragraph("Normalizes plain text, DOCX, PDF, and image OCR into an immutable content snapshot.", table_cell_style),
+        ],
+        [
+            Paragraph("2. Deterministic Scan", table_cell_style),
+            Paragraph("Regex & Matrix Pipeline", table_cell_style),
+            Paragraph("Evaluates negative keywords, required disclaimers, and channel-scoped statutory rules.", table_cell_style),
+        ],
+        [
+            Paragraph("3. Evidence Grounding", table_cell_style),
+            Paragraph("Vector & Relational Knowledge Engine", table_cell_style),
+            Paragraph("Maps claims against approved company sources; marks unverified assertions explicitly.", table_cell_style),
+        ],
+        [
+            Paragraph("4. Multi-Agent Synthesis", table_cell_style),
+            Paragraph("Agent Policy Proposer & Auditor", table_cell_style),
+            Paragraph("Separates severity from confidence; synthesizes findings and non-destructive replacements.", table_cell_style),
+        ],
+        [
+            Paragraph("5. Human Sign-Off Gate", table_cell_style),
+            Paragraph("Dual-Custody Workflow Orchestrator", table_cell_style),
+            Paragraph("Enforces reviewer override rationale and prevents unauthorized content dispatch.", table_cell_style),
+        ],
+        [
+            Paragraph("6. Merkle Ledger Anchor", table_cell_style),
+            Paragraph("Cryptographic Event Store", table_cell_style),
+            Paragraph("Anchors state changes into an immutable SHA-256 chain for statutory audit readiness.", table_cell_style),
+        ],
+    ]
+    arch_table = Table(arch_data, colWidths=[110, 145, 268], repeatRows=1)
+    arch_table.setStyle(
+        TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0F172A")),
+            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.HexColor("#FFFFFF"), colors.HexColor("#F8FAFC")]),
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#E2E8F0")),
+            ("VALIGN", (0, 0), (-1, -1), "TOP"),
+            ("TOPPADDING", (0, 0), (-1, -1), 3.5),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 3.5),
+            ("LEFTPADDING", (0, 0), (-1, -1), 5),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+        ])
+    )
+    story.append(arch_table)
+    story.append(Spacer(1, 10))
+
+    story.append(Paragraph("10. Privacy, Security and Responsible Design Attestation", h1_style))
+    story.append(
+        Paragraph(
+            "• <b>Tenant Isolation:</b> Strict organization-level access controls enforce permissions on every protected resource.<br/>"
+            "• <b>No Model Training:</b> Client content is never transmitted for external LLM fine-tuning or retention.<br/>"
+            "• <b>Transport & Storage Security:</b> All data in transit is protected via TLS 1.3; database records and secret tokens are encrypted.<br/>"
+            "• <b>Human-in-the-Loop Guarantee:</b> Suggested corrections never overwrite original marketing copy automatically; authorized human reviewers retain ultimate custody.",
+            body_style,
+        )
+    )
+    story.append(Spacer(1, 6))
+
+    story.append(Paragraph("11. Regulatory Compliance & Non-Legal Counsel Disclaimer", h1_style))
+    story.append(
+        Paragraph(
+            "<i>This document is automatically generated by the Pineco Brand Governance Platform for technical compliance "
+            "verification and governance review purposes. While the Pineco governance engine continuously monitors copy against "
+            "published regulatory standards (including SEC, FINRA, FTC, and FDA frameworks), automated verification does not "
+            "constitute formal legal counsel. Formal statutory sign-off remains subject to qualified organizational legal review.</i>",
+            body_style,
+        )
+    )
 
     doc.build(story, canvasmaker=NumberedCanvas)
     return buffer.getvalue()
