@@ -20,6 +20,7 @@ import {
   X,
   UserCheck,
   Filter,
+  Lock,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { SubmissionDetail, Finding, Review, ContentVersion, AuditEvent } from '@/lib/types';
@@ -31,7 +32,7 @@ import { ExportReportDropdown } from '@/components/ExportReportDropdown';
 export default function SubmissionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const submissionId = resolvedParams.id;
-  const { currentUser } = useRole();
+  const { currentUser, hasPermission, role } = useRole();
   const { success, error: toastError, info } = useToast();
 
   const [submission, setSubmission] = useState<SubmissionDetail | null>(null);
@@ -223,15 +224,41 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
             <RefreshCw className={`w-3.5 h-3.5 text-neutral-500 ${rerunning ? 'animate-spin' : ''}`} />
             <span>Rerun Scan</span>
           </button>
-          <button
-            onClick={() => setShowDecisionModal(true)}
-            className="flex items-center space-x-1.5 bg-black hover:bg-neutral-800 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs transition active:scale-95"
-          >
-            <CheckCircle2 className="w-3.5 h-3.5 text-white" />
-            <span>Record Human Decision</span>
-          </button>
+          {hasPermission('canApproveSubmissions') ? (
+            <button
+              onClick={() => setShowDecisionModal(true)}
+              className="flex items-center space-x-1.5 bg-black hover:bg-neutral-800 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs transition active:scale-95"
+            >
+              <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+              <span>Record Human Decision</span>
+            </button>
+          ) : (
+            <button
+              disabled
+              title="Sign-off requires Reviewer or Admin authorization."
+              className="flex items-center space-x-1.5 bg-neutral-100 border border-neutral-200 text-neutral-400 text-xs font-bold px-4 py-2 rounded-xl cursor-not-allowed shadow-none"
+            >
+              <Lock className="w-3.5 h-3.5 text-neutral-400" />
+              <span>Decision Restricted (Reviewer Only)</span>
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Creator Custody Scope Notice */}
+      {!hasPermission('canApproveSubmissions') && (
+        <div className="bg-purple-50/70 border border-purple-200 text-purple-950 p-3.5 rounded-2xl flex items-center justify-between text-xs shadow-xs">
+          <div className="flex items-center space-x-2.5">
+            <Lock className="w-4 h-4 text-purple-600 shrink-0" />
+            <span>
+              <strong>Drafter Custody Mode:</strong> Active as <span className="capitalize font-bold">{role.replace('_', ' ')}</span>. In accordance with dual-custody governance, publication decisions and finding overrides require independent <strong>Compliance Reviewer</strong> or <strong>Admin</strong> authorization.
+            </span>
+          </div>
+          <span className="text-[10px] font-mono uppercase bg-white border border-purple-200 text-purple-700 px-2.5 py-0.5 rounded-full font-bold shrink-0">
+            Sign-Off Gated
+          </span>
+        </div>
+      )}
 
       {/* Submission Info Card */}
       <div className="bg-white rounded-2xl border border-neutral-200 p-6 shadow-xs">
@@ -505,7 +532,7 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                             <strong>Overridden by Reviewer:</strong> {finding.resolution_rationale} ({finding.resolved_by})
                           </span>
                         </div>
-                      ) : (
+                      ) : hasPermission('canOverrideWithRationale') ? (
                         <button
                           onClick={() => {
                             setOverrideFindingId(finding.id);
@@ -515,6 +542,11 @@ export default function SubmissionDetailPage({ params }: { params: Promise<{ id:
                         >
                           Override Finding with Rationale...
                         </button>
+                      ) : (
+                        <span className="text-neutral-400 text-[10px] font-mono flex items-center space-x-1">
+                          <Lock className="w-3 h-3 text-neutral-400" />
+                          <span>Override custody requires Reviewer or Admin</span>
+                        </span>
                       )}
                     </div>
                   </div>

@@ -31,6 +31,12 @@ import { CreateProductModal } from './CreateProductModal';
 import { ScanCopyModal } from './ScanCopyModal';
 import { ScrollProgressBar } from './ScrollProgressBar';
 import { ProfileSettingsModal } from './ProfileSettingsModal';
+import {
+  DashboardSkeleton,
+  KnowledgeSkeleton,
+  AuditSkeleton,
+  SubmissionDetailSkeleton,
+} from './Skeleton';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -44,6 +50,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     products,
     activeProduct,
     setActiveProduct,
+    isRoleSwitching,
+    roleSwitchBanner,
+    dismissRoleBanner,
+    hasPermission,
   } = useRole();
   const { success } = useToast();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -159,6 +169,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href || (item.href === '/dashboard' && pathname === '/dashboard');
+            const isRestricted = item.href === '/audit' && !hasPermission('canInspectAuditTrail');
+            const isReadOnly = item.href === '/knowledge' && !hasPermission('canEditRules');
+
             return (
               <Link
                 key={item.href}
@@ -169,8 +182,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     : 'text-neutral-600 hover:text-black hover:bg-purple-50/60'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-purple-400' : 'text-neutral-500'}`} />
-                <span>{item.label}</span>
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-purple-400' : 'text-neutral-500'}`} />
+                <span className="truncate flex-1">{item.label}</span>
+                {isRestricted && (
+                  <span className="text-[9px] font-mono uppercase bg-neutral-100 text-neutral-500 border border-neutral-200 px-1.5 py-0.5 rounded font-bold shrink-0">
+                    Restricted
+                  </span>
+                )}
+                {isReadOnly && (
+                  <span className="text-[9px] font-mono uppercase bg-neutral-100 text-neutral-500 border border-neutral-200 px-1.5 py-0.5 rounded font-bold shrink-0">
+                    Read-Only
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -359,9 +382,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       key={r}
                       type="button"
                       onClick={() => {
-                        setRole(r);
+                        if (role !== r) {
+                          setRole(r);
+                        }
                         setRoleMenuOpen(false);
-                        success('Role Switched', `Active governance scope: ${r.replace('_', ' ')}.`);
                       }}
                       className={`w-full text-left px-2.5 py-2 rounded-xl text-xs transition flex items-center justify-between ${
                         role === r
@@ -449,7 +473,59 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Inner Page View (60% White dominant canvas with subtle purple radial top glow) */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto bg-neutral-50/40 bg-purple-radial min-h-[calc(100vh-4rem)]">
-          {children}
+          {/* Dynamic Enterprise Role Switch Notification Banner */}
+          {roleSwitchBanner && (
+            <div className="mb-6 bg-white border border-purple-200 rounded-2xl p-4 shadow-xs flex items-start sm:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="flex items-center space-x-3.5 min-w-0">
+                <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs uppercase tracking-wider">
+                  {roleSwitchBanner.role.slice(0, 2).toUpperCase()}
+                </div>
+                <div className="space-y-0.5 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs font-black text-black">Active Persona: {roleSwitchBanner.title}</span>
+                    <span className="text-[10px] font-mono font-bold uppercase bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.5 rounded-full">
+                      Scope: {roleSwitchBanner.scope}
+                    </span>
+                    <span className="text-[10px] font-mono text-neutral-400">
+                      RBAC Enforced
+                    </span>
+                  </div>
+                  <p className="text-xs text-neutral-600 leading-relaxed">
+                    {roleSwitchBanner.message}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={dismissRoleBanner}
+                className="text-neutral-400 hover:text-black p-1.5 rounded-lg hover:bg-neutral-100 transition shrink-0 text-xs font-semibold"
+                aria-label="Dismiss banner"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
+          {isRoleSwitching ? (
+            <div className="space-y-5 animate-in fade-in duration-200">
+              <div className="bg-black text-white px-4 py-3 rounded-2xl text-xs font-mono shadow-xl border border-purple-500/40 flex items-center justify-between">
+                <div className="flex items-center space-x-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-purple-400 animate-ping" />
+                  <span className="text-neutral-300 font-bold uppercase text-[10px] tracking-wider">Re-authenticating Access Scope:</span>
+                  <span className="text-white font-bold capitalize">{role.replace('_', ' ')}</span>
+                </div>
+                <span className="text-purple-300 text-[10px] uppercase font-mono tracking-wider">Calibrating RBAC Privileges...</span>
+              </div>
+              {(() => {
+                if (pathname === '/knowledge') return <KnowledgeSkeleton />;
+                if (pathname === '/audit') return <AuditSkeleton />;
+                if (pathname.startsWith('/submissions/')) return <SubmissionDetailSkeleton />;
+                return <DashboardSkeleton />;
+              })()}
+            </div>
+          ) : (
+            children
+          )}
         </main>
       </div>
     </div>

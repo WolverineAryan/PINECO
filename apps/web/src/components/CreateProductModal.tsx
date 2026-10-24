@@ -12,7 +12,7 @@ interface CreateProductModalProps {
 }
 
 export function CreateProductModal({ isOpen, onClose }: CreateProductModalProps) {
-  const { workspaceId, reloadProducts, setActiveProduct } = useRole();
+  const { workspaceId, reloadProducts, setActiveProduct, hasPermission, role } = useRole();
   const { success, error: toastError } = useToast();
 
   const [name, setName] = useState('');
@@ -126,7 +126,7 @@ export function CreateProductModal({ isOpen, onClose }: CreateProductModalProps)
             </button>
             <button
               type="submit"
-              disabled={saving || !name.trim()}
+              disabled={saving || !name.trim() || !hasPermission('canManageWorkspace')}
               className="px-5 py-2.5 text-xs font-bold bg-black hover:bg-neutral-800 text-white rounded-xl shadow-xs transition disabled:opacity-50"
             >
               {saving ? 'Creating Folder...' : 'Create Folder'}

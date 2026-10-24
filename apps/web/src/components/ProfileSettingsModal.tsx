@@ -22,7 +22,7 @@ import {
   ExternalLink,
   Lock,
 } from 'lucide-react';
-import { useRole } from '@/components/RoleContext';
+import { useRole, ROLE_DETAILS } from '@/components/RoleContext';
 import { useToast } from '@/components/Toast';
 
 interface ProfileSettingsModalProps {
@@ -332,6 +332,48 @@ export function ProfileSettingsModal({
                       {token || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'}
                     </div>
                   </div>
+
+                  {/* RBAC Active Scope Summary Card */}
+                  {ROLE_DETAILS[role] && (
+                    <div className="bg-purple-50/50 p-3.5 rounded-2xl border border-purple-200 space-y-2.5">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-mono text-[11px] font-bold text-purple-950 uppercase tracking-wider flex items-center space-x-1.5">
+                          <Shield className="w-3.5 h-3.5 text-purple-600" />
+                          <span>Active Role Privileges (RBAC)</span>
+                        </span>
+                        <span className="text-[10px] font-mono bg-purple-200/70 text-purple-900 px-2 py-0.5 rounded-full font-bold capitalize">
+                          {role.replace('_', ' ')}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-neutral-600 leading-relaxed">
+                        {ROLE_DETAILS[role].description}
+                      </p>
+                      <div className="grid grid-cols-2 gap-3 pt-1 text-[11px]">
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-mono uppercase text-neutral-400 font-bold block">Unlocked</span>
+                          {ROLE_DETAILS[role].unlockedList.slice(0, 3).map((item, i) => (
+                            <div key={i} className="text-black font-semibold flex items-center space-x-1.5 truncate">
+                              <Check className="w-3 h-3 text-purple-600 shrink-0" />
+                              <span className="truncate">{item}</span>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-mono uppercase text-neutral-400 font-bold block">Gated (Dual Custody)</span>
+                          {ROLE_DETAILS[role].restrictedList.length > 0 ? (
+                            ROLE_DETAILS[role].restrictedList.slice(0, 3).map((item, i) => (
+                              <div key={i} className="text-neutral-500 flex items-center space-x-1.5 truncate">
+                                <Lock className="w-3 h-3 text-neutral-400 shrink-0" />
+                                <span className="truncate">{item}</span>
+                              </div>
+                            ))
+                          ) : (
+                            <span className="text-neutral-400 italic">None (Root Administrator)</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Actions */}

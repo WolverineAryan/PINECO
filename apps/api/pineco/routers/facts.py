@@ -1,11 +1,13 @@
 import json
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Security
+from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 
 from pineco.database import get_db
 from pineco.config import settings
 from pineco.models import ApprovedFact, AuditEvent
+from pineco.auth import security_bearer, decode_jwt_token
 from pineco.schemas import FactCreate, FactResponse
 
 router = APIRouter(prefix="/facts", tags=["Approved Facts"])
@@ -31,8 +33,27 @@ def list_facts(
 def create_fact(
     payload: FactCreate,
     actor_id: str = Query(default="usr-manager-marcus"),
+    auth: Optional[HTTPAuthorizationCredentials] = Security(security_bearer),
     db: Session = Depends(get_db),
 ):
+    if auth and auth.credentials:
+        try:
+            token_data = decode_jwt_token(auth.credentials)
+            role = token_data.get("role")
+            if role in ("creator", "reviewer"):
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"Access Denied: Actors with role '{role}' cannot create ground truth facts. Brand Manager or Admin authority is required.",
+                )
+        except HTTPException:
+            raise
+        except Exception:
+            pass
+    elif actor_id in ("usr-creator-sarah", "usr-reviewer-elena"):
+        raise HTTPException(
+            status_code=403,
+            detail="Access Denied: Creating approved facts requires Brand Manager or Admin authority.",
+        )
     ws_id = payload.workspace_id or settings.DEFAULT_WORKSPACE_ID
     fact = ApprovedFact(
         workspace_id=ws_id,

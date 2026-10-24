@@ -97,12 +97,62 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermissions> = {
   },
 };
 
+export interface RoleDetail {
+  name: string;
+  scope: string;
+  description: string;
+  unlockedList: string[];
+  restrictedList: string[];
+}
+
+export const ROLE_DETAILS: Record<UserRole, RoleDetail> = {
+  creator: {
+    name: 'Content Marketing Specialist (Creator)',
+    scope: 'Drafter & Pre-Publication Scans',
+    description: 'Switched to Creator persona. Pre-flight copy drafting and real-time scanning are active. Human decision custody and audit log inspection are restricted under dual custody.',
+    unlockedList: ['Draft Submissions', 'Real-Time Copy Scanner', 'Version Revision Editor', 'Brand Guideline Inspection'],
+    restrictedList: ['Human Sign-Off Custody', 'Finding Overrides', 'Immutable Audit Ledger', 'Policy Rule Creation'],
+  },
+  reviewer: {
+    name: 'Compliance & Legal Reviewer',
+    scope: 'Review Custody & Overrides',
+    description: 'Switched to Reviewer persona. Compliance inspection, rationale-backed finding overrides, and dual-custody publication sign-offs are active. Rule authoring is restricted to preserve evaluator objectivity.',
+    unlockedList: ['Submission Sign-Off (Approve / Reject)', 'Finding Override with Rationale', 'Immutable Audit Ledger', 'Compliance Evidence Inspection'],
+    restrictedList: ['Policy Rule Authoring', 'Approved Fact Deletion', 'Workspace Configuration'],
+  },
+  brand_manager: {
+    name: 'Head of Brand Governance',
+    scope: 'Policy Rules & Truth Library',
+    description: 'Switched to Brand Manager persona. Deterministic brand rule authoring, approved fact library curation, and compliance audits are unlocked.',
+    unlockedList: ['Deterministic Rule Authoring', 'Truth Library / Approved Facts', 'Submission Decision Custody', 'Audit Trail Analysis'],
+    restrictedList: ['Workspace Infrastructure Config (Admin only)'],
+  },
+  admin: {
+    name: 'Enterprise Administrator',
+    scope: 'Sovereign Root Governance',
+    description: 'Switched to Enterprise Administrator persona. Sovereign control unlocked across all workspace configurations, rule libraries, audit trails, and review custody.',
+    unlockedList: ['Sovereign Root Governance', 'Workspace & User Management', 'Deterministic Rule Authoring', 'Full Audit Log Custody', 'All Decision Overrides'],
+    restrictedList: [],
+  },
+};
+
+export interface RoleSwitchBannerInfo {
+  role: UserRole;
+  title: string;
+  scope: string;
+  message: string;
+  timestamp: number;
+}
+
 interface RoleContextType {
   role: UserRole;
   setRole: (role: UserRole) => void;
   currentUser: UserProfile;
   permissions: RolePermissions;
   hasPermission: (perm: keyof RolePermissions) => boolean;
+  isRoleSwitching: boolean;
+  roleSwitchBanner: RoleSwitchBannerInfo | null;
+  dismissRoleBanner: () => void;
   isAuthenticated: boolean;
   workspaceId: string;
   setWorkspaceId: (id: string) => void;
@@ -139,6 +189,8 @@ const RoleContext = createContext<RoleContextType | undefined>(undefined);
 export function RoleProvider({ children }: { children: React.ReactNode }) {
   const [role, setRoleState] = useState<UserRole>('reviewer');
   const [currentUser, setCurrentUser] = useState<UserProfile>(DEFAULT_PROFILES['reviewer']);
+  const [isRoleSwitching, setIsRoleSwitching] = useState<boolean>(false);
+  const [roleSwitchBanner, setRoleSwitchBanner] = useState<RoleSwitchBannerInfo | null>(null);
   const [workspaceId, setWorkspaceId] = useState('ws-demo-enterprise-001');
   const [products, setProducts] = useState<Product[]>([]);
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
@@ -295,7 +347,28 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
   };
 
   const setRole = (newRole: UserRole) => {
+    if (newRole === role) return;
+    setIsRoleSwitching(true);
+
+    const detail = ROLE_DETAILS[newRole] || ROLE_DETAILS['reviewer'];
+    setRoleSwitchBanner({
+      role: newRole,
+      title: detail.name,
+      scope: detail.scope,
+      message: detail.description,
+      timestamp: Date.now(),
+    });
+
     loginWithRole(newRole);
+
+    // Provide a smooth skeleton shimmer feedback transition
+    setTimeout(() => {
+      setIsRoleSwitching(false);
+    }, 600);
+  };
+
+  const dismissRoleBanner = () => {
+    setRoleSwitchBanner(null);
   };
 
   const openAuthModal = (mode?: any) => {
@@ -316,6 +389,9 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
         currentUser,
         permissions,
         hasPermission,
+        isRoleSwitching,
+        roleSwitchBanner,
+        dismissRoleBanner,
         isAuthenticated,
         workspaceId,
         setWorkspaceId,

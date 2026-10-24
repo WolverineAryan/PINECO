@@ -19,6 +19,7 @@ import {
   Sparkles,
   Check,
   Bot,
+  Lock,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { BrandRule, ApprovedFact } from '@/lib/types';
@@ -27,7 +28,7 @@ import { useToast } from '@/components/Toast';
 import { KnowledgeSkeleton } from '@/components/Skeleton';
 
 export default function KnowledgePage() {
-  const { workspaceId, currentUser, activeProduct } = useRole();
+  const { workspaceId, currentUser, activeProduct, hasPermission, role } = useRole();
   const { success, error: toastError } = useToast();
   const [activeTab, setActiveTab] = useState<'rules' | 'facts'>('rules');
 
@@ -78,6 +79,10 @@ export default function KnowledgePage() {
   }, [workspaceId, activeProduct?.id]);
 
   const handleToggleRule = async (rule: BrandRule) => {
+    if (!hasPermission('canEditRules')) {
+      toastError('Permission Denied', 'Brand Manager or Admin authority is required to toggle policy rules.');
+      return;
+    }
     try {
       const updated = await api.updateRule(
         rule.id,
@@ -203,14 +208,25 @@ export default function KnowledgePage() {
           </Link>
 
           {activeTab === 'rules' ? (
-            <button
-              onClick={() => setShowRuleModal(true)}
-              className="flex items-center space-x-1.5 bg-black hover:bg-neutral-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs transition active:scale-95 hover:shadow-[0_0_15px_-2px_rgba(124,58,237,0.35)]"
-            >
-              <Plus className="w-3.5 h-3.5 text-purple-400" />
-              <span>New Brand Rule</span>
-            </button>
-          ) : (
+            hasPermission('canEditRules') ? (
+              <button
+                onClick={() => setShowRuleModal(true)}
+                className="flex items-center space-x-1.5 bg-black hover:bg-neutral-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs transition active:scale-95 hover:shadow-[0_0_15px_-2px_rgba(124,58,237,0.35)]"
+              >
+                <Plus className="w-3.5 h-3.5 text-purple-400" />
+                <span>New Brand Rule</span>
+              </button>
+            ) : (
+              <button
+                disabled
+                title="Brand Manager or Admin authority required to author rules."
+                className="flex items-center space-x-1.5 bg-neutral-100 border border-neutral-200 text-neutral-400 text-xs font-bold px-4 py-2.5 rounded-xl cursor-not-allowed shadow-none"
+              >
+                <Lock className="w-3.5 h-3.5 text-neutral-400" />
+                <span>New Rule (Restricted)</span>
+              </button>
+            )
+          ) : hasPermission('canEditFacts') ? (
             <button
               onClick={() => setShowFactModal(true)}
               className="flex items-center space-x-1.5 bg-black hover:bg-neutral-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs transition active:scale-95 hover:shadow-[0_0_15px_-2px_rgba(124,58,237,0.35)]"
@@ -218,9 +234,40 @@ export default function KnowledgePage() {
               <Plus className="w-3.5 h-3.5 text-purple-400" />
               <span>Add Approved Fact</span>
             </button>
+          ) : (
+            <button
+              disabled
+              title="Brand Manager or Admin authority required to add approved facts."
+              className="flex items-center space-x-1.5 bg-neutral-100 border border-neutral-200 text-neutral-400 text-xs font-bold px-4 py-2.5 rounded-xl cursor-not-allowed shadow-none"
+            >
+              <Lock className="w-3.5 h-3.5 text-neutral-400" />
+              <span>Add Fact (Restricted)</span>
+            </button>
           )}
         </div>
       </div>
+
+      {/* Read-Only Governance Scope Notice */}
+      {!hasPermission('canEditRules') && (
+        <div className="bg-neutral-50 border border-neutral-200 p-4 rounded-2xl flex items-center justify-between text-xs text-neutral-600 shadow-xs">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-xl bg-neutral-200 text-neutral-700 flex items-center justify-center font-bold text-xs shrink-0">
+              <Lock className="w-4 h-4 text-neutral-600" />
+            </div>
+            <div>
+              <span className="font-bold text-black block">Read-Only Policy Scope</span>
+              <span className="text-[11px] text-neutral-500">
+                {role === 'reviewer'
+                  ? 'Reviewers have read-only inspection of brand rules to preserve independent evaluation custody.'
+                  : 'Creators have read-only inspection of brand guidelines for drafting alignment.'}
+              </span>
+            </div>
+          </div>
+          <span className="text-[10px] font-mono uppercase bg-white border border-neutral-200 text-neutral-600 px-2.5 py-1 rounded-full font-bold">
+            Editing Gated
+          </span>
+        </div>
+      )}
 
       {/* Tabs & Search */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-2 rounded-2xl border border-neutral-200 shadow-xs">

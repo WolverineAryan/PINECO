@@ -1,9 +1,12 @@
 import json
-from fastapi import APIRouter, Depends, HTTPException, Query
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, Security
+from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 
 from pineco.database import get_db
 from pineco.models import Review, Submission, Finding, ReviewDecision, AuditEvent, get_utc_now
+from pineco.auth import security_bearer, decode_jwt_token
 from pineco.schemas import (
     DecisionCreate,
     DecisionResponse,
@@ -19,12 +22,30 @@ def record_review_decision(
     review_id: str,
     payload: DecisionCreate,
     reviewer_id: str = Query(default="usr-reviewer-elena"),
+    auth: Optional[HTTPAuthorizationCredentials] = Security(security_bearer),
     db: Session = Depends(get_db),
 ):
     """
     Records a version-specific human review decision.
     An override or changes_requested decision requires a non-empty rationale.
     """
+    if auth and auth.credentials:
+        try:
+            token_data = decode_jwt_token(auth.credentials)
+            if token_data.get("role") == "creator":
+                raise HTTPException(
+                    status_code=403,
+                    detail="Access Denied: Actors with role 'creator' cannot record governance decisions under dual-custody RBAC rules. A Reviewer or Admin role is required.",
+                )
+        except HTTPException:
+            raise
+        except Exception:
+            pass
+    elif reviewer_id == "usr-creator-sarah":
+        raise HTTPException(
+            status_code=403,
+            detail="Access Denied: Actors with role 'creator' cannot record governance decisions under dual-custody RBAC rules. A Reviewer or Admin role is required.",
+        )
     review = db.query(Review).filter(Review.id == review_id).first()
     if not review:
         raise HTTPException(status_code=404, detail="Review not found")
@@ -89,12 +110,30 @@ def override_finding(
     finding_id: str,
     payload: FindingOverrideCreate,
     actor_id: str = Query(default="usr-reviewer-elena"),
+    auth: Optional[HTTPAuthorizationCredentials] = Security(security_bearer),
     db: Session = Depends(get_db),
 ):
     """
     Overrides a specific finding.
     Strictly requires a non-empty rationale explaining the business justification.
     """
+    if auth and auth.credentials:
+        try:
+            token_data = decode_jwt_token(auth.credentials)
+            if token_data.get("role") == "creator":
+                raise HTTPException(
+                    status_code=403,
+                    detail="Access Denied: Actors with role 'creator' cannot override compliance findings. A Reviewer or Admin role is required.",
+                )
+        except HTTPException:
+            raise
+        except Exception:
+            pass
+    elif actor_id == "usr-creator-sarah":
+        raise HTTPException(
+            status_code=403,
+            detail="Access Denied: Actors with role 'creator' cannot override compliance findings. A Reviewer or Admin role is required.",
+        )
     if not payload.rationale or not payload.rationale.strip():
         raise HTTPException(status_code=422, detail="A non-empty override rationale is required.")
 

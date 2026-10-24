@@ -22,7 +22,7 @@ import { useToast } from '@/components/Toast';
 import { AuditSkeleton } from '@/components/Skeleton';
 
 export default function AuditPage() {
-  const { workspaceId } = useRole();
+  const { workspaceId, hasPermission, setRole, role } = useRole();
   const { success, error: toastError } = useToast();
   const [events, setEvents] = useState<AuditEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,8 +43,12 @@ export default function AuditPage() {
   };
 
   useEffect(() => {
-    loadAudit();
-  }, [workspaceId]);
+    if (hasPermission('canInspectAuditTrail')) {
+      loadAudit();
+    } else {
+      setLoading(false);
+    }
+  }, [workspaceId, hasPermission('canInspectAuditTrail')]);
 
   const filteredEvents = events.filter((e) => {
     if (entityFilter !== 'all' && e.entity_type !== entityFilter) return false;
@@ -58,6 +62,48 @@ export default function AuditPage() {
     }
     return true;
   });
+
+  if (!hasPermission('canInspectAuditTrail')) {
+    return (
+      <div className="max-w-xl mx-auto my-12 bg-white rounded-3xl border border-neutral-200 p-8 sm:p-10 text-center shadow-xs space-y-6 animate-in fade-in">
+        <div className="w-16 h-16 rounded-3xl bg-neutral-100 border border-neutral-200 text-neutral-500 flex items-center justify-center mx-auto shadow-inner">
+          <Shield className="w-8 h-8 text-neutral-600" />
+        </div>
+        <div className="space-y-2">
+          <span className="text-[10px] font-mono uppercase bg-neutral-100 text-neutral-600 px-3 py-1 rounded-full font-bold border border-neutral-200">
+            Access Control (RBAC): Least Privilege
+          </span>
+          <h2 className="text-2xl font-black text-black tracking-tight">Audit Ledger Restricted</h2>
+          <p className="text-neutral-600 text-xs sm:text-sm max-w-md mx-auto leading-relaxed">
+            Inspection of the immutable cryptographic compliance chain is restricted to <strong>Compliance Reviewers</strong>, <strong>Brand Managers</strong>, and <strong>Administrators</strong> under dual-custody principles.
+          </p>
+          <p className="text-neutral-400 text-[11px] font-mono">
+            Active Persona: <span className="capitalize font-bold text-neutral-700">{role.replace('_', ' ')}</span> (Drafter Scope)
+          </p>
+        </div>
+
+        <div className="p-4 bg-purple-50/50 rounded-2xl border border-purple-100 text-left text-xs space-y-1.5">
+          <div className="font-bold text-purple-950 flex items-center space-x-1.5">
+            <span className="w-2 h-2 rounded-full bg-purple-600" />
+            <span>Dual-Custody Governance Principle</span>
+          </div>
+          <p className="text-purple-900/80 text-[11px] leading-relaxed">
+            Content creators draft content and test pre-publication copy without tampering with or reviewing official regulatory audit records. Objective review custody ensures audit integrity.
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <button
+            type="button"
+            onClick={() => setRole('reviewer')}
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-black text-white hover:bg-neutral-800 text-xs font-bold transition shadow-xs"
+          >
+            Switch to Reviewer Persona
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return <AuditSkeleton />;

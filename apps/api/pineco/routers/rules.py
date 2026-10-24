@@ -1,11 +1,13 @@
 import json
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Security
+from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 
 from pineco.database import get_db
 from pineco.config import settings
 from pineco.models import BrandRule, AuditEvent, get_utc_now
+from pineco.auth import security_bearer, decode_jwt_token
 from pineco.schemas import RuleCreate, RuleUpdate, RuleResponse
 
 router = APIRouter(prefix="/rules", tags=["Brand Rules"])
@@ -34,8 +36,27 @@ def list_rules(
 def create_rule(
     payload: RuleCreate,
     actor_id: str = Query(default="usr-manager-marcus"),
+    auth: Optional[HTTPAuthorizationCredentials] = Security(security_bearer),
     db: Session = Depends(get_db),
 ):
+    if auth and auth.credentials:
+        try:
+            token_data = decode_jwt_token(auth.credentials)
+            role = token_data.get("role")
+            if role in ("creator", "reviewer"):
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"Access Denied: Actors with role '{role}' cannot create brand policy rules. Brand Manager or Admin authority is required.",
+                )
+        except HTTPException:
+            raise
+        except Exception:
+            pass
+    elif actor_id in ("usr-creator-sarah", "usr-reviewer-elena"):
+        raise HTTPException(
+            status_code=403,
+            detail="Access Denied: Brand policy authoring requires Brand Manager or Admin authority.",
+        )
     ws_id = payload.workspace_id or settings.DEFAULT_WORKSPACE_ID
     rule = BrandRule(
         workspace_id=ws_id,
@@ -74,8 +95,27 @@ def update_rule(
     rule_id: str,
     payload: RuleUpdate,
     actor_id: str = Query(default="usr-manager-marcus"),
+    auth: Optional[HTTPAuthorizationCredentials] = Security(security_bearer),
     db: Session = Depends(get_db),
 ):
+    if auth and auth.credentials:
+        try:
+            token_data = decode_jwt_token(auth.credentials)
+            role = token_data.get("role")
+            if role in ("creator", "reviewer"):
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"Access Denied: Actors with role '{role}' cannot modify brand policy rules. Brand Manager or Admin authority is required.",
+                )
+        except HTTPException:
+            raise
+        except Exception:
+            pass
+    elif actor_id in ("usr-creator-sarah", "usr-reviewer-elena"):
+        raise HTTPException(
+            status_code=403,
+            detail="Access Denied: Brand policy modifications require Brand Manager or Admin authority.",
+        )
     rule = db.query(BrandRule).filter(BrandRule.id == rule_id).first()
     if not rule:
         raise HTTPException(status_code=404, detail="Brand rule not found")

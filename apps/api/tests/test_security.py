@@ -47,3 +47,54 @@ def test_validation_error_envelope(client):
     assert "error" in data
     assert data["error"]["code"] == "VALIDATION_ERROR"
     assert "request_id" in data["error"]
+
+
+def test_creator_cannot_record_decision(client):
+    resp = client.get("/api/v1/submissions/sub-demo-violation")
+    rev = resp.json()["latest_review"]
+    review_id = rev["id"]
+
+    # Creator role attempting decision sign-off -> 403 Forbidden
+    resp = client.post(
+        f"/api/v1/reviews/{review_id}/decision?reviewer_id=usr-creator-sarah",
+        json={"decision": "approved", "rationale": "I like this copy"},
+    )
+    assert resp.status_code == 403
+    data = resp.json()
+    msg = data.get("error", {}).get("message", "") or data.get("detail", "")
+    assert "Access Denied" in msg
+
+
+def test_creator_cannot_override_finding(client):
+    resp = client.get("/api/v1/submissions/sub-demo-violation")
+    rev = resp.json()["latest_review"]
+    finding_id = rev["findings"][0]["id"]
+
+    # Creator role attempting override -> 403 Forbidden
+    resp = client.post(
+        f"/api/v1/findings/{finding_id}/override?actor_id=usr-creator-sarah",
+        json={"rationale": "Creator overriding compliance finding"},
+    )
+    assert resp.status_code == 403
+    data = resp.json()
+    msg = data.get("error", {}).get("message", "") or data.get("detail", "")
+    assert "Access Denied" in msg
+
+
+def test_creator_cannot_create_rule(client):
+    # Creator role attempting rule authoring -> 403 Forbidden
+    resp = client.post(
+        "/api/v1/rules?actor_id=usr-creator-sarah",
+        json={
+            "name": "Creator Rule",
+            "category": "terminology",
+            "pattern": "forbidden",
+            "severity": "high",
+            "channel_scope": "all",
+            "description": "Unauthorized rule",
+        },
+    )
+    assert resp.status_code == 403
+    data = resp.json()
+    msg = data.get("error", {}).get("message", "") or data.get("detail", "")
+    assert "Access Denied" in msg
