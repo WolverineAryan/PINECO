@@ -191,7 +191,12 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<UserProfile>(DEFAULT_PROFILES['reviewer']);
   const [isRoleSwitching, setIsRoleSwitching] = useState<boolean>(false);
   const [roleSwitchBanner, setRoleSwitchBanner] = useState<RoleSwitchBannerInfo | null>(null);
-  const [workspaceId, setWorkspaceId] = useState('ws-demo-enterprise-001');
+  const [workspaceId, setWorkspaceId] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('pineco_workspace_id') || '';
+    }
+    return '';
+  });
   const [products, setProducts] = useState<Product[]>([]);
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
   const [isDemoMode, setDemoMode] = useState(true);
@@ -202,7 +207,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
 
   const reloadProducts = async () => {
     try {
-      const list = await api.getProducts(workspaceId);
+      const list = await api.getProducts(workspaceId || undefined);
       setProducts(list);
       if (list.length > 0) {
         setActiveProduct((prev) => {
@@ -260,17 +265,8 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
             setToken(null);
             setIsAuthenticated(false);
           });
-        return;
       } catch {
         // ignore JSON parse error
-      }
-    }
-
-    // Default: initialize with demo reviewer credentials if not navigating to auth routes
-    if (typeof window !== 'undefined') {
-      const path = window.location.pathname;
-      if (path !== '/login' && path !== '/signup') {
-        loginWithCredentials('reviewer@pineco.internal', 'pineco2026!').catch(() => {});
       }
     }
   }, []);
@@ -317,6 +313,10 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       const res = await api.login({ role: targetRole });
       localStorage.setItem('pineco_jwt_token', res.access_token);
       localStorage.setItem('pineco_jwt_user', JSON.stringify(res.user));
+      if (res.user.workspace_id) {
+        localStorage.setItem('pineco_workspace_id', res.user.workspace_id);
+        setWorkspaceId(res.user.workspace_id);
+      }
       setToken(res.access_token);
       setCurrentUser(res.user);
       setRoleState(res.user.role);
@@ -338,7 +338,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('pineco_workspace_id');
     setToken(null);
     setIsAuthenticated(false);
-    setWorkspaceId('ws-demo-enterprise-001');
+    setWorkspaceId('');
     setActiveProduct(null);
     const fallback = DEFAULT_PROFILES['creator'];
     setCurrentUser(fallback);

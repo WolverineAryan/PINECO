@@ -207,8 +207,10 @@ export function ProfileSettingsModal({
                 Workspace Scope
               </span>
               <div className="bg-white p-2 rounded-lg border border-neutral-200 text-[11px] font-mono text-neutral-600">
-                <div className="font-bold text-black truncate">Pineco Enterprise</div>
-                <div className="text-[10px] text-purple-700 font-semibold truncate">16 Portfolios Active</div>
+                <div className="font-bold text-black truncate">{currentUser.department || 'Pineco Enterprise'}</div>
+                <div className="text-[10px] text-purple-700 font-semibold truncate font-mono">
+                  {workspaceId ? `Scope: ${workspaceId.slice(0, 15)}...` : 'Active Workspace'}
+                </div>
               </div>
             </div>
           </div>

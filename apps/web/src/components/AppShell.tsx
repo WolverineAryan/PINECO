@@ -142,7 +142,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               }}
               className="w-full text-xs font-bold text-black bg-white border border-neutral-300 hover:border-black rounded-xl px-2.5 py-2 appearance-none focus:outline-none focus:ring-1 focus:ring-purple-600 focus:border-purple-600 cursor-pointer shadow-xs pr-7 truncate transition"
             >
-              <option value="all">All Products (16 Portfolios)</option>
+              <option value="all">
+                {products.length > 0 ? `All Products (${products.length} Portfolios)` : 'All Products (0 Portfolios)'}
+              </option>
               {products.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
@@ -153,9 +155,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="text-[10px] text-neutral-500 font-mono truncate px-1 flex items-center justify-between">
-            <span>{activeProduct ? activeProduct.category : 'All 16 Enterprise Portfolios'}</span>
+            <span>
+              {activeProduct
+                ? activeProduct.category
+                : products.length > 0
+                ? `${products.length} Enterprise Portfolios`
+                : 'Workspace Active'}
+            </span>
             <span className="text-[10px] bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.2 rounded-full font-bold">
-              {activeProduct ? 'Active Scope' : '20 Entries'}
+              {activeProduct ? 'Active Scope' : `${products.length} Portfolios`}
             </span>
           </div>
         </div>
@@ -442,7 +450,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 }}
                 className="w-full text-xs font-bold p-2 border border-neutral-300 rounded-lg text-black bg-white"
               >
-                <option value="all">All Products (16 Portfolios)</option>
+                <option value="all">
+                  {products.length > 0 ? `All Products (${products.length} Portfolios)` : 'All Products (0 Portfolios)'}
+                </option>
                 {products.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}

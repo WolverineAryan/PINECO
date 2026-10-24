@@ -224,6 +224,7 @@ def get_current_user_profile(
     initials = "".join([p[0] for p in name.split()[:2]]).upper() or "PI"
     return UserProfileResponse(
         id=payload.get("sub", ""),
+        workspace_id=payload.get("workspace_id", settings.DEFAULT_WORKSPACE_ID),
         email=payload.get("email", ""),
         name=name,
         role=payload.get("role", "reviewer"),

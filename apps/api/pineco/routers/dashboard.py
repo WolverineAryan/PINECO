@@ -5,6 +5,7 @@ from sqlalchemy import func
 
 from pineco.database import get_db
 from pineco.config import settings
+from pineco.auth import get_current_user_optional, resolve_workspace_id
 from pineco.models import (
     Submission,
     BrandRule,
@@ -22,9 +23,10 @@ router = APIRouter(tags=["Dashboard"])
 def get_dashboard_summary(
     workspace_id: Optional[str] = Query(default=None),
     product_id: Optional[str] = Query(default=None),
+    current_user: Optional[dict] = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
-    ws_id = workspace_id or settings.DEFAULT_WORKSPACE_ID
+    ws_id = resolve_workspace_id(workspace_id, current_user)
 
     # 1. Submissions counts via SQL aggregation
     status_counts_q = db.query(Submission.status, func.count(Submission.id)).filter(Submission.workspace_id == ws_id)

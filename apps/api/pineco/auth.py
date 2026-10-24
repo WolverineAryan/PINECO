@@ -50,6 +50,7 @@ DEMO_USERS: Dict[str, Dict[str, Any]] = {
         "title": "Content Marketing Specialist",
         "department": "Growth & Communications",
         "avatar": "SC",
+        "workspace_id": settings.DEFAULT_WORKSPACE_ID,
     },
     "reviewer@pineco.internal": {
         "id": "usr-reviewer-elena",
@@ -59,6 +60,7 @@ DEMO_USERS: Dict[str, Dict[str, Any]] = {
         "title": "Compliance & Legal Reviewer",
         "department": "Legal & Risk Governance",
         "avatar": "ER",
+        "workspace_id": settings.DEFAULT_WORKSPACE_ID,
     },
     "manager@pineco.internal": {
         "id": "usr-manager-marcus",
@@ -68,6 +70,7 @@ DEMO_USERS: Dict[str, Dict[str, Any]] = {
         "title": "Head of Brand Governance",
         "department": "Global Brand Office",
         "avatar": "MV",
+        "workspace_id": settings.DEFAULT_WORKSPACE_ID,
     },
     "admin@pineco.internal": {
         "id": "usr-admin-alex",
@@ -77,6 +80,7 @@ DEMO_USERS: Dict[str, Dict[str, Any]] = {
         "title": "Enterprise Administrator",
         "department": "Platform Operations",
         "avatar": "AT",
+        "workspace_id": settings.DEFAULT_WORKSPACE_ID,
     },
 }
 
@@ -116,8 +120,36 @@ def decode_jwt_token(token: str) -> Dict[str, Any]:
 
 async def get_current_user_optional(
     auth: Optional[HTTPAuthorizationCredentials] = Security(security_bearer),
-) -> Dict[str, Any]:
-    """Extracts user from JWT token if present, otherwise returns default demo reviewer."""
+) -> Optional[Dict[str, Any]]:
+    """Extracts user from JWT token if present, otherwise returns None."""
     if auth and auth.credentials:
-        return decode_jwt_token(auth.credentials)
-    return DEMO_USERS["reviewer@pineco.internal"]
+        try:
+            return decode_jwt_token(auth.credentials)
+        except HTTPException:
+            return None
+    return None
+
+
+def resolve_workspace_id(
+    requested_ws: Optional[str] = None,
+    current_user: Optional[Dict[str, Any]] = None,
+) -> str:
+    """
+    Enforces tenant workspace data isolation:
+    1. If a user is authenticated via JWT:
+       - If user role is 'admin' and requested_ws is provided, allow inspecting requested_ws.
+       - For all standard tenant users, strictly enforce their workspace_id.
+    2. If unauthenticated / demo fallback:
+       - If requested_ws is explicitly supplied, use it.
+       - Otherwise fall back to settings.DEFAULT_WORKSPACE_ID.
+    """
+    if current_user and current_user.get("workspace_id"):
+        user_ws = current_user["workspace_id"]
+        role = current_user.get("role", "reviewer")
+        if role == "admin" and requested_ws:
+            return requested_ws
+        return user_ws
+
+    if requested_ws:
+        return requested_ws
+    return settings.DEFAULT_WORKSPACE_ID

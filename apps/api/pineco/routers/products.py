@@ -6,20 +6,22 @@ from pineco.database import get_db
 from pineco.models import Product, AuditEvent, BrandRule, ApprovedFact, Submission
 from pineco.schemas import ProductCreate, ProductResponse, ProductUpdate
 from pineco.config import settings
-from pineco.auth import get_current_user_optional
+from pineco.auth import get_current_user_optional, resolve_workspace_id
 
 router = APIRouter(prefix="/products", tags=["products"])
 
 
 @router.get("", response_model=List[ProductResponse])
 def list_products(
-    workspace_id: str = Query(default=settings.DEFAULT_WORKSPACE_ID),
+    workspace_id: Optional[str] = Query(default=None),
+    current_user: Optional[dict] = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
     """Lists all products / project folders configured for a workspace."""
+    ws_id = resolve_workspace_id(workspace_id, current_user)
     products = (
         db.query(Product)
-        .filter(Product.workspace_id == workspace_id)
+        .filter(Product.workspace_id == ws_id)
         .order_by(Product.created_at.desc())
         .all()
     )
@@ -33,7 +35,7 @@ def create_product(
     current_user: Optional[dict] = Depends(get_current_user_optional),
 ):
     """Creates a new isolated product compliance workspace folder."""
-    ws_id = payload.workspace_id or settings.DEFAULT_WORKSPACE_ID
+    ws_id = resolve_workspace_id(payload.workspace_id, current_user)
     actor_id = (current_user.get("sub") or current_user.get("id")) if current_user else settings.DEFAULT_USER_ADMIN
 
     product = Product(

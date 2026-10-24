@@ -726,7 +726,7 @@ export default function LandingPage() {
               <div className="flex items-center space-x-3">
                 <div className="flex items-center space-x-1.5 bg-purple-950/80 border border-purple-700/60 text-purple-300 px-2.5 py-1 rounded-lg font-mono text-[10px]">
                   <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-                  <span className="font-bold">16 Portfolios Active</span>
+                  <span className="font-bold">Live Enterprise Scope</span>
                 </div>
                 <Link
                   href="/dashboard"
@@ -748,7 +748,7 @@ export default function LandingPage() {
                       Active Compliance Scope:
                     </span>
                     <span className="text-[10px] font-mono bg-purple-50 border border-purple-200 text-purple-700 font-bold px-2 py-0.5 rounded-full">
-                      All 16 Enterprise Portfolios
+                      Multi-Portfolio Governance
                     </span>
                   </div>
                   <h3 className="text-lg sm:text-xl font-black text-black tracking-tight flex items-center space-x-2">

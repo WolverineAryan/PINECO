@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from pineco.database import get_db
 from pineco.config import settings
 from pineco.models import ApprovedFact, AuditEvent
-from pineco.auth import security_bearer, decode_jwt_token
+from pineco.auth import security_bearer, decode_jwt_token, get_current_user_optional, resolve_workspace_id
 from pineco.schemas import FactCreate, FactResponse
 
 router = APIRouter(prefix="/facts", tags=["Approved Facts"])
@@ -18,9 +18,10 @@ def list_facts(
     workspace_id: Optional[str] = Query(default=None),
     product_id: Optional[str] = Query(default=None),
     status: Optional[str] = Query(default=None),
+    current_user: Optional[dict] = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
-    ws_id = workspace_id or settings.DEFAULT_WORKSPACE_ID
+    ws_id = resolve_workspace_id(workspace_id, current_user)
     query = db.query(ApprovedFact).filter(ApprovedFact.workspace_id == ws_id)
     if product_id:
         query = query.filter((ApprovedFact.product_id == product_id) | (ApprovedFact.product_id.is_(None)))
@@ -36,9 +37,11 @@ def create_fact(
     auth: Optional[HTTPAuthorizationCredentials] = Security(security_bearer),
     db: Session = Depends(get_db),
 ):
+    user_payload = None
     if auth and auth.credentials:
         try:
             token_data = decode_jwt_token(auth.credentials)
+            user_payload = token_data
             role = token_data.get("role")
             if role in ("creator", "reviewer"):
                 raise HTTPException(
@@ -54,7 +57,7 @@ def create_fact(
             status_code=403,
             detail="Access Denied: Creating approved facts requires Brand Manager or Admin authority.",
         )
-    ws_id = payload.workspace_id or settings.DEFAULT_WORKSPACE_ID
+    ws_id = resolve_workspace_id(payload.workspace_id, user_payload)
     fact = ApprovedFact(
         workspace_id=ws_id,
         product_id=payload.product_id,

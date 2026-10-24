@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from pineco.database import get_db
 from pineco.config import settings
+from pineco.auth import get_current_user_optional, resolve_workspace_id
 from pineco.models import AuditEvent, Submission
 from pineco.schemas import AuditEventResponse
 
@@ -36,9 +37,10 @@ def get_submission_audit_trail(
 def list_workspace_audit_trail(
     workspace_id: Optional[str] = Query(default=None),
     limit: int = Query(default=50, ge=1, le=200),
+    current_user: Optional[dict] = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
-    ws_id = workspace_id or settings.DEFAULT_WORKSPACE_ID
+    ws_id = resolve_workspace_id(workspace_id, current_user)
     return (
         db.query(AuditEvent)
         .filter(AuditEvent.workspace_id == ws_id)

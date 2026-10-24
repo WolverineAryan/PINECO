@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from pineco.database import get_db
 from pineco.config import settings
+from pineco.auth import get_current_user_optional, resolve_workspace_id
 from pineco.models import Submission, ContentVersion, Review, Finding, AuditEvent, Product, get_utc_now
 from pineco.engine.parser import parse_uploaded_file
 from pineco.engine.pipeline import execute_review_pipeline
@@ -34,9 +35,10 @@ def list_submissions(
     status: Optional[str] = Query(default=None),
     limit: Optional[int] = Query(default=None, ge=1, le=5000),
     offset: int = Query(default=0, ge=0),
+    current_user: Optional[dict] = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
-    ws_id = workspace_id or settings.DEFAULT_WORKSPACE_ID
+    ws_id = resolve_workspace_id(workspace_id, current_user)
     query = db.query(Submission).filter(Submission.workspace_id == ws_id)
     if product_id:
         query = query.filter(Submission.product_id == product_id)
@@ -52,15 +54,17 @@ def list_submissions(
 def create_submission(
     payload: SubmissionCreate,
     actor_id: str = Query(default="usr-creator-sarah"),
+    current_user: Optional[dict] = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
-    ws_id = payload.workspace_id or settings.DEFAULT_WORKSPACE_ID
+    ws_id = resolve_workspace_id(payload.workspace_id, current_user)
+    actual_actor = (current_user.get("sub") or current_user.get("id")) if current_user else actor_id
     submission = Submission(
         workspace_id=ws_id,
         product_id=payload.product_id,
         title=payload.title,
         channel=payload.channel,
-        created_by=actor_id,
+        created_by=actual_actor,
         status="draft",
     )
     db.add(submission)
@@ -246,6 +250,7 @@ async def upload_and_scan_endpoint(
     workspace_id: Optional[str] = Form(default=None),
     extracted_text: Optional[str] = Form(default=None),
     actor_id: str = Form(default="usr-creator-sarah"),
+    current_user: Optional[dict] = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
     """
@@ -279,7 +284,8 @@ async def upload_and_scan_endpoint(
         base_name = os.path.splitext(file.filename or "Document")[0]
         sub_title = f"{base_name.replace('_', ' ').replace('-', ' ').title()} (Audit)"
 
-    ws_id = workspace_id or settings.DEFAULT_WORKSPACE_ID
+    ws_id = resolve_workspace_id(workspace_id, current_user)
+    actual_actor = (current_user.get("sub") or current_user.get("id")) if current_user else actor_id
 
     # 1. Create Submission
     submission = Submission(
@@ -287,7 +293,7 @@ async def upload_and_scan_endpoint(
         product_id=product_id,
         title=sub_title,
         channel=channel,
-        created_by=actor_id,
+        created_by=actual_actor,
         status="draft",
     )
     db.add(submission)
