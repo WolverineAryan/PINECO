@@ -560,7 +560,12 @@ export default function LandingPage() {
       {/* ======================================================== */}
       <nav className="h-20 border-b border-neutral-200/80 bg-white/85 backdrop-blur-md sticky top-0 z-50 px-4 sm:px-8 transition-colors">
         <div className="max-w-7xl mx-auto h-full flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-3 group">
+          <Link href="/" className="flex items-center space-x-2.5 group">
+            <img
+              src="/favicon.png"
+              alt="Pineco Emblem"
+              className="h-9 w-9 object-contain rounded-xl transition duration-200 group-hover:scale-105"
+            />
             <img
               src="/logo-text.png"
               alt="Pineco"
@@ -616,7 +621,10 @@ export default function LandingPage() {
 
           {/* Foreground Hero Content */}
           <div className="max-w-4xl mx-auto text-center relative z-10 space-y-6">
-            
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-neutral-50/90 border border-neutral-200/90 shadow-xs mb-1 backdrop-blur-xs">
+              <img src="/favicon.png" alt="Pineco Emblem" className="w-5 h-5 object-contain" />
+              <span className="text-xs font-bold text-neutral-800 tracking-wide font-mono">Pineco Brand Governance</span>
+            </div>
 
             {/* Primary Hero Typography with Elegant Serif Gradient Highlight */}
             <h1 className="text-3xl xs:text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-black leading-[1.12] sm:leading-[1.08] text-balance">

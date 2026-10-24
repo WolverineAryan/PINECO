@@ -7,6 +7,16 @@ import { AppShell } from '@/components/AppShell';
 export const metadata: Metadata = {
   title: 'Pineco — Intelligent Brand Governance Platform',
   description: 'Evidence-based brand governance platform combining deterministic rule checks and AI claim verification.',
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon.png', type: 'image/png' },
+      { url: '/icon.png', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png' },
+    ],
+  },
 };
 
 export default function RootLayout({

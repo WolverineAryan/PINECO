@@ -104,7 +104,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <aside className="hidden lg:flex w-64 bg-white border-r border-neutral-200 flex-col shrink-0 min-h-screen fixed inset-y-0 left-0 z-30 shadow-[1px_0_4px_rgba(0,0,0,0.02)]">
         {/* Brand Header */}
         <div className="h-16 px-4 border-b border-neutral-200 flex items-center bg-white">
-          <Link href="/dashboard" className="flex items-center w-full group">
+          <Link href="/dashboard" className="flex items-center space-x-2 w-full group">
+            <img
+              src="/favicon.png"
+              alt="Pineco"
+              className="h-7 w-7 object-contain rounded-lg transition group-hover:scale-105"
+            />
             <img
               src="/logo-text.png"
               alt="Pineco"
@@ -354,7 +359,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
-            <Link href="/dashboard" className="lg:hidden flex items-center">
+            <Link href="/dashboard" className="lg:hidden flex items-center space-x-1.5">
+              <img
+                src="/favicon.png"
+                alt="Pineco"
+                className="h-6 w-6 object-contain rounded-md"
+              />
               <img
                 src="/logo-text.png"
                 alt="Pineco"
