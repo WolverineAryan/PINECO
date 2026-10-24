@@ -60,10 +60,11 @@ app = FastAPI(
     redoc_url="/redoc" if settings.APP_ENV != "production" else None,
 )
 
-# Configure CORS with explicit allowed origins
+# Configure CORS with explicit allowed origins and automatic Vercel preview domain support
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
+    allow_origin_regex=r"^https:\/\/.*\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],

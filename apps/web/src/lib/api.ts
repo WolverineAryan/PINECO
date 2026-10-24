@@ -18,8 +18,9 @@ import {
   UploadAndScanResponse,
 } from './types';
 
-const API_BASE_URL =
+const rawBase =
   process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, '') || 'http://localhost:8000/api/v1';
+const API_BASE_URL = rawBase.endsWith('/api/v1') ? rawBase : `${rawBase}/api/v1`;
 
 function getStoredToken(): string | null {
   if (typeof window === 'undefined') return null;
