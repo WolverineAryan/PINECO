@@ -62,6 +62,8 @@ async def execute_review_pipeline(
     )
     if submission.product_id:
         rules_q = rules_q.filter((BrandRule.product_id == submission.product_id) | (BrandRule.product_id.is_(None)))
+    else:
+        rules_q = rules_q.filter((BrandRule.product_id == "prod-pineco-core") | (BrandRule.product_id.is_(None)))
     rules = rules_q.all()
 
     facts_q = db.query(ApprovedFact).filter(
@@ -69,6 +71,8 @@ async def execute_review_pipeline(
     )
     if submission.product_id:
         facts_q = facts_q.filter((ApprovedFact.product_id == submission.product_id) | (ApprovedFact.product_id.is_(None)))
+    else:
+        facts_q = facts_q.filter((ApprovedFact.product_id == "prod-pineco-core") | (ApprovedFact.product_id.is_(None)))
     facts = facts_q.all()
 
     # Step 1: Run Deterministic Engine

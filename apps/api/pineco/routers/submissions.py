@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from pineco.database import get_db
 from pineco.config import settings
-from pineco.models import Submission, ContentVersion, Review, Finding, AuditEvent, get_utc_now
+from pineco.models import Submission, ContentVersion, Review, Finding, AuditEvent, Product, get_utc_now
 from pineco.engine.parser import parse_uploaded_file
 from pineco.engine.pipeline import execute_review_pipeline
 from pineco.engine.exporter import generate_docx_report, generate_pptx_report, generate_pdf_report
@@ -363,6 +363,7 @@ def export_submission_report(
             joinedload(Submission.versions),
             joinedload(Submission.reviews).joinedload(Review.findings).joinedload(Finding.rule),
             joinedload(Submission.reviews).joinedload(Review.findings).joinedload(Finding.fact),
+            joinedload(Submission.decisions),
         )
         .filter(Submission.id == submission_id)
         .first()
@@ -388,19 +389,23 @@ def export_submission_report(
         .all()
     )
 
+    product = None
+    if sub.product_id:
+        product = db.query(Product).filter(Product.id == sub.product_id).first()
+
     fmt = format.lower()
     clean_title = "".join(c for c in sub.title if c.isalnum() or c in ("-", "_")).strip() or "submission"
 
     if fmt == "docx":
-        data = generate_docx_report(sub, current_ver, latest_review, audit_events)
+        data = generate_docx_report(sub, current_ver, latest_review, audit_events, product=product, decisions=sub.decisions)
         media_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         filename = f"pineco-report-{clean_title}.docx"
     elif fmt == "pptx":
-        data = generate_pptx_report(sub, current_ver, latest_review, audit_events)
+        data = generate_pptx_report(sub, current_ver, latest_review, audit_events, product=product, decisions=sub.decisions)
         media_type = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
         filename = f"pineco-report-{clean_title}.pptx"
     else:  # pdf
-        data = generate_pdf_report(sub, current_ver, latest_review, audit_events)
+        data = generate_pdf_report(sub, current_ver, latest_review, audit_events, product=product, decisions=sub.decisions)
         media_type = "application/pdf"
         filename = f"pineco-report-{clean_title}.pdf"
 

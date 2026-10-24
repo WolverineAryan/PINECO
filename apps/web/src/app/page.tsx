@@ -2263,7 +2263,7 @@ export default function LandingPage() {
                       <p className="text-[11px] text-neutral-500 leading-relaxed">
                         {selectedExportFormat === 'pdf' && 'Includes tamper-evident QR verification token, full character offset inspection tables, and cryptographic reviewer signature blocks.'}
                         {selectedExportFormat === 'docx' && 'Complete legal brief containing statutory SEC Rule 206(4)-1 & FDA 21 CFR citations, redlined diff comparisons, and written rationale justifications.'}
-                        {selectedExportFormat === 'pptx' && 'Executive committee presentation deck summarizing total compliance velocity, penalty prevention metrics, and audit trail health.'}
+                        {selectedExportFormat === 'pptx' && '7-slide board-ready presentation deck featuring compliance scorecard KPIs, policy violation remediation tables, ground-truth fact verification anchors, and dual-custody authorization gates.'}
                       </p>
                     </div>
 

@@ -127,48 +127,54 @@ def scan_with_agent(
     # 1. CRITICAL_LEGAL: Prohibited marketing terminology
     for rule in rules:
         if rule.category == "terminology" and rule.pattern:
-            term = rule.pattern.lower()
-            if term in text_lower:
-                replacement = rule.preferred_replacement or "proven approach"
-                warnings.append(
-                    WarningItem(
-                        id=f"warn-legal-{rule.id}",
-                        category="CRITICAL_LEGAL",
-                        severity="critical",
-                        title=f"Prohibited Absolute Term: '{rule.pattern}'",
-                        explanation=f"Violates brand rule '{rule.name}'. High liability risk.",
-                        recommended_action=f"Replace with '{replacement}'.",
-                        matched_term=rule.pattern,
+            try:
+                pattern = rule.pattern
+                match = re.search(pattern, remediated_text, re.IGNORECASE)
+                if match:
+                    matched_str = match.group(0)
+                    replacement = rule.preferred_replacement or "proven approach"
+                    warnings.append(
+                        WarningItem(
+                            id=f"warn-legal-{rule.id}",
+                            category="CRITICAL_LEGAL",
+                            severity="critical",
+                            title=f"Prohibited Absolute Term: '{matched_str}'",
+                            explanation=f"Violates brand rule '{rule.name}'. High liability risk.",
+                            recommended_action=f"Replace with '{replacement}'.",
+                            matched_term=matched_str,
+                        )
                     )
-                )
-                remediated_text = re.sub(
-                    re.escape(rule.pattern),
-                    replacement,
-                    remediated_text,
-                    flags=re.IGNORECASE,
-                )
-                diff_summary.append(f"Replaced prohibited term '{rule.pattern}' with '{replacement}'")
+                    remediated_text = re.sub(
+                        pattern,
+                        replacement,
+                        remediated_text,
+                        flags=re.IGNORECASE,
+                    )
+                    diff_summary.append(f"Replaced prohibited term '{matched_str}' with '{replacement}'")
+            except Exception as e:
+                logger.warning(f"Regex error for rule {rule.id}: {e}")
 
     # 2. REGULATORY_SENSITIVITY: Mandatory Disclaimers
     now = datetime.now(timezone.utc)
     for rule in rules:
         if rule.category == "disclaimer" and rule.pattern:
-            phrase = rule.pattern.strip()
-            if phrase.lower() not in text_lower:
+            pattern = rule.pattern
+            clean_phrase = re.sub(r"^\\b|\\b$", "", pattern).strip()
+            if not re.search(pattern, remediated_text, re.IGNORECASE):
                 warnings.append(
                     WarningItem(
                         id=f"warn-reg-{rule.id}",
                         category="REGULATORY_SENSITIVITY",
                         severity="high",
                         title=f"Missing Mandatory Disclaimer: '{rule.name}'",
-                        explanation=f"Required disclosure '{phrase}' is missing from marketing copy.",
-                        recommended_action=f"Append mandatory disclosure: '{phrase}'",
-                        matched_term=phrase,
+                        explanation=f"Required disclosure '{clean_phrase}' is missing from marketing copy.",
+                        recommended_action=f"Append mandatory disclosure: '{clean_phrase}'",
+                        matched_term=clean_phrase,
                     )
                 )
-                if not remediated_text.strip().endswith(phrase):
-                    remediated_text = f"{remediated_text.strip()}\n\n{phrase}"
-                    diff_summary.append(f"Injected required legal disclosure: '{phrase}'")
+                if clean_phrase.lower() not in remediated_text.lower():
+                    remediated_text = f"{remediated_text.strip()}\n\n{clean_phrase}"
+                    diff_summary.append(f"Injected required legal disclosure: '{clean_phrase}'")
 
     # 3. EXPIRED_EVIDENCE: Facts older than validity date
     for fact in facts:

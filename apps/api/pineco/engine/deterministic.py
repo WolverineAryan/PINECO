@@ -32,22 +32,24 @@ def run_deterministic_rules(content_text: str, rules: List[BrandRule]) -> List[D
             if not phrase_to_find:
                 continue
 
+            # Strip leading/trailing \b if stored as regex token
+            clean_phrase = re.sub(r"^\\b|\\b$", "", phrase_to_find).strip()
             # Check if required disclaimer is present
-            lower_phrase = normalize_text(phrase_to_find).lower().strip()
+            lower_phrase = normalize_text(clean_phrase).lower()
             # If the required phrase is NOT in the content, flag finding
             if lower_phrase not in lower_content:
                 findings.append({
                     "category": "disclaimer",
                     "severity": rule.severity or "high",
                     "confidence": 1.0,
-                    "excerpt": f"Missing required disclaimer: \"{phrase_to_find}\"",
+                    "excerpt": f"Missing required disclaimer: \"{clean_phrase}\"",
                     "start_offset": None,
                     "end_offset": None,
                     "explanation": f"Mandatory disclaimer requirement violated: '{rule.name}'. The content does not contain the required regulatory/brand disclaimer.",
                     "evidence_status": "contradicted",  # policy contradicted
                     "rule_id": rule.id,
                     "fact_id": None,
-                    "suggested_correction": f"Add the required disclaimer: \"{phrase_to_find}\"",
+                    "suggested_correction": f"Add the required disclaimer: \"{clean_phrase}\"",
                     "source_origin": "rule_engine",
                 })
             continue
@@ -58,8 +60,9 @@ def run_deterministic_rules(content_text: str, rules: List[BrandRule]) -> List[D
             continue
 
         normalized_pattern = normalize_text(pattern).strip()
-        # Word boundary safe matching for terms
-        escaped_pattern = re.escape(normalized_pattern)
+        # Clean pattern of leading/trailing \b if present
+        clean_term = re.sub(r"^\\b|\\b$", "", normalized_pattern).strip()
+        escaped_pattern = re.escape(clean_term)
         # Use regex to find all matches with exact character offsets
         try:
             matches = list(re.finditer(rf"\b{escaped_pattern}\b", normalized_content, re.IGNORECASE))

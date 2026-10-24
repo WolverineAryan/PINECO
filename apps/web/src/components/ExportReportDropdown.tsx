@@ -154,7 +154,7 @@ export function ExportReportDropdown({
                   </span>
                 </div>
                 <p className="text-[11px] text-neutral-500 leading-tight mt-0.5">
-                  5-slide executive deck with KPI cards & remediation slides
+                  7-slide executive deck with scorecard, policy tables, evidence grounding & sign-off gate
                 </p>
               </div>
             </button>

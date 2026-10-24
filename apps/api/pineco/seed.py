@@ -532,7 +532,7 @@ def seed_database(db: Session) -> None:
         },
         # 2. FinTech High-Yield Marketing Campaign (Changes Requested)
         {
-            "id": "sub-fintech-violations",
+            "id": "sub-demo-violation",
             "product_id": "prod-fintech-alpha",
             "title": "AlphaVault Institutional Liquidity Social Campaign",
             "channel": "social",
