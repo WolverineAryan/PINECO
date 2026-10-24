@@ -17,13 +17,6 @@ import {
 import { useRole } from '@/components/RoleContext';
 import { useToast } from '@/components/Toast';
 
-const DEMO_PERSONAS = [
-  { role: 'reviewer', name: 'Compliance Reviewer', email: 'reviewer@pineco.internal', tag: 'Dual Custody' },
-  { role: 'creator', name: 'Content Drafter', email: 'drafter@pineco.internal', tag: 'Drafter' },
-  { role: 'brand_manager', name: 'Brand Manager', email: 'manager@pineco.internal', tag: 'Policies' },
-  { role: 'admin', name: 'System Admin', email: 'admin@pineco.internal', tag: 'Root' },
-];
-
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useRole();
@@ -57,22 +50,6 @@ export default function LoginPage() {
       router.push('/dashboard');
     } catch (err: any) {
       const msg = err.message || 'Authentication failed. Please verify your email and password.';
-      setErrorMessage(msg);
-      toastError('Sign In Failed', msg);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDemoSignIn = async (demoEmail: string, roleName: string) => {
-    try {
-      setLoading(true);
-      setErrorMessage(null);
-      await login(demoEmail, 'pineco2026!');
-      success('Session Initialized', `Authenticated as ${roleName}. Redirecting to Command Center...`);
-      router.push('/dashboard');
-    } catch (err: any) {
-      const msg = err.message || 'Demo authentication failed.';
       setErrorMessage(msg);
       toastError('Sign In Failed', msg);
     } finally {
@@ -181,9 +158,6 @@ export default function LoginPage() {
                 >
                   Password
                 </label>
-                <span className="text-[11px] text-neutral-400 font-mono">
-                  Default: <span className="text-neutral-600 font-semibold">pineco2026!</span>
-                </span>
               </div>
               <div className="relative">
                 <Lock className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -251,36 +225,6 @@ export default function LoginPage() {
               </Link>
             </div>
           </form>
-
-          {/* Quick Demo Role Selector */}
-          <div className="space-y-3 pt-2 border-t border-neutral-100">
-            <div className="flex items-center justify-between text-[11px] text-neutral-500 font-mono uppercase tracking-wider">
-              <span>Instant Persona Login</span>
-              <span className="text-purple-700 font-bold">1-Click</span>
-            </div>
-
-            <div className="grid grid-cols-1 gap-1.5">
-              {DEMO_PERSONAS.map((p) => (
-                <button
-                  key={p.role}
-                  type="button"
-                  onClick={() => handleDemoSignIn(p.email, p.name)}
-                  disabled={loading}
-                  className="w-full flex items-center justify-between px-3 py-2 bg-neutral-50 hover:bg-purple-50/70 border border-neutral-200 hover:border-purple-300 rounded-xl text-left transition group"
-                >
-                  <div className="flex items-center space-x-2 min-w-0">
-                    <span className="w-1.5 h-1.5 rounded-full bg-purple-600 shrink-0" />
-                    <span className="text-xs font-semibold text-neutral-800 group-hover:text-purple-900 truncate">
-                      {p.name}
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-mono font-medium text-neutral-400 group-hover:text-purple-700 bg-white border border-neutral-200/80 px-1.5 py-0.5 rounded shrink-0">
-                    {p.tag}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
 
           {/* Security Footnote */}
           <div className="pt-2 flex items-center justify-center space-x-2 text-[11px] text-neutral-400">
