@@ -561,9 +561,9 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto h-full flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3 group">
             <img
-              src="/logo-navbar.png"
+              src="/logo-text.png"
               alt="Pineco"
-              className="h-10 sm:h-11 w-auto object-contain transition duration-200 group-hover:scale-[1.02]"
+              className="h-12 sm:h-14 w-auto object-contain transition duration-200 group-hover:scale-[1.02]"
             />
           </Link>
 
@@ -2520,9 +2520,9 @@ export default function LandingPage() {
             <div className="md:col-span-6 space-y-3.5">
               <div className="flex items-center space-x-2.5">
                 <img
-                  src="/logo-navbar.png"
+                  src="/logo-text.png"
                   alt="Pineco"
-                  className="h-8 w-auto object-contain"
+                  className="h-36 sm:h-40 w-auto object-contain -ml-1"
                 />
               </div>
               <p className="text-xs text-neutral-500 leading-relaxed max-w-md">

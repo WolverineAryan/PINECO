@@ -105,9 +105,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="h-16 px-4 border-b border-neutral-200 flex items-center bg-white">
           <Link href="/dashboard" className="flex items-center w-full group">
             <img
-              src="/logo-navbar.png"
+              src="/logo-text.png"
               alt="Pineco"
-              className="h-9 w-full object-contain object-left transition group-hover:opacity-90"
+              className="h-10 w-auto max-w-full object-contain object-left transition group-hover:opacity-90"
             />
           </Link>
         </div>
@@ -339,9 +339,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </button>
             <Link href="/dashboard" className="lg:hidden flex items-center">
               <img
-                src="/logo-navbar.png"
+                src="/logo-text.png"
                 alt="Pineco"
-                className="h-8 w-auto object-contain"
+                className="h-10 w-auto object-contain"
               />
             </Link>
             <div className="flex items-center space-x-2 text-xs font-medium text-neutral-600">
