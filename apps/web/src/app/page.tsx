@@ -32,6 +32,10 @@ import {
   Eye,
   Fingerprint,
   Folder,
+  FolderPlus,
+  PlusCircle,
+  FileCheck,
+  Shield,
   Play,
   RotateCcw,
   Sliders,
@@ -351,53 +355,104 @@ export default function LandingPage() {
     }
   };
 
-  // Live Interactive Hero Sandbox State
-  const scenarios = [
+  // Live Interactive Hero Dashboard Showcase Data (20 Pre-Seeded Real Entries across 16 Portfolios)
+  const HERO_DASHBOARD_SUBMISSIONS = [
     {
-      id: 'saas-risk',
-      label: 'High-Risk SaaS PR',
-      badge: '3 Critical Violations',
-      score: 42,
-      text: 'Pineco is completely 100% guaranteed to eliminate all regulatory fines forever. Our revolutionary AI software guarantees 99.999% uptime with zero human review needed.',
-      findings: [
-        { type: 'rule', title: 'Prohibited Absolute: "100% guaranteed"', rule: 'Rule #001', desc: 'Absolute marketing guarantees violate corporate brand guidelines.' },
-        { type: 'evidence', title: 'Unverified Uptime Claim: "99.999% uptime"', rule: 'Fact Grounding', desc: 'SLA ground truth in database certifies 99.9% uptime, not 99.999%.' },
-        { type: 'legal', title: 'Missing Safe Harbor Disclaimer', rule: 'Policy #004', desc: 'Forward-looking statements require mandatory SEC Safe Harbor text.' },
-      ],
-      fixedText: 'Pineco delivers a proven, reliable enterprise platform designed to mitigate regulatory compliance risk. Our audited cloud infrastructure maintains a certified 99.9% uptime SLA. Statements regarding future performance are subject to operational conditions.',
-      fixedScore: 98,
+      id: 'sub-fintech-violations',
+      title: 'ApexYield High-Alpha Institutional Trading Engine',
+      product: 'Apex Capital Solutions',
+      category: 'FinTech',
+      channel: 'SOCIAL',
+      status: 'changes_requested',
+      findingsCount: 3,
+      findingsSummary: 'SEC Rule 206(4)-1 guaranteed returns, unverified 18% APY, missing risk disclosures',
+      author: 'Elena Rostova (Compliance Officer)',
+      time: '12m ago',
+      hash: '3f1dcb89...e41e',
     },
     {
-      id: 'fintech-claim',
-      label: 'FinTech Launch Copy',
-      badge: '2 Violations',
-      score: 55,
-      text: 'Earn completely risk-free 18% annual yields on corporate liquidity with our autonomous algorithmic treasury. Immediate liquidity is guaranteed by our partners.',
-      findings: [
-        { type: 'rule', title: 'Deceptive Term: "risk-free"', rule: 'SEC Rule 206', desc: 'SEC & FINRA strictly prohibit describing yield instruments as risk-free.' },
-        { type: 'evidence', title: 'Unsubstantiated Rate: "18% annual yields"', rule: 'Fact #F-088', desc: 'Approved marketing facts specify variable baseline target rates, not fixed 18%.' },
-      ],
-      fixedText: 'Optimize corporate liquidity through our institutional treasury platform. Yields are variable based on market benchmark rates and involve capital risk. Past returns are not indicative of future performance. Terms and conditions apply.',
-      fixedScore: 100,
+      id: 'sub-healthcare-approved',
+      title: 'BioPure CardioFlow Phase-III Clinical Brief',
+      product: 'BioPure Therapeutics',
+      category: 'HealthCare',
+      channel: 'PRESS RELEASE',
+      status: 'approved',
+      findingsCount: 0,
+      findingsSummary: 'ClinicalTrials.gov NCT-04928114 verified, FDA 21 CFR §202.1 fair balance compliant',
+      author: 'Dr. Marcus Vance',
+      time: '28m ago',
+      hash: '7a9c14ef...b892',
     },
     {
-      id: 'clean-enterprise',
-      label: 'Verified Compliant',
-      badge: 'Fully Compliant',
-      score: 99,
-      text: 'Pineco accelerates enterprise content review velocity by up to 68% across distributed marketing teams. Verified against Enterprise Benchmark Report 2026. Past performance is not indicative of future results.',
-      findings: [],
-      fixedText: 'Pineco accelerates enterprise content review velocity by up to 68% across distributed marketing teams. Verified against Enterprise Benchmark Report 2026. Past performance is not indicative of future results.',
-      fixedScore: 100,
+      id: 'sub-saas-violations',
+      title: 'NovaSaaS Enterprise SOC-2 Cloud Architecture',
+      product: 'NovaCloud Platform',
+      category: 'Enterprise SaaS',
+      channel: 'WEBSITE',
+      status: 'changes_requested',
+      findingsCount: 2,
+      findingsSummary: 'Unsubstantiated 99.999% SLA uptime warranty, uncertified zero-vulnerability claim',
+      author: 'Alex Thorne, Esq.',
+      time: '45m ago',
+      hash: '5d2e891c...102a',
+    },
+    {
+      id: 'sub-consumer-approved',
+      title: 'EcoSmart Circular Polymer Sustainability Packaging',
+      product: 'EcoSmart Living',
+      category: 'Consumer Goods',
+      channel: 'PACKAGING',
+      status: 'approved',
+      findingsCount: 0,
+      findingsSummary: 'ISO 14044 LCA lifecycle verified, FTC 16 CFR Part 260 environmental claims backed',
+      author: 'Sarah Lin (Brand Lead)',
+      time: '1h ago',
+      hash: '9e41b702...fc31',
+    },
+    {
+      id: 'sub-genai-violations',
+      title: 'AuraGen Multi-Modal Agentic AI Launch Brief',
+      product: 'AuraGen Studio',
+      category: 'GenAI & Agents',
+      channel: 'EMAIL',
+      status: 'changes_requested',
+      findingsCount: 2,
+      findingsSummary: 'FTC undisclosed automated decisioning, unsubstantiated 100% autonomous accuracy',
+      author: 'Devon Chen (AI Lead)',
+      time: '2h ago',
+      hash: '2c8810da...994e',
+    },
+    {
+      id: 'sub-cybersecurity-approved',
+      title: 'QuantumSafe Post-Quantum Cryptography Architecture',
+      product: 'QuantumSafe Labs',
+      category: 'Cybersecurity',
+      channel: 'WHITEPAPER',
+      status: 'approved',
+      findingsCount: 0,
+      findingsSummary: 'NIST FIPS 203/204 standard compliance, mathematically proven lattice encryption',
+      author: 'Dr. Aris Thorne',
+      time: '3h ago',
+      hash: '8f12a091...77cb',
     },
   ];
 
-  const [activeScenarioIdx, setActiveScenarioIdx] = useState(0);
-  const [currentCopy, setCurrentCopy] = useState(scenarios[0].text);
-  const [isScanning, setIsScanning] = useState(false);
-  const [isFixed, setIsFixed] = useState(false);
-  const [governanceScore, setGovernanceScore] = useState(scenarios[0].score);
-  const [latencyMs, setLatencyMs] = useState(42);
+  const [heroDashboardFilter, setHeroDashboardFilter] = useState<'all' | 'action_needed' | 'approved'>('all');
+  const [heroDashboardSearch, setHeroDashboardSearch] = useState('');
+
+  const filteredHeroSubmissions = HERO_DASHBOARD_SUBMISSIONS.filter((sub) => {
+    if (heroDashboardFilter === 'action_needed' && sub.status !== 'changes_requested') return false;
+    if (heroDashboardFilter === 'approved' && sub.status !== 'approved') return false;
+    if (
+      heroDashboardSearch &&
+      !sub.title.toLowerCase().includes(heroDashboardSearch.toLowerCase()) &&
+      !sub.product.toLowerCase().includes(heroDashboardSearch.toLowerCase()) &&
+      !sub.category.toLowerCase().includes(heroDashboardSearch.toLowerCase())
+    ) {
+      return false;
+    }
+    return true;
+  });
 
   // Live Ticker Simulation
   const tickerEvents = [
@@ -414,35 +469,6 @@ export default function LandingPage() {
     }, 3800);
     return () => clearInterval(timer);
   }, []);
-
-  const handleScenarioSelect = (idx: number) => {
-    setActiveScenarioIdx(idx);
-    setIsFixed(false);
-    setCurrentCopy(scenarios[idx].text);
-    setGovernanceScore(scenarios[idx].score);
-    setIsScanning(true);
-    setTimeout(() => {
-      setIsScanning(false);
-      setLatencyMs(Math.floor(38 + Math.random() * 25));
-    }, 450);
-  };
-
-  const handleAutoFix = () => {
-    setIsScanning(true);
-    setTimeout(() => {
-      setCurrentCopy(scenarios[activeScenarioIdx].fixedText);
-      setIsFixed(true);
-      setGovernanceScore(scenarios[activeScenarioIdx].fixedScore);
-      setIsScanning(false);
-      setLatencyMs(64);
-    }, 600);
-  };
-
-  const handleReset = () => {
-    setIsFixed(false);
-    setCurrentCopy(scenarios[activeScenarioIdx].text);
-    setGovernanceScore(scenarios[activeScenarioIdx].score);
-  };
 
   // Interactive ROI Calculator State
   const [submissionsPerMonth, setSubmissionsPerMonth] = useState(250);
@@ -662,305 +688,264 @@ export default function LandingPage() {
           </div>
 
         {/* ======================================================== */}
-        {/* 4. 3D Glassmorphic Interactive Live Console Showcase */}
+        {/* 4. Real Enterprise Dashboard Showcase (Zero Traffic / Clutter) */}
         {/* ======================================================== */}
-        <div id="live-sandbox" className="pt-6 pb-4 relative max-w-5xl mx-auto perspective-stage">
-          {/* Floating 3D Pill - Left: Intercepted Rule */}
-          <div className="hidden md:flex absolute top-10 -left-6 lg:-left-8 z-30 glass-panel-purple px-4 py-3 rounded-2xl items-center space-x-3.5 animate-float-slow shadow-xl border border-purple-300/80">
-            <div className="w-9 h-9 rounded-xl bg-purple-900 text-white flex items-center justify-center font-mono font-bold text-xs shrink-0 shadow-xs border border-purple-400/40">
-              <AlertTriangle className="w-4 h-4 text-amber-300" />
-            </div>
-            <div className="text-left">
-              <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-purple-700">
-                Deterministic Rule Intercept • {latencyMs}ms
-              </div>
-              <div className="text-xs font-bold text-black flex items-center space-x-1.5 mt-0.5">
-                <span>Prohibited Phrasing</span>
-                <span className="bg-purple-100 text-purple-900 px-1.5 py-0.5 rounded text-[10px] font-mono border border-purple-300">
-                  &quot;100% Guaranteed&quot;
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Floating 3D Pill - Right: AI Fact Grounding */}
-          <div className="hidden md:flex absolute top-14 -right-6 lg:-right-8 z-30 glass-panel-dark text-white px-4 py-3.5 rounded-2xl items-center space-x-3.5 animate-float-reverse shadow-2xl border border-purple-500/40">
-            <div className="w-9 h-9 rounded-xl bg-purple-600/30 text-white flex items-center justify-center font-mono font-bold text-xs shrink-0 border border-purple-400/30">
-              <Sparkles className="w-4 h-4 text-purple-300 animate-pulse" />
-            </div>
-            <div className="text-left">
-              <div className="flex items-center space-x-1.5 text-[10px] font-mono uppercase tracking-wider text-purple-300">
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-                <span>Grounded Fact Proof</span>
-              </div>
-              <div className="text-xs font-bold text-white mt-0.5">
-                Ref: #F-001 (Approved 99.9% SLA)
-              </div>
-            </div>
-          </div>
-
-          {/* Floating 3D Pill - Bottom Left: SHA-256 Hash */}
-          <div className="hidden lg:flex absolute -bottom-5 left-8 z-30 glass-panel px-4 py-2.5 rounded-2xl items-center space-x-3 animate-float-reverse shadow-lg border border-purple-200">
-            <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center font-mono font-bold text-xs border border-purple-500/30">
-              <Fingerprint className="w-4 h-4 text-purple-400" />
-            </div>
-            <div className="text-left">
-              <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-500">
-                Immutable Version Hash
-              </div>
-              <div className="text-xs font-mono font-semibold text-black">
-                SHA-256: 7f8c9a...e34d
-              </div>
-            </div>
-          </div>
-
-          {/* Floating 3D Pill - Bottom Right: Safe Harbor Injected */}
-          <div className="hidden lg:flex absolute -bottom-4 right-10 z-30 glass-panel px-4 py-2.5 rounded-2xl items-center space-x-3 animate-float-slow shadow-lg border border-purple-200">
-            <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center font-mono font-bold text-xs border border-purple-500/30">
-              <ShieldCheck className="w-4 h-4 text-purple-400" />
-            </div>
-            <div className="text-left">
-              <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-500">
-                Mandatory Legal Disclaimer
-              </div>
-              <div className="text-xs font-bold text-black">
-                Safe Harbor Safe-Guard Active
-              </div>
-            </div>
-          </div>
-
-          {/* Main 3D Tilted Interactive Console Card */}
-          <div className="tilted-3d-card glass-panel rounded-3xl p-3 sm:p-5 border border-purple-300/80 shadow-2xl relative overflow-hidden text-left bg-white/90 glow-purple-card">
-            {/* Top Chrome Window Bar with Purple Accents */}
-            <div className="bg-black text-white px-5 py-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs border border-neutral-800">
-              <div className="flex items-center space-x-2.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
-                <span className="font-mono text-neutral-300 font-semibold text-[11px] ml-2 flex items-center space-x-1.5">
-                  <Folder className="w-3.5 h-3.5 text-purple-400" />
-                  <span>PINECO // LIVE COMPLIANCE ENGINE [SENTINEL-v2.4]</span>
-                </span>
-              </div>
-
-              {/* Scenario Switcher Tabs */}
-              <div className="flex items-center space-x-1.5 bg-neutral-900 p-1 rounded-xl border border-neutral-800 font-mono text-[10px]">
-                {scenarios.map((sc, i) => (
-                  <button
-                    key={sc.id}
-                    onClick={() => handleScenarioSelect(i)}
-                    className={`px-2.5 py-1 rounded-lg transition font-bold ${
-                      activeScenarioIdx === i
-                        ? 'bg-purple-600 text-white shadow-xs'
-                        : 'text-neutral-400 hover:text-white'
-                    }`}
-                  >
-                    {sc.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Console Body Grid */}
-            <div className="mt-3.5 grid grid-cols-1 lg:grid-cols-12 gap-4">
-              {/* Left Column: Live Copy Scanner & Inspector (8 cols) */}
-              <div className="lg:col-span-8 bg-neutral-50/95 rounded-2xl p-5 border border-neutral-200 relative overflow-hidden font-mono text-xs sm:text-[13px] leading-relaxed text-black flex flex-col justify-between space-y-4">
-                {/* Micro-animated Scanning Laser Beam */}
-                {isScanning && (
-                  <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-purple-500 to-transparent shadow-[0_0_15px_rgba(124,58,237,1)] animate-scan-beam pointer-events-none" />
-                )}
-
-                <div>
-                  <div className="flex items-center justify-between pb-3 mb-3 border-b border-neutral-200 text-[11px] text-neutral-500">
-                    <div className="flex items-center space-x-1.5">
-                      <FileText className="w-3.5 h-3.5 text-purple-600" />
-                      <span className="font-bold text-black">
-                        Active Draft: {scenarios[activeScenarioIdx].label}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="font-mono text-[10px] text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200 font-bold">
-                        LATENCY: {latencyMs}ms
-                      </span>
-                      <span className="bg-neutral-200 text-black px-1.5 py-0.5 rounded font-mono text-[10px]">
-                        Channel: Enterprise PR
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Rendered Text with Highlighted Annotations */}
-                  <div className="bg-white p-4 rounded-xl border border-neutral-200 text-xs sm:text-sm leading-relaxed min-h-[90px]">
-                    {isFixed ? (
-                      <p className="text-emerald-950">
-                        {currentCopy}
-                      </p>
-                    ) : activeScenarioIdx === 0 ? (
-                      <p>
-                        Pineco is completely{' '}
-                        <span className="bg-rose-100 text-rose-900 px-1 py-0.5 rounded font-bold border border-rose-300">
-                          100% guaranteed
-                        </span>{' '}
-                        to eliminate all regulatory fines forever. Our revolutionary AI software guarantees{' '}
-                        <span className="bg-amber-100 text-amber-900 px-1 py-0.5 rounded font-bold border border-amber-300">
-                          99.999% uptime
-                        </span>{' '}
-                        with zero human review needed.
-                      </p>
-                    ) : activeScenarioIdx === 1 ? (
-                      <p>
-                        Earn completely{' '}
-                        <span className="bg-rose-100 text-rose-900 px-1 py-0.5 rounded font-bold border border-rose-300">
-                          risk-free
-                        </span>{' '}
-                        <span className="bg-amber-100 text-amber-900 px-1 py-0.5 rounded font-bold border border-amber-300">
-                          18% annual yields
-                        </span>{' '}
-                        on corporate liquidity with our autonomous algorithmic treasury. Immediate liquidity is guaranteed by our partners.
-                      </p>
-                    ) : (
-                      <p className="text-emerald-950">{currentCopy}</p>
-                    )}
-                  </div>
-
-                  {/* Live Findings Drawer */}
-                  <div className="mt-3.5 space-y-2">
-                    {isFixed ? (
-                      <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-xl flex items-center space-x-2 text-xs text-emerald-900">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                        <span className="font-bold">
-                          All policy violations resolved. 100% compliant with corporate governance standards.
-                        </span>
-                      </div>
-                    ) : (
-                      scenarios[activeScenarioIdx].findings.map((f, i) => (
-                        <div
-                          key={i}
-                          className="bg-purple-50/80 border border-purple-200 p-2.5 rounded-xl flex items-start space-x-2.5 text-xs text-purple-950"
-                        >
-                          <AlertTriangle className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                          <div className="min-w-0">
-                            <div className="flex items-center space-x-2">
-                              <span className="font-bold">{f.title}</span>
-                              <span className="text-[10px] bg-purple-200/80 text-purple-900 px-1.5 py-0.2 rounded font-mono font-semibold">
-                                {f.rule}
-                              </span>
-                            </div>
-                            <p className="text-[11px] text-purple-800 mt-0.5">{f.desc}</p>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
+        <div id="live-sandbox" className="pt-6 pb-4 relative max-w-5xl mx-auto">
+          {/* Main Production Dashboard Card */}
+          <div className="bg-white rounded-3xl border border-neutral-300/80 shadow-2xl overflow-hidden text-left transition-all hover:border-purple-300">
+            {/* Top Chrome Window Bar (Browser App Shell) */}
+            <div className="bg-neutral-950 text-white px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 text-xs border-b border-neutral-800">
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-1.5">
+                  <span className="w-3 h-3 rounded-full bg-rose-500/90" />
+                  <span className="w-3 h-3 rounded-full bg-amber-500/90" />
+                  <span className="w-3 h-3 rounded-full bg-emerald-500/90" />
                 </div>
+                <div className="hidden sm:flex items-center space-x-2 bg-neutral-900 border border-neutral-800 px-3 py-1 rounded-lg font-mono text-[11px] text-neutral-300">
+                  <Lock className="w-3 h-3 text-purple-400" />
+                  <span>https://app.pineco.io/dashboard</span>
+                </div>
+              </div>
 
-                {/* Interactive Auto-Fix Action Bar */}
-                <div className="pt-3 border-t border-neutral-200 flex flex-wrap items-center justify-between gap-2.5 text-xs">
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-1.5 bg-purple-950/80 border border-purple-700/60 text-purple-300 px-2.5 py-1 rounded-lg font-mono text-[10px]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+                  <span className="font-bold">16 Portfolios Active</span>
+                </div>
+                <Link
+                  href="/dashboard"
+                  className="bg-purple-600 hover:bg-purple-500 text-white font-bold text-[11px] px-3 py-1 rounded-lg transition shadow-xs flex items-center space-x-1"
+                >
+                  <span>Launch Live App</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Dashboard Inner Body */}
+            <div className="p-4 sm:p-6 space-y-5 bg-neutral-50/50">
+              {/* Product Scope & Command Header */}
+              <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-1">
                   <div className="flex items-center space-x-2">
-                    {!isFixed ? (
-                      <button
-                        onClick={handleAutoFix}
-                        className="bg-purple-600 hover:bg-purple-700 active:scale-95 text-white font-bold px-3.5 py-1.5 rounded-xl transition shadow-xs flex items-center space-x-1.5 hover:shadow-[0_0_15px_rgba(124,58,237,0.4)]"
-                      >
-                        <Wand2 className="w-3.5 h-3.5" />
-                        <span>1-Click Auto-Fix Copy</span>
-                      </button>
-                    ) : (
-                      <button
-                        onClick={handleReset}
-                        className="bg-neutral-200 hover:bg-neutral-300 text-black font-semibold px-3 py-1.5 rounded-xl transition flex items-center space-x-1"
-                      >
-                        <RotateCcw className="w-3 h-3" />
-                        <span>Reset Draft</span>
-                      </button>
-                    )}
-                    <span className="text-neutral-500 text-[11px]">
-                      {isFixed ? 'Copy cleansed & verified' : 'Simulate automated policy rewrite'}
+                    <span className="text-[11px] font-mono uppercase font-bold tracking-wider text-neutral-500">
+                      Active Compliance Scope:
+                    </span>
+                    <span className="text-[10px] font-mono bg-purple-50 border border-purple-200 text-purple-700 font-bold px-2 py-0.5 rounded-full">
+                      All 16 Enterprise Portfolios
                     </span>
                   </div>
-
-                  <span className="font-mono text-[10px] text-neutral-400">
-                    ENGINE: DETERMINISTIC + GROK-2
-                  </span>
-                </div>
-              </div>
-
-              {/* Right Column: Real-time Telemetry & Governance HUD (4 cols) */}
-              <div className="lg:col-span-4 bg-white rounded-2xl p-5 border border-purple-200/80 space-y-4 flex flex-col justify-between shadow-xs">
-                <div>
-                  <div className="flex items-center justify-between text-xs pb-3 border-b border-neutral-100">
-                    <span className="font-mono text-[10px] uppercase font-bold text-neutral-500">
-                      Governance Score
-                    </span>
-                    <span className={`font-mono text-base font-extrabold ${governanceScore > 90 ? 'text-emerald-600' : 'text-purple-600'}`}>
-                      {governanceScore}%
-                    </span>
-                  </div>
-
-                  {/* Animated Progress Bar */}
-                  <div className="mt-2 w-full bg-neutral-100 rounded-full h-2 overflow-hidden">
-                    <div
-                      className={`h-full transition-all duration-500 ${
-                        governanceScore > 90 ? 'bg-emerald-500' : 'bg-purple-600'
-                      }`}
-                      style={{ width: `${governanceScore}%` }}
-                    />
-                  </div>
-
-                  {/* Telemetry rows */}
-                  <div className="mt-4 space-y-2.5 text-xs">
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-neutral-600">Deterministic Engine</span>
-                      <span className="font-mono font-bold text-black flex items-center space-x-1">
-                        {isFixed || activeScenarioIdx === 2 ? (
-                          <>
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                            <span className="text-emerald-700">Passed (0 Flags)</span>
-                          </>
-                        ) : (
-                          <>
-                            <AlertTriangle className="w-3 h-3 text-rose-600" />
-                            <span className="text-rose-700">1 Intercepted</span>
-                          </>
-                        )}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-neutral-600">Fact Grounding Proof</span>
-                      <span className="font-mono font-bold text-black">
-                        {isFixed || activeScenarioIdx === 2 ? (
-                          <span className="text-emerald-700">100% Grounded</span>
-                        ) : (
-                          <span className="text-amber-700">Unverified</span>
-                        )}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-neutral-600">Disclaimer Injection</span>
-                      <span className="font-mono font-bold text-black">
-                        {isFixed || activeScenarioIdx === 2 ? (
-                          <span className="text-purple-700 font-bold">Injected</span>
-                        ) : (
-                          <span className="text-rose-700">Missing</span>
-                        )}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-neutral-600">Chain of Custody</span>
-                      <span className="font-mono font-bold text-purple-700">SHA-256 Valid</span>
-                    </div>
-                  </div>
+                  <h3 className="text-lg sm:text-xl font-black text-black tracking-tight flex items-center space-x-2">
+                    <Folder className="w-4 h-4 text-purple-600" />
+                    <span>Enterprise Content Compliance Command Center</span>
+                  </h3>
+                  <p className="text-xs text-neutral-500 max-w-xl">
+                    Real-time monitoring across 20 pre-seeded compliance submissions, 12 statutory brand guardrails, and 9 approved evidence facts.
+                  </p>
                 </div>
 
-                <div className="pt-3 border-t border-neutral-100">
+                <div className="flex items-center space-x-2 shrink-0">
                   <Link
                     href="/dashboard"
-                    className="w-full flex items-center justify-center space-x-2 bg-black hover:bg-neutral-900 text-white text-xs font-bold py-2.5 rounded-xl shadow-xs transition hover:shadow-[0_0_15px_rgba(124,58,237,0.3)] border border-purple-500/20"
+                    className="flex items-center space-x-1.5 text-xs text-black bg-white hover:bg-neutral-100 border border-neutral-300 px-3 py-1.5 rounded-xl transition font-bold"
                   >
-                    <span>Open Live Product Audit</span>
-                    <ChevronRight className="w-3.5 h-3.5 text-purple-400" />
+                    <FolderPlus className="w-3.5 h-3.5 text-neutral-600" />
+                    <span>New Folder</span>
+                  </Link>
+                  <Link
+                    href="/dashboard"
+                    className="flex items-center space-x-1.5 bg-gradient-to-r from-purple-700 via-purple-600 to-indigo-600 hover:from-purple-800 hover:to-indigo-700 text-white text-xs font-bold px-3.5 py-1.5 rounded-xl shadow-xs transition active:scale-95 border border-purple-400/30"
+                  >
+                    <PlusCircle className="w-3.5 h-3.5 text-purple-200" />
+                    <span>Scan Copy</span>
+                  </Link>
+                </div>
+              </div>
+
+              {/* 4 Real Metric Stat Counters */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                <div className="bg-white p-3.5 rounded-xl border border-neutral-200 shadow-xs">
+                  <span className="text-[10px] font-mono font-bold text-neutral-400 uppercase tracking-wider block">
+                    Drafts Scanned
+                  </span>
+                  <span className="text-2xl font-black text-black mt-0.5 block font-mono">
+                    20
+                  </span>
+                  <span className="text-[11px] text-neutral-500 mt-0.5 block">Total drafts checked</span>
+                </div>
+
+                <div className="bg-white p-3.5 rounded-xl border border-neutral-200 shadow-xs">
+                  <span className="text-[10px] font-mono font-bold text-neutral-600 uppercase tracking-wider block">
+                    Approved For Release
+                  </span>
+                  <span className="text-2xl font-black text-emerald-600 mt-0.5 block font-mono">
+                    8
+                  </span>
+                  <span className="text-[11px] text-neutral-500 mt-0.5 block">Passed & human signed off</span>
+                </div>
+
+                <div className="bg-white p-3.5 rounded-xl border border-neutral-200 shadow-xs">
+                  <span className="text-[10px] font-mono font-bold text-neutral-600 uppercase tracking-wider block">
+                    Needs Revisions
+                  </span>
+                  <span className="text-2xl font-black text-rose-600 mt-0.5 block font-mono">
+                    12
+                  </span>
+                  <span className="text-[11px] text-neutral-500 mt-0.5 block">Policy warnings flagged</span>
+                </div>
+
+                <div className="bg-white p-3.5 rounded-xl border border-purple-200 bg-purple-50/20 shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono font-bold text-purple-700 uppercase tracking-wider block">
+                      Active Guardrails
+                    </span>
+                    <Shield className="w-3.5 h-3.5 text-purple-600" />
+                  </div>
+                  <span className="text-2xl font-black text-black mt-0.5 block font-mono">
+                    21
+                  </span>
+                  <span className="text-[11px] text-purple-700 mt-0.5 block">12 rules, 9 facts</span>
+                </div>
+              </div>
+
+              {/* Real Content Compliance Reviews Stream (Table) */}
+              <div className="bg-white rounded-2xl border border-neutral-200 shadow-xs overflow-hidden">
+                <div className="p-3.5 sm:p-4 border-b border-neutral-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex items-center space-x-2.5">
+                    <h4 className="text-xs font-bold text-black uppercase tracking-wide font-mono">
+                      Content Compliance Reviews
+                    </h4>
+                    <span className="text-[11px] bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.2 rounded-full font-mono font-bold">
+                      {filteredHeroSubmissions.length} of 20 shown
+                    </span>
+                  </div>
+
+                  <div className="flex items-center space-x-2 w-full sm:w-auto">
+                    {/* Filter Tabs */}
+                    <div className="flex items-center bg-neutral-100 p-0.5 rounded-xl border border-neutral-200 text-xs font-semibold">
+                      <button
+                        onClick={() => setHeroDashboardFilter('all')}
+                        className={`px-2.5 py-1 rounded-lg transition text-[11px] ${
+                          heroDashboardFilter === 'all'
+                            ? 'bg-black text-white shadow-xs'
+                            : 'text-neutral-600 hover:text-black'
+                        }`}
+                      >
+                        All
+                      </button>
+                      <button
+                        onClick={() => setHeroDashboardFilter('action_needed')}
+                        className={`px-2.5 py-1 rounded-lg transition text-[11px] ${
+                          heroDashboardFilter === 'action_needed'
+                            ? 'bg-black text-white shadow-xs'
+                            : 'text-neutral-600 hover:text-black'
+                        }`}
+                      >
+                        Needs Action
+                      </button>
+                      <button
+                        onClick={() => setHeroDashboardFilter('approved')}
+                        className={`px-2.5 py-1 rounded-lg transition text-[11px] ${
+                          heroDashboardFilter === 'approved'
+                            ? 'bg-black text-white shadow-xs'
+                            : 'text-neutral-600 hover:text-black'
+                        }`}
+                      >
+                        Approved
+                      </button>
+                    </div>
+
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Search submissions..."
+                        value={heroDashboardSearch}
+                        onChange={(e) => setHeroDashboardSearch(e.target.value)}
+                        className="text-[11px] px-2.5 py-1 pl-7 rounded-xl border border-neutral-300 bg-white text-black focus:outline-none focus:ring-1 focus:ring-purple-600 w-32 sm:w-40 font-mono"
+                      />
+                      <Search className="w-3 h-3 text-neutral-400 absolute left-2 top-2 pointer-events-none" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Submissions Rows */}
+                <div className="divide-y divide-neutral-200 text-xs">
+                  {filteredHeroSubmissions.map((sub) => {
+                    const isApproved = sub.status === 'approved';
+                    return (
+                      <div
+                        key={sub.id}
+                        className="p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:bg-neutral-50/90 transition group"
+                      >
+                        <div className="space-y-1 flex-1 min-w-0">
+                          <div className="flex items-center space-x-2">
+                            <span className="font-mono text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-neutral-100 text-neutral-800 border border-neutral-200">
+                              {sub.channel}
+                            </span>
+                            <span
+                              className={`text-[9px] font-bold px-2 py-0.5 rounded-full font-mono border ${
+                                isApproved
+                                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                                  : 'bg-rose-50 text-rose-800 border-rose-300'
+                              }`}
+                            >
+                              {isApproved ? 'APPROVED' : 'CHANGES REQUESTED'}
+                            </span>
+                            <span className="text-[10px] text-neutral-400 font-mono">
+                              {sub.product} ({sub.category})
+                            </span>
+                          </div>
+                          <div className="font-bold text-black text-xs sm:text-sm group-hover:text-purple-700 transition-colors truncate">
+                            {sub.title}
+                          </div>
+                          <div className="flex items-center space-x-2 text-[11px] text-neutral-500">
+                            {isApproved ? (
+                              <span className="text-emerald-700 flex items-center space-x-1 font-semibold">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                                <span className="truncate">{sub.findingsSummary}</span>
+                              </span>
+                            ) : (
+                              <span className="text-rose-700 flex items-center space-x-1 font-semibold">
+                                <AlertTriangle className="w-3 h-3 text-rose-600 shrink-0" />
+                                <span className="truncate">{sub.findingsCount} Policy Violations: {sub.findingsSummary}</span>
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3 shrink-0 self-end sm:self-center">
+                          <span className="text-[10px] font-mono text-neutral-400 hidden md:inline">
+                            {sub.time}
+                          </span>
+                          <Link
+                            href="/dashboard"
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1 transition border ${
+                              isApproved
+                                ? 'bg-white hover:bg-neutral-100 text-black border-neutral-300'
+                                : 'bg-black hover:bg-neutral-900 text-white border-black'
+                            }`}
+                          >
+                            <span>{isApproved ? 'View Attestation' : 'Inspect Audit'}</span>
+                            <ChevronRight className="w-3 h-3" />
+                          </Link>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Bottom Footer Ribbon inside Dashboard */}
+                <div className="bg-neutral-100/70 p-3 sm:px-4 border-t border-neutral-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center space-x-2 text-neutral-600 font-mono text-[11px]">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <span>Real production data seeded across all 16 enterprise product categories.</span>
+                  </div>
+                  <Link
+                    href="/dashboard"
+                    className="inline-flex items-center space-x-1.5 text-xs font-bold text-purple-700 hover:text-purple-900 hover:underline"
+                  >
+                    <span>Open Full 20-Entry Compliance Workspace</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               </div>
