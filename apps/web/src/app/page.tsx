@@ -18,7 +18,6 @@ import {
   Check,
   ChevronRight,
   BarChart3,
-  ExternalLink,
   Cpu,
   BookOpen,
   Scale,
@@ -2561,17 +2560,7 @@ export default function LandingPage() {
                 <li><a href="#regulations" className="hover:text-purple-700 transition">SEC &amp; FINRA Guidelines</a></li>
                 <li><a href="#regulations" className="hover:text-purple-700 transition">FTC Truth-in-Advertising</a></li>
                 <li><a href="#regulations" className="hover:text-purple-700 transition">FDA Fair-Balance Controls</a></li>
-                <li>
-                  <a
-                    href="https://github.com/WolverineAryan/PINECO"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-purple-700 font-bold hover:underline inline-flex items-center space-x-1"
-                  >
-                    <span>GitHub Repository</span>
-                    <ExternalLink className="w-3 h-3 ml-0.5" />
-                  </a>
-                </li>
+                <li><a href="#security" className="hover:text-purple-700 transition">SOC 2 Type II Readiness</a></li>
               </ul>
             </div>
           </div>
