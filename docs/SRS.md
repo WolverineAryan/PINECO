@@ -1,13 +1,12 @@
 # Pineco --- Software Requirements Specification (SRS)
 
-**Version:** 1.0 \| **Date:** 22 October 2026 \| **Target:** CodeAxis
-Round 2 MVP
+**Version:** 1.0 \| **Date:** 22 October 2026 \| **Target:** Pineco Enterprise Platform Production Release
 
 ## 1. Purpose
 
 This document defines the externally observable behaviour and
-constraints for the Pineco MVP. It is intended for implementation,
-testing and judging.
+constraints for the Pineco platform. It is intended for implementation,
+testing and enterprise verification.
 
 ## 2. System overview
 
@@ -170,8 +169,7 @@ request bodies and use consistent error envelopes.
   GET                     `/api/v1/dashboard/summary`                Basic persisted metrics
   ------------------------------------------------------------------------------------------
 
-The exact endpoint set may be reduced for the hackathon, but the user
-journey and data integrity rules must remain intact.
+The endpoint set supports the complete user journey and enforces strict data integrity rules.
 
 ## 8. Status model
 

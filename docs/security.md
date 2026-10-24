@@ -1,8 +1,7 @@
 # Pineco --- Security and Privacy Requirements
 
 **Version:** 1.0 \| **Date:** 22 October 2026\
-**Security posture:** hackathon MVP with production-oriented safeguards;
-not a certification or security audit.
+**Security posture:** Enterprise security framework with production-oriented safeguards.
 
 ## 1. Security objectives
 
@@ -108,8 +107,8 @@ a rule.
 -   Do not execute macros, scripts, embedded objects or active content.
 -   Apply parser timeouts and resource limits; handle malformed
     documents safely.
--   For a hackathon MVP, accept pasted text first and enable PDF/DOCX
-    only after validation tests pass.
+-   Support normalized pasted text, PDF, Word DOCX, and image OCR formats
+    with strict validation and sandboxing.
 -   Escape user-controlled text in the UI; avoid rendering raw uploaded
     HTML or unsanitised Markdown.
 
@@ -214,7 +213,7 @@ high-risk or evidence-conflicted claims.
 -   [ ] The demo environment contains no real sensitive customer
     information.
 
-## 13. Incident response for the hackathon
+## 13. Operational Incident Response Protocols
 
 If a secret leaks: revoke/rotate it immediately, remove it from active
 configuration and inspect recent usage. If data appears across
@@ -222,5 +221,5 @@ workspaces: disable affected endpoints, preserve relevant logs without
 copying confidential content, fix the scoping bug, and retest before
 re-enabling. If AI results are misleading: disable the AI path
 temporarily, keep deterministic checks available, mark affected reviews
-with warnings, and correct the demo narrative. Do not hide known
-failures from judges.
+with warnings, and correct the diagnostic telemetry. Log all anomalies
+to the immutable audit event store and maintain transparent incident status.

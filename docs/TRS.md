@@ -4,7 +4,7 @@
 
 ## 1. Architecture decision
 
-Use a **modular monolith** for the hackathon. Keep the frontend and API
+Use a **modular monolith** architecture. Keep the frontend and API
 as separate deployables, but avoid splitting review logic into multiple
 microservices before the workflow is stable.
 

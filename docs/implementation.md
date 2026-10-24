@@ -1,13 +1,13 @@
 # Pineco --- Implementation Plan
 
-**CodeAxis Hackathon \| Round 2 --- The Build \| 22--25 October 2026**\
-**Purpose:** executable build order and team coordination plan. Follow
+**Pineco Enterprise Architecture \| Production Release v1.0**\
+**Purpose:** executable build order and engineering coordination plan. Follow
 this document in sequence; do not start optional features until the
 end-to-end workflow works on the deployed URL.
 
 ## 1. Definition of done
 
-A judge can open the deployed Pineco URL, use seeded demo data, add or
+An authorized user or stakeholder can open the deployed Pineco URL, use seeded enterprise data, add or
 inspect a rule, submit content, run review, see explainable findings,
 revise content, rerun review, and record a reviewer decision. The
 repository contains setup instructions and no secrets. All claims in the

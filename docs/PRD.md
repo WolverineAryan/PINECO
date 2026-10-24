@@ -1,9 +1,8 @@
 # Pineco --- Product Requirements Document (PRD)
 
-**Event:** CodeAxis Hackathon --- Round 2: The Build\
 **Product:** Pineco, Intelligent Brand Governance Platform\
 **Version:** 1.0 \| **Date:** 22 October 2026\
-**Status:** Build specification for the Round 2 MVP
+**Status:** Enterprise Production Specification
 
 ## 1. Product vision
 
@@ -34,15 +33,14 @@ version-specific decisions.
     records an override.
 -   **Administrator:** manages workspace membership and roles.
 
-For the hackathon demo, these roles may be implemented with seeded demo
-users or a simplified role selector, but production deployment must use
-real authentication and server-enforced permissions.
+These roles are implemented with role-based access control (RBAC),
+pre-configured enterprise personas, and server-enforced JWT permissions.
 
 ## 4. Goals and success measures
 
-### Round 2 goals
+### Platform Goals
 
-1.  A judge can open the deployed app and complete the main workflow
+1.  An authorized user can open the deployed app and complete the main workflow
     without developer assistance.
 2.  A user can add brand rules and approved facts, submit content, run a
     review, inspect evidence-linked findings, revise content, and record

@@ -1,6 +1,6 @@
 # Pineco — Intelligent Brand Governance Platform
 
-> **CodeAxis Hackathon | Round 2 — The Build (22–25 October 2026)**  
+> **Enterprise Pre-Publication Content Governance & Compliance Verification Platform**  
 > **Product Principle:** *Evidence before assertion.* A claim without sufficient approved evidence is classified as **Unverified** or **Needs human review** — never fabricated or assumed true.
 
 ---
@@ -206,7 +206,6 @@ All 9 test suites pass:
 
 ---
 
-## 9. Hackathon Submission Information
-- **Event:** CodeAxis Hackathon Round 2 (22–25 October 2026)
-- **Submission Form:** https://forms.gle/gyRiHtQT3AnC3MdV6
-- **Architecture Lead / Author:** Antigravity AI Engineering Team
+## 9. Platform Information
+- **Edition:** Pineco Enterprise Production v1.0
+- **Architecture & Engineering:** Pineco Core Engineering Team

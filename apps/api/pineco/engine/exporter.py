@@ -924,7 +924,7 @@ class NumberedCanvas(canvas.Canvas):
     """
     Two-pass ReportLab canvas that calculates the exact total page count
     and renders publication-grade running headers and running footers on every page,
-    matching the CodeAxis Hackathon corporate standard.
+    matching enterprise brand governance publication standards.
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

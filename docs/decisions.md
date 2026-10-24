@@ -2,7 +2,7 @@
 
 **Project:** Pineco — Intelligent Brand Governance Platform  
 **Date:** 22 October 2026  
-**Context:** CodeAxis Hackathon Round 2 Build  
+**Context:** Enterprise Release Build  
 
 ---
 
@@ -26,14 +26,14 @@
 
 ## Decision 2: Dual Database Engine Support (PostgreSQL Primary + SQLite Dev/Test)
 - **Status:** Accepted
-- **Context:** The production target is Render PostgreSQL. In local or automated test environments, requiring a live running PostgreSQL server with pre-configured credentials can hinder reproducible zero-friction setup for hackathon judges or CI runners.
+- **Context:** The production target is Render PostgreSQL. In local or automated test environments, requiring a live running PostgreSQL server with pre-configured credentials can hinder reproducible zero-friction setup for automated test runners or CI environments.
 - **Decision:** Implement database connectivity using SQLAlchemy 2.0 with full PostgreSQL dialect support (foreign keys, UUIDs, UTC timestamps, JSON, indexes) as the primary engine when `DATABASE_URL` is set to a postgres connection string (`postgresql://...` or `postgresql+asyncpg://...` / `psycopg`). When `DATABASE_URL` is unset or points to `sqlite:///...`, use SQLite with SQLite foreign-key pragma enabled. This guarantees 100% test reproducibility anywhere while remaining fully production-ready for Render PostgreSQL.
 
 ---
 
 ## Decision 3: Resilient LLM Adapter with Strict Output Validation and Safe Fallbacks
 - **Status:** Accepted
-- **Context:** Hackathon judging must work whether or not an active paid LLM key is configured on the evaluating machine. If an LLM key is missing, expired, or returns malformed JSON, the application must NEVER crash, fabricate fake compliant scores, or erase deterministic findings.
+- **Context:** Enterprise environments must function reliably whether or not an active external LLM key is configured on the host machine. If an LLM key is missing, expired, or returns malformed JSON, the application must NEVER crash, fabricate fake compliant scores, or erase deterministic findings.
 - **Decision:** Implement a backend provider adapter (`LLMAdapter`) that:
   1. Accepts configuration for standard providers (OpenAI-compatible, Google Gemini, Anthropic, Groq).
   2. If the API key is absent or the model call fails/times out, records a clear `completed_with_warnings` status with a descriptive warning banner ("AI analysis unavailable; deterministic checks completed").
