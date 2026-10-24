@@ -18,6 +18,11 @@ import {
   Bot,
   Sparkles,
   Key,
+  User,
+  Settings as SettingsIcon,
+  HelpCircle,
+  LogOut,
+  ChevronUp,
 } from 'lucide-react';
 import { useRole } from './RoleContext';
 import { useToast } from './Toast';
@@ -25,6 +30,7 @@ import { AuthModal } from './AuthModal';
 import { CreateProductModal } from './CreateProductModal';
 import { ScanCopyModal } from './ScanCopyModal';
 import { ScrollProgressBar } from './ScrollProgressBar';
+import { ProfileSettingsModal } from './ProfileSettingsModal';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -34,6 +40,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     currentUser,
     workspaceId,
     openAuthModal,
+    logout,
     products,
     activeProduct,
     setActiveProduct,
@@ -43,6 +50,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [showCreateProduct, setShowCreateProduct] = useState(false);
   const [showScanCopy, setShowScanCopy] = useState(false);
   const [roleMenuOpen, setRoleMenuOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [profileModalTab, setProfileModalTab] = useState<'profile' | 'settings' | 'help'>('profile');
 
   // If on public landing page at '/' or '/landing', render directly without app sidebar
   const isLanding = pathname === '/' || pathname === '/landing';
@@ -66,6 +76,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-white text-black flex">
       <AuthModal />
+      <ProfileSettingsModal
+        isOpen={profileModalOpen}
+        initialTab={profileModalTab}
+        onClose={() => setProfileModalOpen(false)}
+      />
       <CreateProductModal
         isOpen={showCreateProduct}
         onClose={() => setShowCreateProduct(false)}
@@ -172,32 +187,120 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </button>
         </div>
 
-        {/* User Card in Sidebar Footer */}
-        <div className="p-3 border-t border-neutral-200 bg-white flex items-center justify-between">
-          <button
-            onClick={() => openAuthModal('signin')}
-            className="flex items-center space-x-2.5 text-left flex-1 min-w-0 group hover:opacity-90 transition"
-          >
-            <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-mono font-bold text-xs shrink-0 shadow-xs border border-purple-500/30">
-              {currentUser.avatar}
-            </div>
-            <div className="flex-1 min-w-0">
-              <span className="text-xs font-bold text-black block truncate">
-                {currentUser.name}
-              </span>
-              <span className="text-[10px] text-purple-600 block truncate capitalize font-mono font-bold">
-                {role.replace('_', ' ')}
-              </span>
-            </div>
-          </button>
+        {/* User Card in Sidebar Footer (ChatGPT-Style Popover Menu) */}
+        <div className="p-3 border-t border-neutral-200 bg-white relative">
+          {/* ChatGPT-Style Small Floating Pop-up Menu */}
+          {profileMenuOpen && (
+            <>
+              {/* Invisible Click-Outside Backdrop */}
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setProfileMenuOpen(false)}
+              />
 
-          <button
-            onClick={() => openAuthModal('signin')}
-            title="Account & JWT Session"
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-purple-600 hover:bg-purple-50 transition"
-          >
-            <Key className="w-4 h-4" />
-          </button>
+              {/* Floating Menu Popover */}
+              <div className="absolute bottom-full left-3 right-3 mb-2 bg-white border border-neutral-200 rounded-2xl shadow-2xl p-1.5 z-50 animate-in fade-in slide-in-from-bottom-2 duration-150 text-xs">
+                {/* User Header Summary */}
+                <div className="p-2.5 pb-2 border-b border-neutral-100 flex items-center space-x-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-black text-white flex items-center justify-center font-mono font-bold text-xs shrink-0 border border-purple-500/30">
+                    {currentUser.avatar}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs font-bold text-black block truncate">
+                      {currentUser.name}
+                    </span>
+                    <span className="text-[10px] text-neutral-500 font-mono block truncate">
+                      {currentUser.email}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Navigation Options */}
+                <div className="py-1 space-y-0.5">
+                  <button
+                    onClick={() => {
+                      setProfileMenuOpen(false);
+                      setProfileModalTab('profile');
+                      setProfileModalOpen(true);
+                    }}
+                    className="w-full flex items-center space-x-2.5 px-2.5 py-1.5 rounded-lg text-neutral-700 hover:text-black hover:bg-neutral-100 font-semibold transition text-left"
+                  >
+                    <User className="w-3.5 h-3.5 text-neutral-500" />
+                    <span>My Profile</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setProfileMenuOpen(false);
+                      setProfileModalTab('settings');
+                      setProfileModalOpen(true);
+                    }}
+                    className="w-full flex items-center space-x-2.5 px-2.5 py-1.5 rounded-lg text-neutral-700 hover:text-black hover:bg-neutral-100 font-semibold transition text-left"
+                  >
+                    <SettingsIcon className="w-3.5 h-3.5 text-neutral-500" />
+                    <span>Settings</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setProfileMenuOpen(false);
+                      setProfileModalTab('help');
+                      setProfileModalOpen(true);
+                    }}
+                    className="w-full flex items-center space-x-2.5 px-2.5 py-1.5 rounded-lg text-neutral-700 hover:text-black hover:bg-neutral-100 font-semibold transition text-left"
+                  >
+                    <HelpCircle className="w-3.5 h-3.5 text-neutral-500" />
+                    <span>Help &amp; Support</span>
+                  </button>
+                </div>
+
+                <div className="border-t border-neutral-100 pt-1 space-y-0.5">
+                  <button
+                    onClick={() => {
+                      setProfileMenuOpen(false);
+                      openAuthModal('signin');
+                    }}
+                    className="w-full flex items-center space-x-2.5 px-2.5 py-1.5 rounded-lg text-neutral-600 hover:text-black hover:bg-neutral-100 text-[11px] transition text-left font-medium"
+                  >
+                    <Key className="w-3.5 h-3.5 text-neutral-400" />
+                    <span>Switch Account / JWT</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setProfileMenuOpen(false);
+                      logout();
+                    }}
+                    className="w-full flex items-center space-x-2 px-2.5 py-1.5 rounded-lg text-rose-600 hover:bg-rose-50 font-bold transition text-left"
+                  >
+                    <LogOut className="w-3.5 h-3.5 text-rose-500" />
+                    <span>Log out</span>
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Bottom Profile Pill Button */}
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+              className="flex items-center space-x-2.5 text-left flex-1 min-w-0 group hover:opacity-90 p-1.5 rounded-xl hover:bg-neutral-100/70 transition"
+            >
+              <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-mono font-bold text-xs shrink-0 shadow-xs border border-purple-500/30">
+                {currentUser.avatar}
+              </div>
+              <div className="flex-1 min-w-0">
+                <span className="text-xs font-bold text-black block truncate">
+                  {currentUser.name}
+                </span>
+                <span className="text-[10px] text-purple-600 block truncate capitalize font-mono font-bold">
+                  {role.replace('_', ' ')}
+                </span>
+              </div>
+              <ChevronUp className={`w-3.5 h-3.5 text-neutral-400 transition-transform ${profileMenuOpen ? 'rotate-180' : ''}`} />
+            </button>
+          </div>
         </div>
       </aside>
 

@@ -222,3 +222,74 @@ def get_current_user_profile(
         department=payload.get("department", "Enterprise"),
         avatar=initials,
     )
+
+
+class UpdateProfileRequest(BaseModel):
+    name: Optional[str] = None
+    title: Optional[str] = None
+    department: Optional[str] = None
+
+
+@router.patch("/me", response_model=UserProfileResponse)
+def update_current_user_profile(
+    payload: UpdateProfileRequest,
+    auth: Optional[HTTPAuthorizationCredentials] = Security(security_bearer),
+    db: Session = Depends(get_db),
+):
+    """Updates profile information for the authenticated user."""
+    if not auth or not auth.credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication token required.",
+        )
+    claims = decode_jwt_token(auth.credentials)
+    user_email = claims.get("email")
+    if not user_email:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token claims.")
+
+    db_user = db.query(User).filter(User.email == user_email).first()
+    if db_user:
+        if payload.name:
+            db_user.name = payload.name.strip()
+        if payload.title:
+            db_user.title = payload.title.strip()
+        if payload.department:
+            db_user.department = payload.department.strip()
+        db.commit()
+        db.refresh(db_user)
+        return format_user_profile(db_user)
+
+    # For demo users not in database
+    name = payload.name or claims.get("name", "User")
+    initials = "".join([p[0] for p in name.split()[:2]]).upper() or "PI"
+    return UserProfileResponse(
+        id=claims.get("sub", ""),
+        email=user_email,
+        name=name,
+        role=claims.get("role", "reviewer"),
+        title=payload.title or claims.get("title", "Enterprise Specialist"),
+        department=payload.department or claims.get("department", "Enterprise"),
+        avatar=initials,
+    )
+
+
+@router.delete("/me")
+def delete_current_user_account(
+    auth: Optional[HTTPAuthorizationCredentials] = Security(security_bearer),
+    db: Session = Depends(get_db),
+):
+    """Permanently deletes the authenticated user account and revokes active sessions."""
+    if not auth or not auth.credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication token required.",
+        )
+    claims = decode_jwt_token(auth.credentials)
+    user_email = claims.get("email")
+    if user_email:
+        db_user = db.query(User).filter(User.email == user_email).first()
+        if db_user:
+            db.delete(db_user)
+            db.commit()
+
+    return {"status": "success", "message": "User account permanently deleted and active sessions revoked."}

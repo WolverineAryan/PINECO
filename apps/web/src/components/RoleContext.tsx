@@ -125,6 +125,8 @@ interface RoleContextType {
   loginWithRole: (role: UserRole) => Promise<void>;
   loginWithCredentials: (email: string, password?: string) => Promise<void>;
   logout: () => void;
+  updateProfile: (data: { name?: string; title?: string; department?: string }) => Promise<void>;
+  deleteAccount: () => Promise<void>;
   openAuthModal: (mode?: any) => void;
   closeAuthModal: () => void;
   isAuthModalOpen: boolean;
@@ -264,6 +266,34 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     setRoleState(fallback.role);
   };
 
+  const updateProfile = async (data: { name?: string; title?: string; department?: string }) => {
+    try {
+      const updated = await api.updateCurrentUser(data);
+      setCurrentUser(updated);
+      localStorage.setItem('pineco_jwt_user', JSON.stringify(updated));
+    } catch {
+      // Local fallback for demo or offline accounts
+      const updated: UserProfile = {
+        ...currentUser,
+        name: data.name || currentUser.name,
+        title: data.title || currentUser.title,
+        department: data.department || currentUser.department,
+        avatar: data.name ? data.name.split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase() : currentUser.avatar,
+      };
+      setCurrentUser(updated);
+      localStorage.setItem('pineco_jwt_user', JSON.stringify(updated));
+    }
+  };
+
+  const deleteAccount = async () => {
+    try {
+      await api.deleteCurrentUser();
+    } catch {
+      // Ignore network errors for local demo accounts
+    }
+    logout();
+  };
+
   const setRole = (newRole: UserRole) => {
     loginWithRole(newRole);
   };
@@ -301,6 +331,8 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
         loginWithRole,
         loginWithCredentials,
         logout,
+        updateProfile,
+        deleteAccount,
         openAuthModal,
         closeAuthModal: () => setIsAuthModalOpen(false),
         isAuthModalOpen,

@@ -116,6 +116,17 @@ export const api = {
 
   getCurrentUser: () => fetchJson<UserProfile>('/auth/me'),
 
+  updateCurrentUser: (data: { name?: string; title?: string; department?: string }) =>
+    fetchJson<UserProfile>('/auth/me', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  deleteCurrentUser: () =>
+    fetchJson<{ status: string; message: string }>('/auth/me', {
+      method: 'DELETE',
+    }),
+
   // Health
   getHealth: () => fetchJson<HealthResponse>('/health'),
 
