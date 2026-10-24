@@ -29,7 +29,6 @@ import { useToast } from './Toast';
 import { AuthModal } from './AuthModal';
 import { CreateProductModal } from './CreateProductModal';
 import { ScanCopyModal } from './ScanCopyModal';
-import { ScrollProgressBar } from './ScrollProgressBar';
 import { ProfileSettingsModal } from './ProfileSettingsModal';
 import {
   DashboardSkeleton,
@@ -329,9 +328,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Main Content Area (60% White dominant canvas with subtle purple radial backdrop) */}
       <div className="flex-1 lg:pl-64 flex flex-col min-w-0 relative">
-        {/* Dynamic Glowing Purple Scroll Progress Bar */}
-        <ScrollProgressBar />
-
         {/* Top Header Bar */}
         <header className="h-16 bg-white/90 backdrop-blur-md border-b border-neutral-200/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-20">
           <div className="flex items-center space-x-3">

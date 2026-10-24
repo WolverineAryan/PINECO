@@ -53,7 +53,6 @@ import {
   Server,
 } from 'lucide-react';
 import { useRole } from '@/components/RoleContext';
-import { ScrollProgressBar } from '@/components/ScrollProgressBar';
 import { ScrollReveal } from '@/components/ScrollReveal';
 import { InteractiveFluidCanvas } from '@/components/InteractiveFluidCanvas';
 
@@ -542,9 +541,6 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white text-black relative selection:bg-purple-600 selection:text-white">
-      {/* Glowing Purple Scroll Progress Bar */}
-      <ScrollProgressBar />
-
       {/* ======================================================== */}
       {/* 1. Fluid Ambient Purple Mesh Background for entire Hero */}
       {/* ======================================================== */}
