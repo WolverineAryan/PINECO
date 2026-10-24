@@ -31,22 +31,31 @@ logger = logging.getLogger("pineco")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Initialize database tables
+    # Initialize database tables gracefully so network timeouts do not cause process boot crash loops
     logger.info("Initializing database schema...")
-    Base.metadata.create_all(bind=engine)
-
-    # Seed demo data if database is empty
-    db = SessionLocal()
     try:
-        rule_count = db.query(BrandRule).filter(BrandRule.workspace_id == settings.DEFAULT_WORKSPACE_ID).count()
-        if rule_count == 0:
-            logger.info("Database empty for demo workspace. Seeding initial baseline...")
-            seed_database(db)
-            logger.info("Demo data seeding completed.")
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database schema initialized successfully.")
+
+        # Seed demo data if database is empty
+        db = SessionLocal()
+        try:
+            rule_count = db.query(BrandRule).filter(BrandRule.workspace_id == settings.DEFAULT_WORKSPACE_ID).count()
+            if rule_count == 0:
+                logger.info("Database empty for demo workspace. Seeding initial baseline...")
+                seed_database(db)
+                logger.info("Demo data seeding completed.")
+        except Exception as exc:
+            logger.error(f"Error checking or seeding database: {exc}")
+        finally:
+            db.close()
     except Exception as exc:
-        logger.error(f"Error checking or seeding database: {exc}")
-    finally:
-        db.close()
+        logger.error(f"WARNING: Database connection failed during startup: {exc}")
+        logger.error(
+            "If connecting to Supabase from Render, please ensure you use the Supabase IPv4 Pooler URL "
+            "(e.g., aws-0-[region].pooler.supabase.com:5432) rather than direct (db.xxxx.supabase.co) "
+            "because Render does not route IPv6."
+        )
 
     yield
 

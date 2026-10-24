@@ -23,6 +23,8 @@ if db_url.startswith("postgresql://") and not any(
 connect_args = {}
 if db_url.startswith("sqlite"):
     connect_args["check_same_thread"] = False
+else:
+    connect_args["connect_timeout"] = 10
 
 engine = create_engine(
     db_url,
