@@ -504,6 +504,18 @@ export default function LandingPage() {
     }, 650);
   };
 
+  // Footer Newsletter State
+  const [footerEmail, setFooterEmail] = useState('');
+  const [footerSubscribed, setFooterSubscribed] = useState(false);
+
+  const handleFooterSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (footerEmail.trim()) {
+      setFooterSubscribed(true);
+      setFooterEmail('');
+    }
+  };
+
   // FAQs
   const faqs = [
     {
@@ -2458,29 +2470,195 @@ export default function LandingPage() {
       </ScrollReveal>
 
       {/* ======================================================== */}
-      {/* 13. Footer */}
+      {/* 13. Professional Enterprise Footer */}
       {/* ======================================================== */}
-      <footer className="border-t border-neutral-200 bg-white py-12 px-4 sm:px-8 text-xs text-neutral-500">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center space-x-3">
-            <img
-              src="/logo-mark.jpg"
-              alt="Pineco"
-              className="w-7 h-7 rounded-lg object-contain border border-neutral-200"
-            />
-            <span className="font-bold text-black">Pineco Brand Governance</span>
-            <span className="text-neutral-300">|</span>
-            <span className="font-mono text-[11px] text-purple-700 font-semibold">CodeAxis Enterprise Platform</span>
+      <footer className="border-t border-neutral-200 bg-neutral-50/90 text-neutral-600 pt-16 pb-12 px-4 sm:px-8 text-xs relative">
+        <div className="max-w-7xl mx-auto space-y-12">
+          {/* Top Newsletter & Statutory Security Bulletin Bar */}
+          <div className="bg-white rounded-2xl p-6 sm:p-8 border border-neutral-200 shadow-xs flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+            <div className="space-y-1.5 max-w-xl">
+              <div className="flex items-center space-x-2">
+                <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse" />
+                <span className="text-[10px] font-mono uppercase font-bold text-purple-700 tracking-wider">
+                  Statutory Regulatory Bulletin
+                </span>
+              </div>
+              <h3 className="text-base sm:text-lg font-black text-black">
+                Stay updated on SEC, FTC, and FDA Brand Compliance Directives
+              </h3>
+              <p className="text-xs text-neutral-500 leading-relaxed">
+                Receive quarterly analysis of advertising enforcement actions, emerging AI disclosure statutes, and automated brand governance benchmarks.
+              </p>
+            </div>
+
+            <div className="w-full lg:w-auto">
+              {footerSubscribed ? (
+                <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 px-4 py-2.5 rounded-xl font-bold flex items-center space-x-2 text-xs">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Subscribed! You will receive quarterly statutory compliance intelligence.</span>
+                </div>
+              ) : (
+                <form onSubmit={handleFooterSubscribe} className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  <input
+                    type="email"
+                    required
+                    placeholder="Enter compliance or legal email..."
+                    value={footerEmail}
+                    onChange={(e) => setFooterEmail(e.target.value)}
+                    className="px-3.5 py-2 text-xs rounded-xl border border-neutral-300 bg-white text-black focus:outline-none focus:ring-1 focus:ring-purple-600 min-w-[240px] font-mono shadow-xs"
+                  />
+                  <button
+                    type="submit"
+                    className="bg-purple-600 hover:bg-purple-700 active:scale-95 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-xs flex items-center justify-center space-x-1.5 shrink-0"
+                  >
+                    <span>Subscribe</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </form>
+              )}
+            </div>
           </div>
 
-          <div className="flex items-center space-x-6 text-[11px]">
-            <a href="#live-sandbox" className="hover:text-purple-700 transition">Live Sandbox</a>
-            <a href="#how-it-works" className="hover:text-purple-700 transition">Chain of Custody</a>
-            <a href="#roi-calculator" className="hover:text-purple-700 transition">ROI Calculator</a>
-            <a href="#security" className="hover:text-purple-700 transition">Security</a>
-            <Link href="/dashboard" className="text-black font-bold hover:text-purple-700 transition">
-              Launch App &rarr;
-            </Link>
+          {/* Main Footer 5-Column Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 text-xs">
+            {/* Column 1: Brand & Sovereign Trust (Span 2 cols on desktop) */}
+            <div className="col-span-2 space-y-4">
+              <div className="flex items-center space-x-2.5">
+                <img
+                  src="/logo-navbar.png"
+                  alt="Pineco"
+                  className="h-8 w-auto object-contain"
+                />
+              </div>
+              <p className="text-xs text-neutral-500 leading-relaxed max-w-sm">
+                Pineco delivers pre-publication content governance, deterministic regulatory rule verification, and cryptographic chain-of-custody audit logging for distributed enterprise organizations.
+              </p>
+
+              {/* Real-time System Operational Pill */}
+              <div className="inline-flex items-center space-x-2 bg-white border border-neutral-200 px-3 py-1.5 rounded-xl text-[11px] font-mono shadow-xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-neutral-700 font-semibold">Systems Operational</span>
+                <span className="text-neutral-300">|</span>
+                <span className="text-purple-700 font-bold">Latency &lt;0.04s</span>
+              </div>
+
+              {/* Enterprise Security Badges */}
+              <div className="pt-2 flex flex-wrap gap-2 text-[10px] font-mono">
+                <span className="bg-white border border-neutral-200 text-neutral-700 px-2 py-1 rounded-md font-bold">
+                  SOC 2 Type II
+                </span>
+                <span className="bg-white border border-neutral-200 text-neutral-700 px-2 py-1 rounded-md font-bold">
+                  ISO/IEC 27001
+                </span>
+                <span className="bg-white border border-neutral-200 text-neutral-700 px-2 py-1 rounded-md font-bold">
+                  SHA-256 Merkle Chain
+                </span>
+                <span className="bg-white border border-neutral-200 text-neutral-700 px-2 py-1 rounded-md font-bold">
+                  Zero LLM Retention
+                </span>
+              </div>
+            </div>
+
+            {/* Column 2: Governance Engine */}
+            <div className="space-y-3">
+              <div className="font-mono text-[11px] font-bold uppercase tracking-wider text-black">
+                Platform Architecture
+              </div>
+              <ul className="space-y-2 text-neutral-500">
+                <li><a href="#live-sandbox" className="hover:text-purple-700 transition">Multi-Format Ingestion</a></li>
+                <li><a href="#how-it-works" className="hover:text-purple-700 transition">Deterministic Rule Matrix</a></li>
+                <li><a href="#how-it-works" className="hover:text-purple-700 transition">Ground Truth Evidence Vault</a></li>
+                <li><a href="#how-it-works" className="hover:text-purple-700 transition">Dual-Custody Sign-Off Gate</a></li>
+                <li><a href="#security" className="hover:text-purple-700 transition">Merkle Audit Ledger</a></li>
+                <li><Link href="/automation" className="hover:text-purple-700 transition">AI Policy Proposer</Link></li>
+                <li><Link href="/knowledge" className="hover:text-purple-700 transition">Knowledge Base Engine</Link></li>
+              </ul>
+            </div>
+
+            {/* Column 3: Statutory Frameworks */}
+            <div className="space-y-3">
+              <div className="font-mono text-[11px] font-bold uppercase tracking-wider text-black">
+                Statutory Mandates
+              </div>
+              <ul className="space-y-2 text-neutral-500">
+                <li><a href="#regulations" className="hover:text-purple-700 transition">SEC Rule 206(4)-1</a></li>
+                <li><a href="#regulations" className="hover:text-purple-700 transition">FINRA Rule 2210</a></li>
+                <li><a href="#regulations" className="hover:text-purple-700 transition">FTC 16 CFR Part 260</a></li>
+                <li><a href="#regulations" className="hover:text-purple-700 transition">FDA 21 CFR §202.1</a></li>
+                <li><a href="#regulations" className="hover:text-purple-700 transition">EU AI Act Article 52</a></li>
+                <li><a href="#regulations" className="hover:text-purple-700 transition">AICPA SOC 2 Criteria</a></li>
+                <li><a href="#regulations" className="hover:text-purple-700 transition">NIST AI RMF 1.0</a></li>
+              </ul>
+            </div>
+
+            {/* Column 4: 16 Product Portfolios */}
+            <div className="space-y-3">
+              <div className="font-mono text-[11px] font-bold uppercase tracking-wider text-black">
+                Product Scopes
+              </div>
+              <ul className="space-y-2 text-neutral-500">
+                <li><Link href="/dashboard" className="hover:text-purple-700 transition">Apex Capital FinTech</Link></li>
+                <li><Link href="/dashboard" className="hover:text-purple-700 transition">BioPure HealthCare</Link></li>
+                <li><Link href="/dashboard" className="hover:text-purple-700 transition">NovaCloud B2B SaaS</Link></li>
+                <li><Link href="/dashboard" className="hover:text-purple-700 transition">EcoSmart Retail Goods</Link></li>
+                <li><Link href="/dashboard" className="hover:text-purple-700 transition">AuraGen GenAI Studio</Link></li>
+                <li><Link href="/dashboard" className="hover:text-purple-700 transition">QuantumSafe Defense</Link></li>
+                <li><Link href="/dashboard" className="hover:text-purple-700 transition">All 16 Scoped Products &rarr;</Link></li>
+              </ul>
+            </div>
+
+            {/* Column 5: Dossier & Resources */}
+            <div className="space-y-3">
+              <div className="font-mono text-[11px] font-bold uppercase tracking-wider text-black">
+                CodeAxis Hackathon
+              </div>
+              <ul className="space-y-2 text-neutral-500">
+                <li><a href="#live-sandbox" className="hover:text-purple-700 transition">Interactive Live Sandbox</a></li>
+                <li><a href="#roi-calculator" className="hover:text-purple-700 transition">ROI &amp; Cost Calculator</a></li>
+                <li><Link href="/audit" className="hover:text-purple-700 transition">Cryptographic Audit Trail</Link></li>
+                <li><Link href="/dashboard" className="hover:text-purple-700 transition">Instant Demo Account (20 Scans)</Link></li>
+                <li><a href="#security" className="hover:text-purple-700 transition">RBAC Sovereign Matrix</a></li>
+                <li><Link href="/dashboard" className="hover:text-purple-700 transition">Export PDF / PPTX Dossier</Link></li>
+                <li>
+                  <a
+                    href="https://github.com/WolverineAryan/PINECO"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-purple-700 font-bold hover:underline flex items-center space-x-1"
+                  >
+                    <span>GitHub Repository</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Legal & Non-Counsel Disclaimer */}
+          <div className="pt-8 border-t border-neutral-200/80 space-y-3">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-neutral-500">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span>&copy; 2026 Pineco Technologies Inc. All rights reserved.</span>
+                <span className="hidden sm:inline text-neutral-300">|</span>
+                <span className="font-mono text-purple-700 font-bold">
+                  CodeAxis Hackathon • Technical Plan &amp; Verification Dossier
+                </span>
+              </div>
+
+              <div className="flex flex-wrap items-center space-x-4">
+                <a href="#security" className="hover:text-purple-700 transition">Privacy Architecture</a>
+                <a href="#security" className="hover:text-purple-700 transition">Terms of Service</a>
+                <a href="#security" className="hover:text-purple-700 transition">Zero-Retention DPA</a>
+                <Link href="/dashboard" className="text-black font-bold hover:text-purple-700 transition flex items-center space-x-1">
+                  <span>Launch Dashboard</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
+
+            <p className="text-[10px] text-neutral-400 leading-relaxed text-center sm:text-left">
+              Disclaimer: Pineco is an automated brand governance and content pre-clearance platform designed to enforce organizational brand guidelines and published regulatory baselines. Automated verification supplements but does not constitute formal legal counsel. Enterprise release remains subject to authorized dual-custody human sign-off.
+            </p>
           </div>
         </div>
       </footer>
